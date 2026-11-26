@@ -10,7 +10,7 @@ import frappe
 from .apply import SETTINGS, THEME_FILE
 
 
-def state() -> str:
+def state() -> None:
 	files = frappe.get_all(
 		"File",
 		filters={"file_name": ["like", "wk-theme%"]},
@@ -40,14 +40,11 @@ def state() -> str:
 		"theme_file_count": len([row for row in files if row.file_name == THEME_FILE]),
 	}
 	print(json.dumps(data, sort_keys=True))
-	return json.dumps(data, sort_keys=True)
 
 
-def reapply() -> str:
+def reapply() -> None:
 	"""Run the install hook and `apply` again; print what they changed (must be `{}` and `{}`)."""
 	from .apply import apply
 	from .install import after_install
 
-	out = json.dumps({"after_install": after_install(), "apply": apply()}, sort_keys=True)
-	print(out)
-	return out
+	print(json.dumps({"after_install": after_install(), "apply": apply()}, sort_keys=True))
