@@ -6,7 +6,7 @@ articles of www.erp-crm.org. Its sources are in `tasmail/erpnext-infra`, not in 
 
 - Wiki pages: `website/erpcrm_docs/pages/kit-*.md` (Ukrainian) and `website/erpcrm_docs_en/pages/kit-*.md` (English);
 - articles: `website/erpcrm_blog/{uk,en}/kit-*.md`;
-- the list of claims with their sources in this repository, and the screenshots: `docs/erp-crm.org/website-kit-docs.md`.
+- `docs/erp-crm.org/website-kit-docs.md` (also in `tasmail/erpnext-infra`): the claims of the texts with their sources in this kit repository (file and line, or test), the screenshots and the flip steps.
 
 The technical contract of the kit stays here: [theming](../theming.md), [pages and contact form](../pages.md),
 [fonts](../fonts.md), [licensing](../licensing.md).
