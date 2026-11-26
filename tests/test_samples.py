@@ -85,7 +85,7 @@ def test_the_shop_stylesheet_is_scoped_to_the_shop_pages():
 	css = (ROOT / "website_kit/public/css/wk-shop.css").read_text(encoding="utf-8")
 	body = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
 	selectors = [s.strip() for block in re.findall(r"([^{}]+)\{", body) for s in block.split(",")]
-	assert selectors and all(s.startswith((".wk-shop ", "body.wk-shop")) for s in selectors), selectors
+	assert selectors and all(s.startswith((".wk-shop ", "body.wk-shop", "@media")) for s in selectors), selectors
 	assert "url(" not in body and "@import" not in body and "@font-face" not in body
 	# the main job is to point Frappe's design variables at the kit tokens, so inline `var(--gray-800)` in Webshop's markup follows the preset
 	for variable in ("--text-color", "--gray-800", "--border-color", "--bg-color", "--primary"):

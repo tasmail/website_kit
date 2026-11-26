@@ -172,7 +172,7 @@ Selectors on internal classes (such as the parts of the header) or on Frappe and
 While Webshop is on, the kit adds the body class `wk-shop` and one more stylesheet, `/assets/website_kit/css/wk-shop.css` (about 1 KB
 gzip), on the Webshop pages only: the catalogue and its sub-routes, search, cart, orders, wishlist, checkout and the product pages. Webshop's
 markup is written against Frappe's design variables (`var(--gray-800)` even in inline styles), so the stylesheet points those variables
-(`--text-color`, `--gray-*`, `--border-color`, `--bg-color`, `--primary`, ...) at the kit tokens under `.wk-shop`, plus a few rules for the card
+(`--text-color`, `--gray-*`, `--border-color`, `--bg-color`, `--primary`, ...) at the kit tokens on the `wk-shop` body, plus a few rules for the card
 variant, radii and fonts. A preset, including the dark one, therefore re-skins the stock markup without light text on a white card. It
 adds no layout rules: Frappe's `website.bundle.css` and Webshop's bundle stay in charge of the layout, which is why the kit keeps the stock
 `Standard` Website Theme. That markup is outside the contract above, so a Webshop release can change it; CI renders the pages in Chrome

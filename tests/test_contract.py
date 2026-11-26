@@ -111,7 +111,7 @@ def test_templates_use_only_documented_classes():
 
 def test_every_class_of_the_stylesheet_is_documented_or_internal():
 	"""The other direction: a new public-looking class in wk.css must be added to the contract or be internal."""
-	internal = re.compile(r"^wk-(header__|footer__|menu)")
+	internal = re.compile(r"^wk-(header__|footer__|menu|shop$)")
 	found = {f".{name}" for name in re.findall(r"\.(wk-[a-z0-9_-]+)", BASE_CSS) if not internal.match(name)}
 	assert found == CLASSES
 
