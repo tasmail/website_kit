@@ -90,3 +90,17 @@ def test_the_shop_stylesheet_is_scoped_to_the_shop_pages():
 	assert "url(" not in body and "@import" not in body and "@font-face" not in body
 	# the variable remap moved to wk.css (`:root`): the shop sheet does not repeat it
 	assert "--gray-800" not in body and "--text-muted" not in body
+
+
+def test_group_and_unit_names_follow_the_site_language():
+	assert (samples.group_name("uk"), samples.uom_name("uk")) == ("Зразки", "шт")
+	assert (samples.group_name("uk-UA"), samples.uom_name("uk-UA")) == ("Зразки", "шт")
+	for lang in ("en", "de", "", None):
+		assert (samples.group_name(lang), samples.uom_name(lang)) == ("Sample", "Nos"), lang
+
+
+def test_the_unit_is_tagged_like_every_other_record_the_kit_creates():
+	"""A "шт" unit made for the samples must be removed with them; the source lists UOM among the tagged doctypes."""
+	source = (ROOT / "website_kit/shop.py").read_text(encoding="utf-8")
+	assert re.search(r'TAGGED = \((?=[^)]*"UOM")', source)
+	assert "samples.uom_name" in source and '"stock_uom": "Nos"' not in source

@@ -4,14 +4,14 @@ Releases before 0.3 assigned a kit-owned Website Theme that needed a per-site no
 Frappe printed `href="None"` and omitted its base stylesheet, so the stock pages (the Webshop catalogue, the 404 page) came out
 unstyled. This patch runs before the `after_migrate` hooks (Frappe's own re-saves, and so re-compiles, the active theme there),
 switches only the exact value `Website Kit` to `Standard`, and deletes the retired record and the CSS files it generated
-(`website_theme/website_kit_*.css`) when nothing selects it. Idempotent.
+(`website_theme/website_kit_<8 hex>.css` and `website_kit_style.css`, nothing else) when nothing selects it. Idempotent.
 """
 
 import os
 
 import frappe
 
-from website_kit import apply
+from website_kit import apply, settings_sync
 
 
 def execute():
@@ -33,7 +33,7 @@ def remove_generated_files() -> list[str]:
 	removed = []
 	if os.path.isdir(folder):
 		for name in sorted(os.listdir(folder)):
-			if name.startswith("website_kit_") and name.endswith(".css"):
+			if settings_sync.is_retired_theme_file(name):
 				os.remove(os.path.join(folder, name))
 				removed.append(name)
 	return removed

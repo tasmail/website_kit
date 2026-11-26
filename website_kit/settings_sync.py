@@ -9,10 +9,15 @@ styles) and the kit adds `wk.css` and the generated token file on top. A kit rel
 customer's own theme and is never touched.
 """
 
+import re
+
 from . import guard_keys, seo
 
 OLD_THEME = "Website Kit"  # assigned by releases before 0.3; the only value the kit ever replaces
 STOCK_THEME = "Standard"
+# The CSS files the retired theme compiled: `website_kit_<8 hex>.css` and `website_kit_style.css`. Nothing else matches, so the
+# files of a customer's own theme (for example "Website Kit 2" -> `website_kit_2_<hash>.css`) are never removed.
+RETIRED_THEME_FILE = re.compile(r"website_kit_(?:[0-9a-f]{8}|style)\.css")
 NAVBAR = "WK Navbar"
 FOOTER = "WK Footer"
 
@@ -23,6 +28,11 @@ OWNED = {
 	"footer_template": (FOOTER, (None, "", "Standard Footer", FOOTER)),
 }
 FIELDS = (*OWNED, "robots_txt")
+
+
+def is_retired_theme_file(name: str) -> bool:
+	"""True for a file name that only the retired `Website Kit` theme produced."""
+	return RETIRED_THEME_FILE.fullmatch(name) is not None
 
 
 def website_settings_changes(current: dict, allow_search_engines) -> dict:

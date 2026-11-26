@@ -6,7 +6,9 @@ carry the tag field `website_kit_sample`.
 """
 
 TAG_FIELD = "website_kit_sample"
-ITEM_GROUP = "Sample"
+# The item group and the unit are shown on the shop pages, so they follow the site language like the item texts do.
+GROUPS = {"en": "Sample", "uk": "Зразки"}
+UOMS = {"en": "Nos", "uk": "шт"}
 FILE_PREFIX = "wk-sample-"
 SIZE = (480, 360)
 
@@ -31,6 +33,20 @@ def item_code(slug: str) -> str:
 
 def file_name(slug: str) -> str:
 	return f"{FILE_PREFIX}{slug}.svg"
+
+
+def _by_language(names: dict, lang) -> str:
+	return names.get((lang or "en")[:2], names["en"])
+
+
+def group_name(lang) -> str:
+	"""The name of the item group of the samples in the site language, English when there is no translation."""
+	return _by_language(GROUPS, lang)
+
+
+def uom_name(lang) -> str:
+	"""The stock unit of the samples in the site language ("шт" or "Nos")."""
+	return _by_language(UOMS, lang)
 
 
 def text_for(entry: tuple, lang: str) -> tuple[str, str]:

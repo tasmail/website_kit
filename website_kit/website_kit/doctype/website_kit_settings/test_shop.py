@@ -189,7 +189,7 @@ class TestShop(TestCase):
 		self.assertEqual(shop.load_samples()["created"], 0)  # idempotent
 		for doctype in ("Item", "Website Item", "Item Price"):
 			self.assertEqual(len(shop.tagged(doctype)), len(samples.ITEMS), doctype)
-		self.assertTrue(frappe.db.exists("Item Group", samples.ITEM_GROUP))
+		self.assertTrue(frappe.db.exists("Item Group", samples.group_name(shop.site_language())))
 		item = frappe.get_doc("Item", samples.item_code("mug"))
 		self.assertEqual((item.is_stock_item, item.is_sales_item), (0, 1))
 		website_item = frappe.get_doc("Website Item", {"item_code": item.name})
