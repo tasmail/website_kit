@@ -28,6 +28,12 @@ def sources_in_code():
 	return found
 
 
+def sources_of_stock_pages():
+	"""Strings of the stock Webshop pages that the kit translates on purpose (Webshop ships no Ukrainian)."""
+	lines = (PKG / "translations" / "webshop_sources.txt").read_text(encoding="utf-8").splitlines()
+	return {line for line in lines if line and not line.startswith("#")}
+
+
 def sources_in_data():
 	"""Strings that live in data files: the validator messages, the preset names and texts, the contrast pair labels."""
 	found = set(json.loads(RULES.read_text(encoding="utf-8"))["messages"].values())
@@ -57,7 +63,14 @@ def test_every_string_is_translated():
 
 
 def test_no_dead_rows():
-	assert sorted(set(UK) - (sources_in_code() | sources_in_doctype() | sources_in_data())) == []
+	assert (
+		sorted(set(UK) - (sources_in_code() | sources_in_doctype() | sources_in_data() | sources_of_stock_pages()))
+		== []
+	)
+
+
+def test_every_stock_page_string_has_a_translation():
+	assert sorted(sources_of_stock_pages() - set(UK)) == []
 
 
 def test_translations_are_ukrainian_and_keep_placeholders():

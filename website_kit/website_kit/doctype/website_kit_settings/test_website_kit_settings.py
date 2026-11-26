@@ -55,8 +55,7 @@ class TestWebsiteKitSettings(TestCase):
 		self.assertEqual(doc.preset, "clear")
 		self.assertFalse(doc.allow_search_engines)
 		self.assertTrue(doc.kit_version)
-		self.assertEqual(website_settings_state()[1]["website_theme"], "Website Kit")
-		self.assertTrue(frappe.db.exists("Website Theme", "Website Kit"))
+		self.assertEqual(website_settings_state()[1]["website_theme"], "Standard")
 		for name, kind in (("WK Navbar", "Navbar"), ("WK Footer", "Footer")):
 			template = frappe.get_doc("Web Template", name)
 			self.assertEqual((template.type, template.standard), (kind, 1))
@@ -74,6 +73,37 @@ class TestWebsiteKitSettings(TestCase):
 		self.assertEqual(doc.theme_file_url, file_doc.file_url)
 		self.assertRegex(doc.theme_file_url, r"^/files/wk-theme[0-9a-f]*\.css$")
 		self.assertEqual(file_doc.is_private, 0)
+
+	def test_a_site_on_the_retired_kit_theme_is_moved_to_the_stock_theme_even_if_the_file_step_fails(self):
+		frappe.db.set_single_value("Website Settings", "website_theme", "Website Kit")
+		with (
+			mock.patch("website_kit.apply.write_file", side_effect=RuntimeError("disk full")),
+			self.assertRaises(RuntimeError),
+		):
+			apply.apply()
+		self.assertEqual(frappe.db.get_single_value("Website Settings", "website_theme"), "Standard")
+		self.assertEqual(apply.apply(), {})
+
+	def test_the_patch_moves_the_site_and_drops_the_unused_record(self):
+		from website_kit.patches.v0_3 import use_stock_website_theme
+
+		if not frappe.db.exists("Website Theme", "Website Kit"):
+			frappe.db.sql(
+				"insert into `tabWebsite Theme` (name, theme, module, custom, creation, modified, owner, modified_by) values ('Website Kit', 'Website Kit', 'Website Kit', 0, now(), now(), 'Administrator', 'Administrator')"
+			)
+		frappe.db.set_single_value("Website Settings", "website_theme", "Website Kit")
+		use_stock_website_theme.execute()
+		self.assertEqual(frappe.db.get_single_value("Website Settings", "website_theme"), "Standard")
+		self.assertFalse(frappe.db.exists("Website Theme", "Website Kit"))
+		use_stock_website_theme.execute()  # idempotent
+
+	def test_a_customers_own_theme_is_never_replaced(self):
+		for own in ("My Theme", "Website Kit 2"):
+			frappe.db.set_single_value("Website Settings", "website_theme", own)
+			self.assertEqual(apply.ensure_stock_theme(), {})
+			apply.apply()
+			self.assertEqual(frappe.db.get_single_value("Website Settings", "website_theme"), own)
+		frappe.db.set_single_value("Website Settings", "website_theme", "Standard")
 
 	def test_apply_is_idempotent(self):
 		before = (website_settings_state(), frappe.get_doc(SETTINGS).modified, theme_files())

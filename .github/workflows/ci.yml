@@ -142,8 +142,8 @@ jobs:
       - name: Sizes of the stylesheets a public page loads
         run: |
           cd "$BENCH/sites"
-          ls -l "$SITE"/public/files/website_theme/*.css "$SITE"/public/files/wk-theme*.css assets/website_kit/css/wk.css
-          for f in "$SITE"/public/files/website_theme/*.css "$SITE"/public/files/wk-theme*.css assets/website_kit/css/wk.css; do
+          ls -l "$SITE"/public/files/wk-theme*.css assets/website_kit/css/wk.css
+          for f in "$SITE"/public/files/wk-theme*.css assets/website_kit/css/wk.css; do
             printf '%s raw=%s gzip=%s\n' "$f" "$(wc -c < "$f")" "$(gzip -9c "$f" | wc -c)"
           done
       - name: Page cache over real requests (safe mode is never cached or served to guests)
@@ -193,6 +193,23 @@ jobs:
           bench --site shop.localhost run-tests --app website_kit --module website_kit.website_kit.doctype.website_kit_settings.test_shop 2>&1 | tee "$RUNNER_TEMP/shop-tests.log"
           if grep -Eq "skipped=|skipped [0-9]+" "$RUNNER_TEMP/shop-tests.log"; then echo "the shop tests were skipped"; exit 1; fi
           grep -Eq "^Ran [1-9][0-9]* tests" "$RUNNER_TEMP/shop-tests.log"
+      # The stock Webshop pages, the login page and the 404 page in Chrome under every preset: layout facts, no href=None, the tokens applied.
+      - name: Shop pages in Chrome under every preset
+        if: matrix.frappe == '15'
+        run: |
+          cd "$BENCH"
+          bench build --apps frappe,erpnext,payments,webshop  # the pages need the built bundles
+          bench --site shop.localhost execute website_kit.probe.shop_demo
+          (bench --site shop.localhost serve --port 8001 > "$RUNNER_TEMP/serve-shop.log" 2>&1 &)
+          for _ in $(seq 1 60); do curl -fs -o /dev/null -H "Host: shop.localhost" http://127.0.0.1:8001/all-products && break; sleep 1; done
+          cd "$GITHUB_WORKSPACE"
+          npm install --no-save --no-audit --no-fund puppeteer-core@23.11.1
+          export CHROME="$(which google-chrome)"
+          for preset in clear market contrast night ledger custom; do
+            (cd "$BENCH" && bench --site shop.localhost execute website_kit.probe.set_preset --args "['$preset']")
+            LABEL="$preset" node scripts/shop_layout_check.mjs http://shop.localhost:8001 "$RUNNER_TEMP/shop-shots"
+          done
+          pkill -f "serve --port 8001" || true
       # Last: it leaves customer data (preset market) on the site, and the integration tests expect the install defaults.
       - name: Migrate keeps customer data
         run: |

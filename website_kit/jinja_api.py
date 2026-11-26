@@ -96,7 +96,7 @@ def wk_head(lang="uk", key="home"):
 	return markup.head_tags(
 		base_css=f"{runtime.BASE_CSS}?v={__version__}",
 		theme_css=theme_css,
-		robots_closed=not allow,
+		robots_closed=False,  # the robots meta tag comes from the page context (runtime.update_website_context): once, not twice
 		alternates=alternates,
 		organization=organization,
 		guard_site_key=guard_key,

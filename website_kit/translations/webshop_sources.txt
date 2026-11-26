@@ -1,0 +1,113 @@
+# Source strings of the stock Webshop and Frappe pages that uk.csv translates because Webshop ships no Ukrainian translation.
+Add a new address
+Add notes
+Add to Cart
+Add to Quote
+All Products
+Applied Coupon Code
+Apply Coupon Code
+Available on backorder
+Billing Address
+Billing Address is same as Shipping Address
+Cannot find a matching Item. Please select some other value for {0}.
+Cart
+Cart is Empty
+Categories
+Checkout
+Clear All
+Clear Values
+Clear values
+Contact Us
+Continue Selection
+Continue Shopping
+Coupons
+Customer Reviews
+Discounts
+Enter value betweeen {0} and {1}
+Explore
+FREE
+Go to Cart
+Go to Quote
+Grand Total
+Headline
+In stock
+Item
+Item Code
+Items
+Items)
+Make Purchase Invoice
+More details
+More...
+Move to Cart
+Net Total
+Net Total (
+No Reviews
+No products found
+No searches yet.
+No values
+Not in stock
+OFF
+Orders
+Organization Name
+Out of stock
+Overall Rating
+Page Not Found
+Past Orders
+Past Quotes
+Pay
+Pay Remaining
+Payment Summary
+Phone Number
+Place Order
+Please enter a coupon code
+Please enter a valid coupon code
+Prev
+Price
+Product Details
+Products
+Qty
+Quantity
+Rate
+Rate:
+Recent
+Recommended
+Request for Quote
+Review Submitted
+Sale
+Savings
+Search Results
+Search for Products
+Search {0}
+See past orders
+See past quotations
+Select Variant
+Select Variant for {0}
+Set Address
+Shipping Address
+Shop by Category
+Shopping Cart
+Something went wrong!
+Something went wrong. Please refresh or contact us.
+Sorry, something went wrong. Please refresh.
+Subtotal
+Terms and Conditions
+Thank you for submitting your review
+Thank you for the review
+The page you are looking for has gone missing.
+Total Amount
+UOM
+Valid Till
+Value must be between {0} and {1}
+Variant
+Variant of
+View
+View More
+View all reviews
+View in Cart
+View in Quote
+Wishlist
+Wishlist is empty !
+Wishlist is empty!
+Write a Review
+Your Review
+Your cart is Empty

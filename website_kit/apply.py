@@ -1,6 +1,6 @@
 """`apply()`: make a site match its Website Kit Settings, idempotently.
 
-It compiles the theme CSS, writes it as one public File with a stable name, sets the Website Theme, the Navbar and Footer
+It compiles the theme CSS, writes it as one public File with a stable name, sets the Navbar and Footer
 templates and the robots text where the customer has not chosen otherwise, and records what was applied. It writes nothing
 when nothing differs (a save of Website Settings clears the page cache) and returns what it changed, so a second run
 returns an empty dict.
@@ -36,6 +36,7 @@ def apply(settings=None, previous_email=None) -> dict:
 	release) the site fails closed: the file is rebuilt from the preset and the tokens without any Custom CSS, so the
 	forbidden CSS stops being served. The stored text is never touched; `css_notes` says why it is not applied.
 	"""
+	changes = ensure_stock_theme()  # first: a failure below must never leave the site on a theme without a stylesheet
 	with apply_lock():
 		settings = settings or frappe.get_doc(SETTINGS)
 		custom = (settings.custom_css or "") if custom_css_enabled() else ""
@@ -46,7 +47,6 @@ def apply(settings=None, previous_email=None) -> dict:
 			notes = rejection_notes(error.result)
 			custom = ""
 			css, digest = compiler.build(settings.preset, settings.token_overrides, "", settings.custom_base)
-		changes = {}
 		url, file_change = write_file(THEME_FILE, css)
 		if file_change:
 			changes["theme_file"] = file_change
@@ -107,6 +107,23 @@ def apply_lock(timeout: int = 10):
 		yield
 	finally:
 		frappe.db.sql(*release)
+
+
+def ensure_stock_theme() -> dict:
+	"""Move a site off the retired `Website Kit` Website Theme, on its own and before anything that can fail.
+
+	That theme needed a per-site node compile; where the compile did not run, Frappe printed `href="None"` and dropped all of
+	its base CSS. Only the exact value `Website Kit` is replaced, by `Standard`, which Frappe serves prebuilt.
+	"""
+	current = frappe.db.get_single_value("Website Settings", "website_theme")
+	if current != settings_sync.OLD_THEME:
+		return {}
+	frappe.db.set_single_value("Website Settings", "website_theme", settings_sync.STOCK_THEME)
+	frappe.clear_document_cache("Website Settings", "Website Settings")
+	from frappe.website.utils import clear_website_cache
+
+	clear_website_cache()
+	return {"website_settings.website_theme": settings_sync.STOCK_THEME}
 
 
 def lock_is_free() -> bool:

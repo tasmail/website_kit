@@ -35,7 +35,7 @@ def test_robots_change_never_replaces_the_customers_text():
 def test_website_settings_changes_on_a_fresh_site():
 	changes = settings_sync.website_settings_changes({}, False)
 	assert changes == {
-		"website_theme": "Website Kit",
+		"website_theme": "Standard",
 		"navbar_template": "WK Navbar",
 		"footer_template": "WK Footer",
 		"robots_txt": seo.ROBOTS_CLOSED,
@@ -60,8 +60,16 @@ def test_customer_choices_are_kept():
 def test_the_stock_defaults_may_be_replaced():
 	current = {"website_theme": "Standard", "navbar_template": "Standard Navbar"}
 	changes = settings_sync.website_settings_changes(current, True)
-	assert changes["website_theme"] == "Website Kit"
+	assert "website_theme" not in changes  # the stock theme is what the kit wants
 	assert changes["navbar_template"] == "WK Navbar"
+
+
+def test_the_retired_kit_theme_is_replaced_by_the_stock_theme_and_nothing_else_is():
+	assert (
+		settings_sync.website_settings_changes({"website_theme": "Website Kit"}, False)["website_theme"] == "Standard"
+	)
+	for own in ("My Theme", "Website Kit 2", "website kit", "Standard"):
+		assert "website_theme" not in settings_sync.website_settings_changes({"website_theme": own}, False), own
 
 
 def test_contact_us_settings_follow_the_customers_address_and_the_guard():

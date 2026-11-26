@@ -1,18 +1,24 @@
 """What the kit may write into `Website Settings`, as pure decisions.
 
-The kit sets its theme, its Navbar and Footer templates and the robots text only while the field holds nothing, the Frappe
-default or the kit's own value. A choice of the customer is never overwritten (also not on a re-install).
+The kit sets its Navbar and Footer templates and the robots text only while the field holds nothing, the Frappe default or the
+kit's own value. A choice of the customer is never overwritten (also not on a re-install).
+
+The Website Theme stays the stock `Standard` one: Frappe serves it from the prebuilt `website.bundle.css` (Bootstrap and the website
+styles) and the kit adds `wk.css` and the generated token file on top. A kit release before 0.3 assigned its own theme `Website Kit`
+(a per-site node/sass compile); a site that still holds exactly that value is moved back to `Standard`. Any other value is the
+customer's own theme and is never touched.
 """
 
 from . import guard_keys, seo
 
-THEME = "Website Kit"
+OLD_THEME = "Website Kit"  # assigned by releases before 0.3; the only value the kit ever replaces
+STOCK_THEME = "Standard"
 NAVBAR = "WK Navbar"
 FOOTER = "WK Footer"
 
 # field -> (value the kit wants, values it may replace)
 OWNED = {
-	"website_theme": (THEME, (None, "", "Standard", THEME)),
+	"website_theme": (STOCK_THEME, (None, "", OLD_THEME)),
 	"navbar_template": (NAVBAR, (None, "", "Standard Navbar", NAVBAR)),
 	"footer_template": (FOOTER, (None, "", "Standard Footer", FOOTER)),
 }

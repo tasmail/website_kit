@@ -1,0 +1,194 @@
+// Render the stock Webshop pages, the login page and the 404 page of a running site in headless Chrome and assert layout facts.
+// It guards against the unstyled shop pages (a Website Theme without a usable stylesheet): no `href="None"`, Frappe's base
+// stylesheet present, every stylesheet really served as CSS, the kit tokens applied to the page, the product list and grid
+// laid out the same for every card (also after scrolling and after the grid/list toggle), the toggle buttons clear of the
+// cards, images inside their cards, no horizontal scroll, and the narrow-screen menu collapsed.
+//
+//   npm install --no-save puppeteer-core@23.11.1
+//   CHROME=/usr/bin/google-chrome node scripts/shop_layout_check.mjs http://shop.localhost:8000 [outdir]
+//
+// The site needs Webshop on with the ten sample products (`bench execute website_kit.probe.shop_demo`). LABEL names the
+// screenshots. Exit code 1 on any failure.
+import { createRequire } from "node:module";
+import { mkdirSync } from "node:fs";
+
+const require = createRequire(import.meta.url);
+const puppeteer = require("puppeteer-core");
+const [base = "http://shop.localhost:8000", outDir = ""] = process.argv.slice(2);
+const label = process.env.LABEL || "check";
+if (outDir) mkdirSync(outDir, { recursive: true });
+
+const problems = [];
+const check = (ok, text) => {
+	if (!ok) problems.push(text);
+};
+const pause = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const browser = await puppeteer.launch({
+	executablePath: process.env.CHROME || "/usr/bin/google-chrome",
+	headless: false,
+	args: ["--headless=new", "--no-sandbox", "--disable-gpu", ...(process.env.CHROME_ARGS || "").split("|").filter(Boolean)],
+});
+
+// The route of a product page is made from the item name and a random suffix: ask the catalogue API for the first one.
+const catalogue = await fetch(new URL("/api/method/webshop.webshop.api.get_product_filter_data", base), {
+	method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ query_args: { start: 0 } }),
+}).then((r) => r.json());
+const productRoute = "/" + catalogue.message.items[0].route;
+
+const PAGES = [
+	["/all-products", "list"],
+	[productRoute, "page"],
+	["/search?search=mug", "page"],
+	["/cart", "page"],
+	["/login", "page"],
+	["/no-such-page-for-the-check", "page"],
+];
+
+async function common(page, where, themed) {
+	const info = await page.evaluate(async () => {
+		const sheets = [...document.querySelectorAll('link[rel="stylesheet"]')].map((l) => l.getAttribute("href"));
+		const served = [];
+		for (const href of sheets) {
+			if (!href || href === "None") continue;
+			const r = await fetch(href);
+			served.push({ href, status: r.status, type: r.headers.get("content-type") || "" });
+		}
+		const root = getComputedStyle(document.documentElement);
+		const probe = document.createElement("div");
+		probe.style.color = root.getPropertyValue("--wk-color-bg").trim();
+		document.body.appendChild(probe);
+		const tokenBg = getComputedStyle(probe).color;
+		probe.remove();
+		return {
+			sheets, served, tokenBg, bodyBg: getComputedStyle(document.body).backgroundColor,
+			hscroll: document.documentElement.scrollWidth > innerWidth + 1, scrollW: document.documentElement.scrollWidth,
+		};
+	});
+	check(!info.sheets.some((h) => !h || h === "None" || h.endsWith("/None")), `${where}: a stylesheet link points at None`);
+	check(info.sheets.some((h) => /website\.bundle/.test(h || "")), `${where}: Frappe's website.bundle.css is not linked`);
+	if (themed) check(info.sheets.some((h) => /wk-theme/.test(h || "")), `${where}: the kit token file is not linked`);
+	for (const s of info.served) check(s.status === 200 && /text\/css/.test(s.type), `${where}: ${s.href} is ${s.status} ${s.type}`);
+	// The login page is Frappe's own template without the kit head: stock styling, but with the stock base stylesheet.
+	check(!themed || (info.tokenBg !== "" && info.bodyBg === info.tokenBg), `${where}: body background ${info.bodyBg} is not the token --wk-color-bg ${info.tokenBg}`);
+	check(!info.hscroll, `${where}: horizontal scroll (${info.scrollW}px)`);
+}
+
+async function listFacts(page, mode) {
+	await page.mouse.move(2, 2); // a hovered card has its own shadow
+	return page.evaluate((mode) => {
+		const r = (e) => {
+			const b = e.getBoundingClientRect();
+			return { x: b.x, y: b.y + scrollY, w: b.width, h: b.height };
+		};
+		const sel = mode === "grid" ? ".products-list .card" : ".products-list .list-row";
+		const items = [...document.querySelectorAll(sel)];
+		const toggles = [...document.querySelectorAll(".toggle-container button")].map(r);
+		return {
+			items: items.map((i) => {
+				const img = i.querySelector("img");
+				const cs = getComputedStyle(i);
+				return {
+					box: r(i), img: img ? r(img) : null, radius: cs.borderTopLeftRadius, border: cs.borderTopWidth + cs.borderTopStyle,
+					bg: cs.backgroundColor, pad: cs.paddingLeft, shadow: cs.boxShadow,
+				};
+			}),
+			toggles, vw: innerWidth,
+		};
+	}, mode);
+}
+
+function sameLayout(facts, where, expectColumns) {
+	const items = facts.items;
+	check(items.length >= 10, `${where}: ${items.length} product cards, 10 expected`);
+	if (!items.length) return;
+	const first = items[0];
+	for (const [n, it] of items.entries()) {
+		check(Math.abs(it.box.w - first.box.w) <= 1, `${where}: card ${n} is ${it.box.w}px wide, card 0 is ${first.box.w}px`);
+		// A list row is as high as its text (a long name wraps); the cards of the grid share one height.
+		if (expectColumns) check(Math.abs(it.box.h - first.box.h) <= 40, `${where}: card ${n} is ${it.box.h}px high, card 0 is ${first.box.h}px`);
+		for (const key of ["radius", "border", "bg", "pad", "shadow"]) {
+			check(it[key] === first[key], `${where}: card ${n} ${key} ${it[key]} differs from card 0 ${first[key]}`);
+		}
+		check(it.img !== null, `${where}: card ${n} has no image`);
+		if (it.img) {
+			check(it.img.w <= it.box.w + 1 && it.img.h <= it.box.h + 1, `${where}: card ${n} image ${Math.round(it.img.w)}x${Math.round(it.img.h)} is larger than its card`);
+			check(it.img.x >= it.box.x - 1 && it.img.x + it.img.w <= it.box.x + it.box.w + 1, `${where}: card ${n} image sticks out of its card`);
+			check(Math.abs(it.img.w - first.img.w) <= 1 && Math.abs(it.img.h - first.img.h) <= 1, `${where}: card ${n} image box differs from card 0`);
+		}
+		check(it.box.x >= -1 && it.box.x + it.box.w <= facts.vw + 1, `${where}: card ${n} is outside the viewport horizontally`);
+	}
+	if (expectColumns) {
+		const columns = new Set(items.map((i) => Math.round(i.box.x))).size;
+		check(columns === expectColumns, `${where}: ${columns} columns, ${expectColumns} expected`);
+	}
+	for (const [n, t] of facts.toggles.entries()) {
+		check(t.w <= 80 && t.h <= 60, `${where}: toggle button ${n} is ${Math.round(t.w)}x${Math.round(t.h)}px`);
+		for (const [m, it] of items.entries()) {
+			const overlap = t.x < it.box.x + it.box.w && t.x + t.w > it.box.x && t.y < it.box.y + it.box.h && t.y + t.h > it.box.y;
+			check(!overlap, `${where}: toggle button ${n} overlaps card ${m}`);
+		}
+	}
+}
+
+async function scrollBottom(page) {
+	await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+	await pause(600);
+}
+
+try {
+	for (const size of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
+		const wide = size.width > 800;
+		for (const [path, kind] of PAGES) {
+			const page = await browser.newPage();
+			await page.setViewport(size);
+			await page.goto(new URL(path, base).href, { waitUntil: "networkidle0" });
+			const where = `${size.width}px ${path}`;
+			await common(page, where, path !== "/login");
+			if (outDir) await page.screenshot({ path: `${outDir}/${label}-${path.replace(/[^a-z]+/g, "_")}-${size.width}.png`, fullPage: kind !== "list" });
+			if (kind === "list") {
+				await page.waitForSelector(".products-list .list-row");
+				sameLayout(await listFacts(page, "list"), `${where} list`);
+				await scrollBottom(page);
+				sameLayout(await listFacts(page, "list"), `${where} list after scrolling`);
+				await page.evaluate(() => window.scrollTo(0, 0));
+				await page.click(".btn-grid-view");
+				await page.waitForSelector(".products-list .card");
+				await pause(600);
+				sameLayout(await listFacts(page, "grid"), `${where} grid`, wide ? 3 : 1);
+				if (outDir) await page.screenshot({ path: `${outDir}/${label}-grid-${size.width}.png` });
+				await scrollBottom(page);
+				sameLayout(await listFacts(page, "grid"), `${where} grid after scrolling`, wide ? 3 : 1);
+				await page.evaluate(() => window.scrollTo(0, 0));
+				await page.click(".btn-list-view");
+				await page.waitForSelector(".products-list .list-row");
+				await pause(600);
+				sameLayout(await listFacts(page, "list"), `${where} list after the toggle`);
+				const nav = await page.evaluate(() => {
+					const n = document.querySelector(".wk-header__nav");
+					const b = document.querySelector(".wk-header__burger");
+					return n && { display: getComputedStyle(n).display, burger: b ? getComputedStyle(b).display : "none" };
+				});
+				check(nav !== null, `${where}: no kit header on the shop page`);
+				if (nav && wide) {
+					check(nav.display !== "none" && nav.burger === "none", `${where}: the menu must be open and without a burger on a wide screen`);
+				} else if (nav) {
+					check(nav.display === "none" && nav.burger !== "none", `${where}: the menu must be collapsed behind a burger (${nav.display}, ${nav.burger})`);
+					await page.evaluate(() => window.scrollTo(0, 0));
+					await page.click(".wk-header__burger");
+					const open = await page.evaluate(() => getComputedStyle(document.querySelector(".wk-header__nav")).display);
+					check(open !== "none", `${where}: the burger does not open the menu`);
+				}
+			}
+			await page.close();
+		}
+	}
+} finally {
+	await browser.close();
+}
+if (problems.length) {
+	console.log(`${problems.length} problems`);
+	for (const p of problems.slice(0, 60)) console.log(" - " + p);
+	process.exit(1);
+}
+console.log("shop layout ok");

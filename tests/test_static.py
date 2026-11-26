@@ -40,12 +40,8 @@ def test_templates_never_render_site_data_without_escaping():
 
 
 def test_json_files_are_valid_and_name_the_module():
-	files = [
-		path
-		for folder in ("doctype", "web_template", "website_theme")
-		for path in (PKG / "website_kit" / folder).rglob("*.json")
-	]
-	assert len(files) >= 5
+	files = [path for folder in ("doctype", "web_template") for path in (PKG / "website_kit" / folder).rglob("*.json")]
+	assert len(files) >= 4
 	for path in files:
 		assert json.loads(path.read_text(encoding="utf-8"))["module"] == "Website Kit", path
 

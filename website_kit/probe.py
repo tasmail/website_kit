@@ -198,3 +198,32 @@ def contact_demo_off() -> None:
 	settings.recaptcha_secret = ""
 	settings.save(ignore_permissions=True)
 	frappe.db.commit()
+
+
+def shop_demo() -> None:
+	"""CI and local check: switch the shop on and load the ten sample products (needs ERPNext, Webshop and a company)."""
+	from . import shop
+
+	shop.enable_shop()
+	shop.load_samples()
+	frappe.db.commit()
+	print("shop demo ready")
+
+
+def set_preset(name: str = "clear") -> None:
+	"""CI and local check: save a preset the way the settings page does (`custom` is a copy of `market` with two changes)."""
+	import json
+
+	from .theme import editor
+
+	settings = frappe.get_doc(SETTINGS)
+	if name == "custom":
+		values = editor.duplicate_as_custom("market", "", "")
+		overrides = json.loads(values["token_overrides"])
+		overrides["tokens"].update({"color-primary": "#7c3aed", "radius-md": "16px"})
+		settings.update({**values, "token_overrides": json.dumps(overrides)})
+	else:
+		settings.update({"preset": name, "custom_base": "", "token_overrides": ""})
+	settings.save(ignore_permissions=True)
+	frappe.db.commit()
+	print(name, settings.theme_hash)
