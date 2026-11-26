@@ -165,6 +165,7 @@ jobs:
           npm install --no-save --no-audit --no-fund puppeteer-core@23.11.1 axe-core@4.10.2
           export CHROME="$(which google-chrome)"
           node scripts/axe_check.mjs "http://$SITE:8000"
+          node scripts/header_check.mjs "http://$SITE:8000"  # one header on the Builder pages and on login / the 404 page
           cd "$BENCH"
           bench --site "$SITE" set-config guard_mode enforce
           bench --site "$SITE" execute website_kit.probe.contact_demo

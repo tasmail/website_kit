@@ -1,0 +1,98 @@
+// The header of the Builder pages and of the stock pages (login, the shop, the 404 page) of a running site, in headless Chrome at a
+// phone width and a desktop width. It guards the one-header rule: the same menu everywhere, behind a native disclosure on a phone
+// that the keyboard can open and walk.
+//
+//   npm install --no-save puppeteer-core@23.11.1
+//   CHROME=/usr/bin/google-chrome node scripts/header_check.mjs http://test.localhost:8000 [outdir]
+//
+// The site needs the Builder pages of the kit (Ukrainian at the root, English under /en); the shop entry is expected only when
+// Webshop is on with a published product. Exit code 1 on any failure.
+import { createRequire } from "node:module";
+import { mkdirSync } from "node:fs";
+
+const require = createRequire(import.meta.url);
+const puppeteer = require("puppeteer-core");
+const [base = "http://test.localhost:8000", outDir = ""] = process.argv.slice(2);
+if (outDir) mkdirSync(outDir, { recursive: true });
+
+const problems = [];
+const check = (ok, text) => {
+	if (!ok) problems.push(text);
+};
+
+// A Builder page and the stock pages that must show its menu, per language.
+const SETS = [
+	{ lang: "uk", builder: "/about", stock: ["/login", "/all-products", "/no-such-page-for-the-check"] },
+	{ lang: "en", builder: "/en/about", stock: ["/login", "/all-products", "/no-such-page-for-the-check"] },
+];
+
+const browser = await puppeteer.launch({
+	executablePath: process.env.CHROME || "/usr/bin/google-chrome",
+	headless: false,
+	args: ["--headless=new", "--no-sandbox", "--disable-gpu", ...(process.env.CHROME_ARGS || "").split("|").filter(Boolean)],
+});
+
+// The links of the menu that is reachable (visible, or inside the open disclosure), in document order.
+const menuLinks = (page) =>
+	page.evaluate(() => {
+		const nav = [...document.querySelectorAll(".wk-header__nav")].find((n) => n.getBoundingClientRect().width > 0);
+		return nav ? [...nav.querySelectorAll("a")].map((a) => [a.getAttribute("href"), a.textContent.trim()]) : null;
+	});
+
+async function open(size, lang, path) {
+	const page = await browser.newPage();
+	await page.setViewport(size);
+	await page.setExtraHTTPHeaders({ "Accept-Language": lang });
+	await page.goto(new URL(path, base).href, { waitUntil: "networkidle0" });
+	return page;
+}
+
+try {
+	for (const size of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
+		const phone = size.width < 800;
+		for (const { lang, builder, stock } of SETS) {
+			const reference = await open(size, lang, builder);
+			let expected;
+			if (phone) {
+				check(await menuLinks(reference) === null, `${size.width}px ${builder}: the menu is not collapsed on a phone`);
+				await reference.focus(".wk-header__burger");
+				await reference.keyboard.press("Enter");
+			}
+			expected = await menuLinks(reference);
+			check(expected && expected.length >= 4, `${size.width}px ${builder}: the menu has ${expected ? expected.length : 0} links (home, about, contact, language, login expected)`);
+			check(expected && expected.some(([href]) => href === "/login"), `${size.width}px ${builder}: no login link`);
+			if (phone && expected) {
+				// Keyboard: Tab from the burger visits every link of the open menu, in order.
+				await reference.focus(".wk-header__burger");
+				const visited = [];
+				for (let n = 0; n < expected.length; n++) {
+					await reference.keyboard.press("Tab");
+					visited.push(await reference.evaluate(() => document.activeElement.getAttribute("href")));
+				}
+				check(JSON.stringify(visited) === JSON.stringify(expected.map(([href]) => href)), `${size.width}px ${builder}: Tab visits ${JSON.stringify(visited)}, the menu is ${JSON.stringify(expected.map(([href]) => href))}`);
+			}
+			if (outDir) await reference.screenshot({ path: `${outDir}/header-${lang}-${size.width}.png` });
+			await reference.close();
+			for (const path of stock) {
+				const page = await open(size, lang, path);
+				if (phone) {
+					await page.focus(".wk-header__burger");
+					await page.keyboard.press("Enter");
+				}
+				const got = await menuLinks(page);
+				// Same links, same labels, same order as the Builder page, in the same language.
+				check(JSON.stringify(got) === JSON.stringify(expected), `${size.width}px ${path} (${lang}): menu ${JSON.stringify(got)} differs from ${builder}: ${JSON.stringify(expected)}`);
+				if (outDir) await page.screenshot({ path: `${outDir}/header-${lang}-${path.replace(/[^a-z]+/g, "_")}-${size.width}.png` });
+				await page.close();
+			}
+		}
+	}
+} finally {
+	await browser.close();
+}
+if (problems.length) {
+	console.log(`${problems.length} problems`);
+	for (const p of problems.slice(0, 40)) console.log(" - " + p);
+	process.exit(1);
+}
+console.log("header ok");

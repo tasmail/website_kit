@@ -69,7 +69,7 @@ async function common(page, where, themed) {
 	check(info.sheets.some((h) => /website\.bundle/.test(h || "")), `${where}: Frappe's website.bundle.css is not linked`);
 	if (themed) check(info.sheets.some((h) => /wk-theme/.test(h || "")), `${where}: the kit token file is not linked`);
 	for (const s of info.served) check(s.status === 200 && /text\/css/.test(s.type), `${where}: ${s.href} is ${s.status} ${s.type}`);
-	// The login page is Frappe's own template without the kit head: stock styling, but with the stock base stylesheet.
+	// The login page replaces Frappe's head block: the kit sheets reach it through the navbar, so it is themed like the rest.
 	check(!themed || (info.tokenBg !== "" && info.bodyBg === info.tokenBg), `${where}: body background ${info.bodyBg} is not the token --wk-color-bg ${info.tokenBg}`);
 	check(!info.hscroll, `${where}: horizontal scroll (${info.scrollW}px)`);
 }
@@ -124,6 +124,7 @@ function sameLayout(facts, where, expectColumns) {
 	}
 	for (const [n, t] of facts.toggles.entries()) {
 		check(t.w <= 80 && t.h <= 60, `${where}: toggle button ${n} is ${Math.round(t.w)}x${Math.round(t.h)}px`);
+		if (facts.vw <= 768) check(t.w >= 43.5 && t.h >= 43.5, `${where}: toggle button ${n} is ${Math.round(t.w)}x${Math.round(t.h)}px, a touch target needs 44x44`);
 		for (const [m, it] of items.entries()) {
 			const overlap = t.x < it.box.x + it.box.w && t.x + t.w > it.box.x && t.y < it.box.y + it.box.h && t.y + t.h > it.box.y;
 			check(!overlap, `${where}: toggle button ${n} overlaps card ${m}`);
@@ -146,7 +147,7 @@ async function contrastProblems(page) {
 			}
 			return [255, 255, 255];
 		};
-		const selectors = "h1, h2, h3, h4, .breadcrumb-item, .breadcrumb a, .filters-title, .filter-label, .clear-filters a, .list-row, .list-row a, .list-row p, .list-row div, .card .card-title, .card p, .card a, .product-container h1, .product-container h2, .product-container p, .product-container .product-title, .product-container .product-code, .cart-empty-message, .cart-empty-message a, .cart-container h6, .shopping-cart-header, body > div p";
+		const selectors = "h1, h2, h3, h4, .page-breadcrumbs a, .page-breadcrumbs span, .page-breadcrumbs li, .breadcrumb-item, .breadcrumb a, .text-muted, .error-text, .back-to-home a, .page-card a, .page-card p, .page-card-head h4, .for-login .sign-up-message, .for-forgot a, label, .wk-header a, .wk-header summary, .filters-title, .filter-label, .clear-filters a, .list-row, .list-row a, .list-row p, .list-row div, .card .card-title, .card p, .card a, .product-container h1, .product-container h2, .product-container p, .product-container .product-title, .product-container .product-code, .cart-empty-message, .cart-empty-message a, .cart-container h6, .shopping-cart-header, body > div p";
 		const out = [];
 		const seen = new Set();
 		for (const e of document.querySelectorAll(selectors)) {
@@ -168,6 +169,36 @@ async function contrastProblems(page) {
 	});
 }
 
+// The header on every page: the menu the visitor can reach is exactly one, open on a wide screen and behind a native disclosure on a
+// narrow one; the disclosure works from the keyboard (Enter and Space on the summary).
+async function menuChecks(page, where, wide) {
+	const info = await page.evaluate(() => {
+		const shown = (e) => e && getComputedStyle(e).display !== "none" && e.getBoundingClientRect().width > 0;
+		const burger = document.querySelector(".wk-header__burger");
+		const menu = document.querySelector(".wk-header__menu");
+		const visibleNavs = [...document.querySelectorAll(".wk-header__nav")].filter(shown);
+		return {
+			header: !!document.querySelector(".wk-header"), burger: shown(burger), menu: shown(menu), navs: visibleNavs.length,
+			checkbox: !!document.querySelector(".wk-header input[type=checkbox]"),
+		};
+	});
+	check(info.header, `${where}: no kit header`);
+	check(!info.checkbox, `${where}: the header still has a checkbox`);
+	if (wide) {
+		check(info.navs === 1 && !info.burger, `${where}: wide screen: ${info.navs} visible menus, burger ${info.burger} (one open menu, no burger expected)`);
+		return;
+	}
+	check(info.burger && info.navs === 0, `${where}: narrow screen: burger ${info.burger}, ${info.navs} visible menus (the menu must be closed behind the burger)`);
+	await page.evaluate(() => window.scrollTo(0, 0));
+	await page.focus(".wk-header__burger");
+	await page.keyboard.press("Enter");
+	const opened = await page.evaluate(() => ({ open: document.querySelector(".wk-header__menu").open, navs: [...document.querySelectorAll(".wk-header__nav")].filter((n) => n.getBoundingClientRect().width > 0).length }));
+	check(opened.open && opened.navs === 1, `${where}: Enter on the burger does not open exactly one menu (${JSON.stringify(opened)})`);
+	await page.keyboard.press("Space");
+	const closed = await page.evaluate(() => document.querySelector(".wk-header__menu").open);
+	check(!closed, `${where}: Space on the burger does not close the menu`);
+}
+
 async function scrollBottom(page) {
 	await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 	await pause(600);
@@ -181,10 +212,9 @@ try {
 			await page.setViewport(size);
 			await page.goto(new URL(path, base).href, { waitUntil: "networkidle0" });
 			const where = `${size.width}px ${path}`;
-			await common(page, where, path !== "/login");
-			if (!["/login", "/no-such-page-for-the-check"].includes(path)) {
-				for (const text of await contrastProblems(page)) check(false, `${where}: low contrast ${text}`);
-			}
+			await common(page, where, true);
+			for (const text of await contrastProblems(page)) check(false, `${where}: low contrast ${text}`);
+			await menuChecks(page, where, wide);
 			if (outDir) await page.screenshot({ path: `${outDir}/${label}-${path.replace(/[^a-z]+/g, "_")}-${size.width}.png`, fullPage: kind !== "list" });
 			if (kind === "list") {
 				await page.waitForSelector(".products-list .list-row");
@@ -204,21 +234,6 @@ try {
 				await page.waitForSelector(".products-list .list-row");
 				await pause(600);
 				sameLayout(await listFacts(page, "list"), `${where} list after the toggle`);
-				const nav = await page.evaluate(() => {
-					const n = document.querySelector(".wk-header__nav");
-					const b = document.querySelector(".wk-header__burger");
-					return n && { display: getComputedStyle(n).display, burger: b ? getComputedStyle(b).display : "none" };
-				});
-				check(nav !== null, `${where}: no kit header on the shop page`);
-				if (nav && wide) {
-					check(nav.display !== "none" && nav.burger === "none", `${where}: the menu must be open and without a burger on a wide screen`);
-				} else if (nav) {
-					check(nav.display === "none" && nav.burger !== "none", `${where}: the menu must be collapsed behind a burger (${nav.display}, ${nav.burger})`);
-					await page.evaluate(() => window.scrollTo(0, 0));
-					await page.click(".wk-header__burger");
-					const open = await page.evaluate(() => getComputedStyle(document.querySelector(".wk-header__nav")).display);
-					check(open !== "none", `${where}: the burger does not open the menu`);
-				}
 			}
 			await page.close();
 		}

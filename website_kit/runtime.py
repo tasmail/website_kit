@@ -4,7 +4,7 @@ import json
 
 import frappe
 
-from . import WK_THEME_API, __version__, seo
+from . import WK_THEME_API, __version__, seo, stockpage
 from .theme.escape import esc, safe_url
 
 SETTINGS = "Website Kit Settings"
@@ -106,6 +106,13 @@ def before_request():
 		frappe.local.no_cache = 1
 
 
+def webshop_messages() -> dict:
+	"""The Webshop script strings in the language of the request; empty for English, where nothing needs translating."""
+	if (getattr(frappe.local, "lang", "") or "en").startswith("en"):
+		return {}
+	return stockpage.translated(lambda text, context: frappe._(text, context=context))
+
+
 def update_website_context(context):
 	"""Hook `update_website_context`: the stylesheet links, the `wk` template values and the robots meta tag."""
 	settings = _settings()
@@ -116,14 +123,22 @@ def update_website_context(context):
 	if link:
 		links += f'<link rel="stylesheet" href="{esc(link)}">'
 	shop_on = _shop_enabled() and is_shop_page(context)
+	shop_link = f"{SHOP_CSS}?v={__version__}" if shop_on else ""
 	if shop_on:
-		links += f'<link rel="stylesheet" href="{SHOP_CSS}?v={__version__}">'
+		links += f'<link rel="stylesheet" href="{shop_link}">'
 	brand = (settings.brand_name if settings else "") or frappe.get_website_settings("app_name") or ""
 	values = {
 		"head_include": (context.get("head_include") or "") + links,
 		"metatags": seo.metatags(context.get("metatags"), allow),
 		# Strings for the standard templates: already escaped, braces encoded, so they are inert even in a second Jinja pass.
-		"wk": {"brand_name": esc(brand), "theme_api": WK_THEME_API, "mode": mode},
+		"wk": {
+			"brand_name": esc(brand),
+			"theme_api": WK_THEME_API,
+			"mode": mode,
+			# What the navbar emits itself: Frappe's login page replaces the whole head_include block (see stockpage.py).
+			"links": stockpage.links(f"{BASE_CSS}?v={__version__}", link, shop_link),
+			"scripts": stockpage.scripts(guard=True, messages=webshop_messages() if shop_on else {}),
+		},
 	}
 	if shop_on:
 		values["body_class"] = f"{context.get('body_class') or ''} wk-shop".strip()
