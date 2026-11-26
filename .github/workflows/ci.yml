@@ -24,7 +24,16 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
       - run: pip install ruff==0.17.0 pytest==9.2.0 pytest-cov==7.1.0 jinja2 fonttools brotli
+      # The browser oracle: Chromium loads the CSS that the validator accepts and no request may leave the allow-list.
+      - name: Playwright and Chromium
+        if: matrix.python-version == '3.12'
+        run: |
+          pip install playwright==1.49.1
+          playwright install --with-deps chromium
       - run: ruff check .
       - run: ruff format --check .
       - run: pytest --cov --cov-report=term-missing
@@ -137,6 +146,11 @@ jobs:
           for f in "$SITE"/public/files/website_theme/*.css "$SITE"/public/files/wk-theme*.css assets/website_kit/css/wk.css; do
             printf '%s raw=%s gzip=%s\n' "$f" "$(wc -c < "$f")" "$(gzip -9c "$f" | wc -c)"
           done
+      - name: Page cache over real requests (safe mode is never cached or served to guests)
+        run: |
+          cd "$BENCH"
+          bench build --app frappe  # a page render needs the built bundles (assets.json)
+          bench --site "$SITE" execute website_kit.probe.http_cache_check
       - name: Frappe integration tests
         run: |
           cd "$BENCH"

@@ -13,7 +13,9 @@ site. The pages were looked at in a browser on a test bench (see `docs/pages.md`
 What exists:
 
 - `Website Kit Settings` (a Single DocType): preset, token overrides (JSON), brand name, "Allow search engines" (off by default).
-  The `custom_css` field is a read-only placeholder; nothing typed there is ever served.
+  The settings page has preset cards with a live preview, a `custom` theme editor (colours with contrast checks, fonts, corners,
+  density, variants), Custom CSS with a parser-based validator and a client twin, draft preview, safe mode (`?wk_safe=1`),
+  versions and "Reset to preset" (see [docs/theming.md](docs/theming.md)).
 - The token layer (`--wk-*` custom properties and `data-wk-*` variants) and five presets as data: `clear` (default), `market`,
   `contrast` (7:1), `night`, `ledger`. They compile into one small plain CSS file per site (`/files/wk-theme.css`); there is
   no SCSS or node step at runtime. The public names are documented in [docs/theming.md](docs/theming.md) and guarded by a
@@ -34,8 +36,7 @@ What exists:
   phone instead. A release updates a page the customer did not touch and writes a draft next to one that was edited.
   See [docs/pages.md](docs/pages.md).
 
-What does not exist yet: the settings page with preset cards and the Custom CSS editor and validator, the shop (Webshop) styling
-and sample products, the setup-wizard stage, the "Public website" switch, and any deployment. These are planned in the analysis `docs/site-default-theme-analysis.md` of `tasmail/erpnext-infra`.
+What does not exist yet: the "Public website" switch, and any deployment. These are planned in the analysis `docs/site-default-theme-analysis.md` of `tasmail/erpnext-infra`.
 
 Public pages load three stylesheets: the Website Theme CSS that Frappe compiles (full Bootstrap and website styles, not minimal), `wk.css`
 and the generated `wk-theme.css`. Measured on the Frappe 15.128.0 CI bench (files, not a browser): the Website Theme CSS is 453 KB raw / 69 KB gzip, `wk.css` 5.9 KB / 1.5 KB, `wk-theme.css` 3.7 KB / 1.0 KB. The Website Theme bundle is the heavy part and is Frappe's, not the kit's; the CI job prints the sizes on every run.

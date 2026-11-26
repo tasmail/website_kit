@@ -1,0 +1,2680 @@
+[
+	{
+		"id": "empty",
+		"css": "",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "only-comment",
+		"css": "/* nothing here */",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "simple",
+		"css": ".wk-card { color: #111; background: #fff; }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "hook-contact-form",
+		"css": ".wk-contact-form { margin-block: 2rem; }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "hook-footer-legal",
+		"css": ".wk-footer-legal a { text-decoration: underline; }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "hook-price",
+		"css": ".wk-price { font-weight: 700; }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "hook-cart",
+		"css": ".wk-cart { padding: 1rem; }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "hook-login-link",
+		"css": ".wk-login-link:hover { color: var(--wk-color-primary); }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "tokens",
+		"css": ":root { --wk-color-primary: #c2410c !important; --wk-radius-md: 12px; }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "custom-prop",
+		"css": ":root { --cx-gap: calc(var(--wk-space-unit) * 3); }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "media-width",
+		"css": "@media (min-width: 768px) and (max-width: 1200px) { .wk-card { padding: 2rem; } }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "media-print",
+		"css": "@media print { .wk-header { display: none; } }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "media-scheme",
+		"css": "@media (prefers-color-scheme: dark) { body { background: #000; color: #fff; } }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "media-reduced",
+		"css": "@media (prefers-reduced-motion: reduce) { * { transition: none; } }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "media-orientation",
+		"css": "@media screen and (orientation: landscape) { h1 { font-size: 3rem; } }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "supports",
+		"css": "@supports (display: grid) { .wk-card { display: grid; } }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "supports-not",
+		"css": "@supports not (display: grid) { .wk-card { float: left; } }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "keyframes",
+		"css": "@keyframes cx-fade { from { opacity: 0; } 50% { opacity: .5; } to { opacity: 1; } }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "keyframes-in-media",
+		"css": "@media (min-width: 1px) { @keyframes cx-a { from { top: 0 } to { top: 1px } } }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "font-face-local",
+		"css": "@font-face { font-family: 'Mine'; src: local('Arial'); font-display: swap; }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "url-files",
+		"css": ".wk-header { background: url(/files/bg.png) no-repeat; }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "url-assets-quoted",
+		"css": ".wk-header { background-image: url('/assets/website_kit/x.svg'); }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "url-image-set-local",
+		"css": ".wk-header { background-image: image-set('/files/a.png' 1x, '/files/b.png' 2x); }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "url-data-png",
+		"css": ".wk-badge { background-image: url(data:image/png;base64,iVBORw0KGgo=); }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "gradient",
+		"css": ".wk-header { background: linear-gradient(90deg, #1d4ed8 0%, rgba(0,0,0,.5) 100%); }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "transform",
+		"css": ".wk-card:hover { transform: translateY(-2px) scale(1.02); transition: transform .2s ease-in-out; }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "pseudo-elements",
+		"css": ".wk-card::before { content: '>'; } .wk-card:after { content: ''; }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "pseudo-functions",
+		"css": "li:nth-child(2n+1):not(.wk-badge), :is(h1, h2) { margin: 0; }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "attribute-selectors",
+		"css": "a[href^='https://'][target=_blank], input[type=text] { color: #111; }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "data-attrs",
+		"css": "[data-wk-card='raised'] .wk-card { box-shadow: 0 2px 4px #0003; }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "important-on-token",
+		"css": ".x { --wk-color-text: #000 !important }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "combinators",
+		"css": "ul > li + li ~ li { margin: 0 }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "escaped-benign",
+		"css": ".wk-c\\61 rd { color: red }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "unicode-content",
+		"css": ".wk-card::before { content: 'Привіт, світе'; }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "numbers",
+		"css": "a { width: 1e3px; height: .5em; margin: -1px +2px; line-height: 1.5; }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "semicolons",
+		"css": "a { ;; color: red;; }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "multi-line",
+		"css": "a {\n  color: red;\n}\n\nb {\n  color: blue;\n}\n",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "var-fallback",
+		"css": "a { color: var(--wk-color-text, #111); }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "comment-in-value",
+		"css": "a { color: /* x */ red; }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "crlf",
+		"css": "a {\r\n color: red;\r\n}\r\n",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "big-but-fine",
+		"css": "a{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\n",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "depth-three",
+		"css": "@media (min-width: 1px) { @supports (display: grid) { a { color: red } } }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "important-uppercase",
+		"css": "a { --wk-color-text: #000 !IMPORTANT }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "hex3-contrast-ok",
+		"css": "a { color: #000; background: #fff }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "css-wide",
+		"css": "a { color: inherit; width: calc(100% - 2 * var(--wk-space-unit)); }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "unclosed-block",
+		"css": "a { color: red",
+		"errors": [
+			[
+				1,
+				3,
+				"unclosed-block"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "unclosed-paren",
+		"css": "a { width: calc(1px + 2px; }",
+		"errors": [
+			[
+				1,
+				3,
+				"unclosed-block"
+			],
+			[
+				1,
+				12,
+				"unclosed-block"
+			],
+			[
+				1,
+				28,
+				"unbalanced"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "unclosed-string",
+		"css": "a { content: 'abc }",
+		"errors": [
+			[
+				1,
+				3,
+				"unclosed-block"
+			],
+			[
+				1,
+				14,
+				"unclosed-string"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "unclosed-string-newline",
+		"css": "a { content: 'abc\n}",
+		"errors": [
+			[
+				1,
+				14,
+				"unclosed-string"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "unclosed-comment",
+		"css": "a { color: red } /* never ends",
+		"errors": [
+			[
+				1,
+				18,
+				"unclosed-comment"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "unclosed-url",
+		"css": "a { background: url(/files/x.png",
+		"errors": [
+			[
+				1,
+				3,
+				"unclosed-block"
+			],
+			[
+				1,
+				17,
+				"unclosed-url"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "extra-brace",
+		"css": "a { color: red } }",
+		"errors": [
+			[
+				1,
+				18,
+				"unbalanced"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "extra-paren",
+		"css": "a { color: red) }",
+		"errors": [
+			[
+				1,
+				15,
+				"unbalanced"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "style-breakout",
+		"css": "a { content: '</style><script>alert(1)</script>' }",
+		"errors": [
+			[
+				1,
+				15,
+				"markup"
+			],
+			[
+				1,
+				23,
+				"markup"
+			],
+			[
+				1,
+				39,
+				"markup"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "html-comment-open",
+		"css": "<!-- a { color: red }",
+		"errors": [
+			[
+				1,
+				1,
+				"bad-selector"
+			],
+			[
+				1,
+				1,
+				"markup"
+			],
+			[
+				1,
+				2,
+				"bad-selector"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "html-comment-close",
+		"css": "a { color: red } -->",
+		"errors": [
+			[
+				1,
+				18,
+				"markup"
+			],
+			[
+				1,
+				20,
+				"missing-block"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "markup-in-comment",
+		"css": "/* </style> */ a { color: red }",
+		"errors": [
+			[
+				1,
+				4,
+				"markup"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "import",
+		"css": "@import url(https://evil.example/x.css);",
+		"errors": [
+			[
+				1,
+				1,
+				"at-rule-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "import-upper",
+		"css": "@IMPORT 'x.css';",
+		"errors": [
+			[
+				1,
+				1,
+				"at-rule-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "import-escaped",
+		"css": "@\\69 mport 'x.css';",
+		"errors": [
+			[
+				1,
+				1,
+				"at-rule-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "charset",
+		"css": "@charset 'utf-8'; a { color: red }",
+		"errors": [
+			[
+				1,
+				1,
+				"at-rule-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "namespace",
+		"css": "@namespace svg url(http://www.w3.org/2000/svg);",
+		"errors": [
+			[
+				1,
+				1,
+				"at-rule-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "layer",
+		"css": "@layer base { a { color: red } }",
+		"errors": [
+			[
+				1,
+				1,
+				"at-rule-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "container",
+		"css": "@container (min-width: 1px) { a { color: red } }",
+		"errors": [
+			[
+				1,
+				1,
+				"at-rule-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "property-rule",
+		"css": "@property --x { syntax: '*'; inherits: false }",
+		"errors": [
+			[
+				1,
+				1,
+				"at-rule-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "page",
+		"css": "@page { margin: 1cm }",
+		"errors": [
+			[
+				1,
+				1,
+				"at-rule-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "font-feature-values",
+		"css": "@font-feature-values Font One { @styleset { nice: 12 } }",
+		"errors": [
+			[
+				1,
+				1,
+				"at-rule-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "unknown-at-rule",
+		"css": "@evil { a { color: red } }",
+		"errors": [
+			[
+				1,
+				1,
+				"at-rule-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "moz-document",
+		"css": "@-moz-document url-prefix() { a { color: red } }",
+		"errors": [
+			[
+				1,
+				1,
+				"at-rule-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "url-protocol-relative",
+		"css": "a { background: url(//evil.example/p.gif) }",
+		"errors": [
+			[
+				1,
+				17,
+				"url-external"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "url-https",
+		"css": "a { background: url(https://evil.example/p.gif) }",
+		"errors": [
+			[
+				1,
+				17,
+				"url-external"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "url-http-quoted",
+		"css": "a { background: url('http://evil.example/p.gif') }",
+		"errors": [
+			[
+				1,
+				17,
+				"url-external"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "url-relative",
+		"css": "a { background: url(x.png) }",
+		"errors": [
+			[
+				1,
+				17,
+				"url-external"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "url-escaped-scheme",
+		"css": "a { background: url(\\68 ttps://evil.example/p.gif) }",
+		"errors": [
+			[
+				1,
+				17,
+				"url-external"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "url-function-escaped",
+		"css": "a { background: u\\72 l(//evil.example/p.gif) }",
+		"errors": [
+			[
+				1,
+				17,
+				"url-external"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "url-uppercase",
+		"css": "a { background: URL(//evil.example/p.gif) }",
+		"errors": [
+			[
+				1,
+				17,
+				"url-external"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "url-traversal",
+		"css": "a { background: url(/files/../private/x.png) }",
+		"errors": [
+			[
+				1,
+				17,
+				"url-external"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "url-encoded-traversal",
+		"css": "a { background: url(/files/%2e%2e/x.png) }",
+		"errors": [
+			[
+				1,
+				17,
+				"url-external"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "url-backslash",
+		"css": "a { background: url('/files/\\\\evil') }",
+		"errors": [
+			[
+				1,
+				17,
+				"url-external"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "url-empty",
+		"css": "a { background: url('') }",
+		"errors": [
+			[
+				1,
+				17,
+				"url-external"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "url-in-wrong-property",
+		"css": "a { content: url(/files/x.png) }",
+		"errors": [
+			[
+				1,
+				14,
+				"url-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "url-in-custom-property",
+		"css": "a { --cx-x: url(/files/x.png) }",
+		"errors": [
+			[
+				1,
+				13,
+				"url-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "url-via-var-fallback",
+		"css": "a { background: var(--cx-a, url(//evil.example/x)) }",
+		"errors": [
+			[
+				1,
+				17,
+				"var-in-url-property"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "url-javascript",
+		"css": "a { background: url('javascript:alert(1)') }",
+		"errors": [
+			[
+				1,
+				17,
+				"script-url"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "url-javascript-unquoted",
+		"css": "a { background: url(javascript:alert(1)) }",
+		"errors": [
+			[
+				1,
+				17,
+				"bad-url"
+			],
+			[
+				1,
+				40,
+				"unbalanced"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "url-bad-spaces",
+		"css": "a { background: url(a b) }",
+		"errors": [
+			[
+				1,
+				17,
+				"bad-url"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "url-data-html",
+		"css": "a { background: url(data:text/html;base64,PHNjcmlwdD4=) }",
+		"errors": [
+			[
+				1,
+				17,
+				"url-external"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "url-data-too-big",
+		"css": "a { background: url(data:image/png;base64,AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA) }",
+		"errors": [
+			[
+				1,
+				17,
+				"url-external"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "image-set-external",
+		"css": "a { background-image: image-set('//evil.example/a.png' 1x) }",
+		"errors": [
+			[
+				1,
+				33,
+				"url-external"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "image-set-url-external",
+		"css": "a { background-image: image-set(url(https://evil.example/a.png) 1x) }",
+		"errors": [
+			[
+				1,
+				33,
+				"url-external"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "image-set-wrong-property",
+		"css": "a { width: image-set('/files/a.png' 1x) }",
+		"errors": [
+			[
+				1,
+				12,
+				"url-not-allowed"
+			],
+			[
+				1,
+				22,
+				"url-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "webkit-image-set",
+		"css": "a { background-image: -webkit-image-set(url(/files/a.png) 1x) }",
+		"errors": [
+			[
+				1,
+				23,
+				"function-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "src-function",
+		"css": "a { background-image: src('/files/a.png') }",
+		"errors": [
+			[
+				1,
+				23,
+				"function-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "attr-function",
+		"css": "a { background-image: attr(data-bg) }",
+		"errors": [
+			[
+				1,
+				23,
+				"function-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "expression",
+		"css": "a { width: expression(alert(1)) }",
+		"errors": [
+			[
+				1,
+				12,
+				"expression"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "expression-upper",
+		"css": "a { width: EXPRESSION(alert(1)) }",
+		"errors": [
+			[
+				1,
+				12,
+				"expression"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "expression-escaped",
+		"css": "a { width: expr\\65 ssion(alert(1)) }",
+		"errors": [
+			[
+				1,
+				12,
+				"expression"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "expression-comment",
+		"css": "a { width: expr/**/ession(alert(1)) }",
+		"errors": [
+			[
+				1,
+				20,
+				"function-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "behavior",
+		"css": "a { behavior: url(x.htc) }",
+		"errors": [
+			[
+				1,
+				5,
+				"property-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "behavior-escaped",
+		"css": "a { b\\65 havior: url(x.htc) }",
+		"errors": [
+			[
+				1,
+				5,
+				"property-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "moz-binding",
+		"css": "a { -moz-binding: url(x.xml#y) }",
+		"errors": [
+			[
+				1,
+				5,
+				"property-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "ms-filter",
+		"css": "a { -ms-filter: 'alpha(opacity=50)' }",
+		"errors": [
+			[
+				1,
+				5,
+				"property-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "filter-progid",
+		"css": "a { filter: progid:DXImageTransform.Microsoft.Alpha(opacity=50) }",
+		"errors": [
+			[
+				1,
+				47,
+				"function-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "zoom",
+		"css": "a { zoom: 1 }",
+		"errors": [
+			[
+				1,
+				5,
+				"property-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "unknown-property",
+		"css": "a { speak: none }",
+		"errors": [
+			[
+				1,
+				5,
+				"property-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "custom-property-bad-prefix",
+		"css": "a { --evil: 1 }",
+		"errors": [
+			[
+				1,
+				5,
+				"custom-property"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "string-javascript",
+		"css": "a { content: 'javascript:alert(1)' }",
+		"errors": [
+			[
+				1,
+				14,
+				"script-url"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "string-javascript-escaped",
+		"css": "a { content: 'java\\73 cript:alert(1)' }",
+		"errors": [
+			[
+				1,
+				14,
+				"script-url"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "string-javascript-tab",
+		"css": "a { content: 'java\tscript:alert(1)' }",
+		"errors": [
+			[
+				1,
+				14,
+				"script-url"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "string-javascript-fullwidth",
+		"css": "a { content: 'ｊａｖａｓｃｒｉｐｔ:alert(1)' }",
+		"errors": [
+			[
+				1,
+				14,
+				"script-url"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "string-vbscript",
+		"css": "a { content: 'VBScript:x' }",
+		"errors": [
+			[
+				1,
+				14,
+				"script-url"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "zero-width-in-scheme",
+		"css": "a { content: 'java​script:alert(1)' }",
+		"errors": [
+			[
+				1,
+				14,
+				"script-url"
+			],
+			[
+				1,
+				19,
+				"control-char"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "desk-class",
+		"css": ".desk a { color: red }",
+		"errors": [
+			[
+				1,
+				2,
+				"selector-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "navbar-desk",
+		"css": ".navbar-desk { color: red }",
+		"errors": [
+			[
+				1,
+				2,
+				"selector-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "modal-class",
+		"css": ".modal-body { color: red }",
+		"errors": [
+			[
+				1,
+				2,
+				"selector-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "desk-escaped",
+		"css": ".d\\65 sk { color: red }",
+		"errors": [
+			[
+				1,
+				2,
+				"selector-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "desk-uppercase",
+		"css": ".DESK { color: red }",
+		"errors": [
+			[
+				1,
+				2,
+				"selector-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "body-desk",
+		"css": "body.desk { color: red }",
+		"errors": [
+			[
+				1,
+				6,
+				"selector-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "page-id",
+		"css": "#page-home { color: red }",
+		"errors": [
+			[
+				1,
+				1,
+				"selector-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "data-route",
+		"css": "[data-route^='app'] { color: red }",
+		"errors": [
+			[
+				1,
+				1,
+				"selector-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "class-attribute-desk",
+		"css": "[class*=desk] { color: red }",
+		"errors": [
+			[
+				1,
+				1,
+				"selector-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "desk-in-not",
+		"css": ".wk-card:not(.desk) { color: red }",
+		"errors": [
+			[
+				1,
+				15,
+				"selector-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "desk-in-is",
+		"css": ":is(.wk-card, .modal) { color: red }",
+		"errors": [
+			[
+				1,
+				16,
+				"selector-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "desk-in-nth-of",
+		"css": "li:nth-child(2 of .desk) { color: red }",
+		"errors": [
+			[
+				1,
+				16,
+				"bad-selector"
+			],
+			[
+				1,
+				19,
+				"bad-selector"
+			],
+			[
+				1,
+				20,
+				"bad-selector"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "has-pseudo",
+		"css": ".wk-card:has(.x) { color: red }",
+		"errors": [
+			[
+				1,
+				10,
+				"pseudo-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "unknown-pseudo",
+		"css": "a:visited-x { color: red }",
+		"errors": [
+			[
+				1,
+				3,
+				"pseudo-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "pseudo-element-unknown",
+		"css": "a::-webkit-scrollbar { color: red }",
+		"errors": [
+			[
+				1,
+				4,
+				"pseudo-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "empty-selector",
+		"css": "{ color: red }",
+		"errors": [
+			[
+				1,
+				1,
+				"empty-selector"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "selector-percent",
+		"css": "a % b { color: red }",
+		"errors": [
+			[
+				1,
+				3,
+				"bad-selector"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "nested-rule",
+		"css": "a { b { color: red } }",
+		"errors": [
+			[
+				1,
+				7,
+				"nested-rule"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "nested-media-in-rule",
+		"css": "a { @media print { color: red } }",
+		"errors": [
+			[
+				1,
+				18,
+				"nested-rule"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "too-deep",
+		"css": "@media print { @media print { @media print { a { color: red } } } }",
+		"errors": [
+			[
+				1,
+				46,
+				"too-deep"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "missing-block",
+		"css": "a { color: red } b",
+		"errors": [
+			[
+				1,
+				18,
+				"missing-block"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "at-missing-block",
+		"css": "@media print;",
+		"errors": [
+			[
+				1,
+				1,
+				"missing-block"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "bad-declaration",
+		"css": "a { color red }",
+		"errors": [
+			[
+				1,
+				5,
+				"bad-declaration"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "bad-important",
+		"css": "a { color: red !important !important }",
+		"errors": [
+			[
+				1,
+				16,
+				"bad-important"
+			]
+		],
+		"warnings": [
+			[
+				1,
+				27,
+				"important"
+			]
+		]
+	},
+	{
+		"id": "bang-in-value",
+		"css": "a { color: !red }",
+		"errors": [
+			[
+				1,
+				12,
+				"bad-important"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "media-hover",
+		"css": "@media (hover: hover) { a { color: red } }",
+		"errors": [
+			[
+				1,
+				8,
+				"media-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "media-unknown-type",
+		"css": "@media tv { a { color: red } }",
+		"errors": [
+			[
+				1,
+				8,
+				"media-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "media-range",
+		"css": "@media (width < 600px) { a { color: red } }",
+		"errors": [
+			[
+				1,
+				8,
+				"media-not-allowed"
+			],
+			[
+				1,
+				15,
+				"markup"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "supports-selector",
+		"css": "@supports selector(:has(a)) { a { color: red } }",
+		"errors": [
+			[
+				1,
+				11,
+				"supports-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "supports-url",
+		"css": "@supports (background: url(//evil.example/x)) { a { color: red } }",
+		"errors": [
+			[
+				1,
+				24,
+				"url-external"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "keyframes-unprefixed",
+		"css": "@keyframes spin { from { top: 0 } to { top: 1px } }",
+		"errors": [
+			[
+				1,
+				12,
+				"keyframes-name"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "keyframes-no-name",
+		"css": "@keyframes { from { top: 0 } }",
+		"errors": [
+			[
+				1,
+				1,
+				"keyframes-name"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "keyframes-string-name",
+		"css": "@keyframes 'cx-a' { from { top: 0 } }",
+		"errors": [
+			[
+				1,
+				12,
+				"keyframes-name"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "font-face-external",
+		"css": "@font-face { font-family: x; src: url(https://evil.example/f.woff2) format('woff2'); }",
+		"errors": [
+			[
+				1,
+				35,
+				"font-face-src"
+			],
+			[
+				1,
+				69,
+				"function-not-allowed"
+			]
+		],
+		"warnings": [
+			[
+				1,
+				1,
+				"font-display-missing"
+			]
+		]
+	},
+	{
+		"id": "font-face-relative",
+		"css": "@font-face { font-family: x; src: url(f.woff2); font-display: swap }",
+		"errors": [
+			[
+				1,
+				35,
+				"font-face-src"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "font-face-property",
+		"css": "@font-face { font-family: x; color: red }",
+		"errors": [
+			[
+				1,
+				30,
+				"property-not-allowed"
+			]
+		],
+		"warnings": [
+			[
+				1,
+				1,
+				"font-display-missing"
+			]
+		]
+	},
+	{
+		"id": "font-face-selector",
+		"css": "@font-face a { font-family: x }",
+		"errors": [
+			[
+				1,
+				12,
+				"bad-selector"
+			]
+		],
+		"warnings": [
+			[
+				1,
+				1,
+				"font-display-missing"
+			]
+		]
+	},
+	{
+		"id": "control-nul",
+		"css": "a { color: red\u0000 }",
+		"errors": [
+			[
+				1,
+				15,
+				"control-char"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "control-bidi",
+		"css": "a { content: '‮abc' }",
+		"errors": [
+			[
+				1,
+				15,
+				"control-char"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "control-bom",
+		"css": "﻿a { color: red }",
+		"errors": [
+			[
+				1,
+				1,
+				"control-char"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "control-c1",
+		"css": "a { content: '' }",
+		"errors": [
+			[
+				1,
+				15,
+				"control-char"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "too-large",
+		"css": "a{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\na{color:red}\n",
+		"errors": [
+			[
+				1,
+				1,
+				"too-large"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "too-many-rules",
+		"css": "a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}a{color:red}",
+		"errors": [
+			[
+				1,
+				18001,
+				"too-many-rules"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "brace-in-custom-property",
+		"css": "a { --cx-x: { color: red } }",
+		"errors": [
+			[
+				1,
+				13,
+				"nested-rule"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "at-in-value",
+		"css": "a { color: @red }",
+		"errors": [
+			[
+				1,
+				12,
+				"bad-selector"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "backslash-eof",
+		"css": "a { color: red; \\",
+		"errors": [
+			[
+				1,
+				3,
+				"unclosed-block"
+			],
+			[
+				1,
+				17,
+				"bad-declaration"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "function-unknown",
+		"css": "a { color: evil(1) }",
+		"errors": [
+			[
+				1,
+				12,
+				"function-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "paint-function",
+		"css": "a { background-image: paint(x) }",
+		"errors": [
+			[
+				1,
+				23,
+				"function-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "local-outside-font-face",
+		"css": "a { color: local(x) }",
+		"errors": [
+			[
+				1,
+				12,
+				"function-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "cdo-token",
+		"css": "a { color: red } <!--",
+		"errors": [
+			[
+				1,
+				18,
+				"bad-selector"
+			],
+			[
+				1,
+				18,
+				"markup"
+			],
+			[
+				1,
+				19,
+				"bad-selector"
+			],
+			[
+				1,
+				20,
+				"missing-block"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "multi-error-lines",
+		"css": "a { behavior: x }\nb { zoom: 1 }",
+		"errors": [
+			[
+				1,
+				5,
+				"property-not-allowed"
+			],
+			[
+				2,
+				5,
+				"property-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "unicode-line-col",
+		"css": "/* Привіт */ a { speak: x }",
+		"errors": [
+			[
+				1,
+				18,
+				"property-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "astral-line-col",
+		"css": "/* 😀 */ a { speak: x }",
+		"errors": [
+			[
+				1,
+				13,
+				"property-not-allowed"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "warn-important",
+		"css": "a { color: red !important }",
+		"errors": [],
+		"warnings": [
+			[
+				1,
+				16,
+				"important"
+			]
+		]
+	},
+	{
+		"id": "warn-hides-form",
+		"css": ".wk-contact-form { display: none }",
+		"errors": [],
+		"warnings": [
+			[
+				1,
+				29,
+				"hides-hook"
+			]
+		]
+	},
+	{
+		"id": "warn-hides-visibility",
+		"css": ".wk-price { visibility: hidden }",
+		"errors": [],
+		"warnings": [
+			[
+				1,
+				25,
+				"hides-hook"
+			]
+		]
+	},
+	{
+		"id": "warn-hides-opacity",
+		"css": ".wk-cart { opacity: 0 }",
+		"errors": [],
+		"warnings": [
+			[
+				1,
+				21,
+				"hides-hook"
+			]
+		]
+	},
+	{
+		"id": "warn-hides-font-size",
+		"css": ".wk-footer-legal { font-size: 8px }",
+		"errors": [],
+		"warnings": [
+			[
+				1,
+				31,
+				"hides-hook"
+			]
+		]
+	},
+	{
+		"id": "warn-hides-height",
+		"css": ".wk-login-link { height: 0 }",
+		"errors": [],
+		"warnings": [
+			[
+				1,
+				26,
+				"hides-hook"
+			]
+		]
+	},
+	{
+		"id": "warn-no-hide-elsewhere",
+		"css": ".other { display: none }",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "warn-contrast",
+		"css": "a { color: #777; background: #888 }",
+		"errors": [],
+		"warnings": [
+			[
+				1,
+				12,
+				"contrast"
+			]
+		]
+	},
+	{
+		"id": "warn-contrast-3hex",
+		"css": "a { color: #ccc; background-color: #fff }",
+		"errors": [],
+		"warnings": [
+			[
+				1,
+				12,
+				"contrast"
+			]
+		]
+	},
+	{
+		"id": "warn-unknown-token",
+		"css": ":root { --wk-color-nonexistent: #fff }",
+		"errors": [],
+		"warnings": [
+			[
+				1,
+				9,
+				"unknown-token"
+			]
+		]
+	},
+	{
+		"id": "warn-unknown-class",
+		"css": ".wk-nonexistent { color: red }",
+		"errors": [],
+		"warnings": [
+			[
+				1,
+				2,
+				"unknown-class"
+			]
+		]
+	},
+	{
+		"id": "warn-font-display",
+		"css": "@font-face { font-family: x; src: local(x) }",
+		"errors": [],
+		"warnings": [
+			[
+				1,
+				1,
+				"font-display-missing"
+			]
+		]
+	},
+	{
+		"id": "var-image-set-string",
+		"css": ".a{--cx-a:\"//evil.example/x.png\";background-image:image-set(var(--cx-a) 1x)}",
+		"errors": [
+			[
+				1,
+				61,
+				"var-in-url-property"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "var-list-style-image",
+		"css": ".a{--cx-a:\"//evil.example/x.png\";list-style-image:image-set(var(--cx-a) 1x)}",
+		"errors": [
+			[
+				1,
+				61,
+				"var-in-url-property"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "var-border-image-source",
+		"css": ".a{--cx-a:\"//evil.example/x.png\";border-image-source:image-set(var(--cx-a) 1x)}",
+		"errors": [
+			[
+				1,
+				64,
+				"var-in-url-property"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "var-cursor",
+		"css": ".a{--cx-a:\"//evil.example/x.png\";cursor:image-set(var(--cx-a) 1x), auto}",
+		"errors": [
+			[
+				1,
+				41,
+				"url-not-allowed"
+			],
+			[
+				1,
+				51,
+				"var-in-url-property"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "var-content",
+		"css": ".a{--cx-a:\"//evil.example/x.png\";content:image-set(var(--cx-a) 1x)}",
+		"errors": [
+			[
+				1,
+				42,
+				"url-not-allowed"
+			],
+			[
+				1,
+				52,
+				"var-in-url-property"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "var-background-shorthand",
+		"css": ".a{--cx-a:\"//evil.example/x.png\";background:var(--cx-a)}",
+		"errors": [
+			[
+				1,
+				45,
+				"var-in-url-property"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "var-fallback-in-image-set",
+		"css": ".a{background-image:image-set(var(--cx-none, \"//evil.example/x.png\") 1x)}",
+		"errors": [
+			[
+				1,
+				31,
+				"var-in-url-property"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "var-in-supports",
+		"css": "@supports (background-image: var(--cx-a)) { a { color: red } }",
+		"errors": [
+			[
+				1,
+				30,
+				"var-in-url-property"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "var-in-colour-is-fine",
+		"css": ".a{--cx-a:#123456;color:var(--cx-a);border-color:var(--wk-color-border);font-family:var(--wk-font-body)}",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "string-in-custom-property-alone",
+		"css": ".a{--cx-label:'//not a url, just text';font-family:var(--cx-label)}",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "nested-calc-800",
+		"css": "a{width:calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(1px))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))}",
+		"errors": [
+			[
+				1,
+				164,
+				"too-nested"
+			],
+			[
+				1,
+				169,
+				"too-nested"
+			],
+			[
+				1,
+				174,
+				"too-nested"
+			],
+			[
+				1,
+				179,
+				"too-nested"
+			],
+			[
+				1,
+				184,
+				"too-nested"
+			],
+			[
+				1,
+				189,
+				"too-nested"
+			],
+			[
+				1,
+				194,
+				"too-nested"
+			],
+			[
+				1,
+				199,
+				"too-nested"
+			],
+			[
+				1,
+				204,
+				"too-nested"
+			],
+			[
+				1,
+				209,
+				"too-nested"
+			],
+			[
+				1,
+				214,
+				"too-nested"
+			],
+			[
+				1,
+				219,
+				"too-nested"
+			],
+			[
+				1,
+				224,
+				"too-nested"
+			],
+			[
+				1,
+				229,
+				"too-nested"
+			],
+			[
+				1,
+				234,
+				"too-nested"
+			],
+			[
+				1,
+				239,
+				"too-nested"
+			],
+			[
+				1,
+				244,
+				"too-nested"
+			],
+			[
+				1,
+				249,
+				"too-nested"
+			],
+			[
+				1,
+				254,
+				"too-nested"
+			],
+			[
+				1,
+				259,
+				"too-nested"
+			],
+			[
+				1,
+				264,
+				"too-nested"
+			],
+			[
+				1,
+				269,
+				"too-nested"
+			],
+			[
+				1,
+				274,
+				"too-nested"
+			],
+			[
+				1,
+				279,
+				"too-nested"
+			],
+			[
+				1,
+				284,
+				"too-nested"
+			],
+			[
+				1,
+				289,
+				"too-nested"
+			],
+			[
+				1,
+				294,
+				"too-nested"
+			],
+			[
+				1,
+				299,
+				"too-nested"
+			],
+			[
+				1,
+				304,
+				"too-nested"
+			],
+			[
+				1,
+				309,
+				"too-nested"
+			],
+			[
+				1,
+				314,
+				"too-nested"
+			],
+			[
+				1,
+				319,
+				"too-nested"
+			],
+			[
+				1,
+				324,
+				"too-nested"
+			],
+			[
+				1,
+				329,
+				"too-nested"
+			],
+			[
+				1,
+				334,
+				"too-nested"
+			],
+			[
+				1,
+				339,
+				"too-nested"
+			],
+			[
+				1,
+				344,
+				"too-nested"
+			],
+			[
+				1,
+				349,
+				"too-nested"
+			],
+			[
+				1,
+				354,
+				"too-nested"
+			],
+			[
+				1,
+				359,
+				"too-nested"
+			],
+			[
+				1,
+				364,
+				"too-nested"
+			],
+			[
+				1,
+				369,
+				"too-nested"
+			],
+			[
+				1,
+				374,
+				"too-nested"
+			],
+			[
+				1,
+				379,
+				"too-nested"
+			],
+			[
+				1,
+				384,
+				"too-nested"
+			],
+			[
+				1,
+				389,
+				"too-nested"
+			],
+			[
+				1,
+				394,
+				"too-nested"
+			],
+			[
+				1,
+				399,
+				"too-nested"
+			],
+			[
+				1,
+				404,
+				"too-nested"
+			],
+			[
+				1,
+				409,
+				"too-nested"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "nested-not-800",
+		"css": "a:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(.x)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))){color:red}",
+		"errors": [
+			[
+				1,
+				163,
+				"too-nested"
+			],
+			[
+				1,
+				168,
+				"too-nested"
+			],
+			[
+				1,
+				173,
+				"too-nested"
+			],
+			[
+				1,
+				178,
+				"too-nested"
+			],
+			[
+				1,
+				183,
+				"too-nested"
+			],
+			[
+				1,
+				188,
+				"too-nested"
+			],
+			[
+				1,
+				193,
+				"too-nested"
+			],
+			[
+				1,
+				198,
+				"too-nested"
+			],
+			[
+				1,
+				203,
+				"too-nested"
+			],
+			[
+				1,
+				208,
+				"too-nested"
+			],
+			[
+				1,
+				213,
+				"too-nested"
+			],
+			[
+				1,
+				218,
+				"too-nested"
+			],
+			[
+				1,
+				223,
+				"too-nested"
+			],
+			[
+				1,
+				228,
+				"too-nested"
+			],
+			[
+				1,
+				233,
+				"too-nested"
+			],
+			[
+				1,
+				238,
+				"too-nested"
+			],
+			[
+				1,
+				243,
+				"too-nested"
+			],
+			[
+				1,
+				248,
+				"too-nested"
+			],
+			[
+				1,
+				253,
+				"too-nested"
+			],
+			[
+				1,
+				258,
+				"too-nested"
+			],
+			[
+				1,
+				263,
+				"too-nested"
+			],
+			[
+				1,
+				268,
+				"too-nested"
+			],
+			[
+				1,
+				273,
+				"too-nested"
+			],
+			[
+				1,
+				278,
+				"too-nested"
+			],
+			[
+				1,
+				283,
+				"too-nested"
+			],
+			[
+				1,
+				288,
+				"too-nested"
+			],
+			[
+				1,
+				293,
+				"too-nested"
+			],
+			[
+				1,
+				298,
+				"too-nested"
+			],
+			[
+				1,
+				303,
+				"too-nested"
+			],
+			[
+				1,
+				308,
+				"too-nested"
+			],
+			[
+				1,
+				313,
+				"too-nested"
+			],
+			[
+				1,
+				318,
+				"too-nested"
+			],
+			[
+				1,
+				323,
+				"too-nested"
+			],
+			[
+				1,
+				328,
+				"too-nested"
+			],
+			[
+				1,
+				333,
+				"too-nested"
+			],
+			[
+				1,
+				338,
+				"too-nested"
+			],
+			[
+				1,
+				343,
+				"too-nested"
+			],
+			[
+				1,
+				348,
+				"too-nested"
+			],
+			[
+				1,
+				353,
+				"too-nested"
+			],
+			[
+				1,
+				358,
+				"too-nested"
+			],
+			[
+				1,
+				363,
+				"too-nested"
+			],
+			[
+				1,
+				368,
+				"too-nested"
+			],
+			[
+				1,
+				373,
+				"too-nested"
+			],
+			[
+				1,
+				378,
+				"too-nested"
+			],
+			[
+				1,
+				383,
+				"too-nested"
+			],
+			[
+				1,
+				388,
+				"too-nested"
+			],
+			[
+				1,
+				393,
+				"too-nested"
+			],
+			[
+				1,
+				398,
+				"too-nested"
+			],
+			[
+				1,
+				403,
+				"too-nested"
+			],
+			[
+				1,
+				408,
+				"too-nested"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "nested-33",
+		"css": "a{width:calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(1px)))))))))))))))))))))))))))))))))}",
+		"errors": [
+			[
+				1,
+				164,
+				"too-nested"
+			],
+			[
+				1,
+				169,
+				"too-nested"
+			],
+			[
+				1,
+				208,
+				"unbalanced"
+			],
+			[
+				1,
+				209,
+				"unbalanced"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "nested-20-is-fine",
+		"css": "a{width:calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(1px))))))))))))))))))))}",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "empty-selector-trailing-comma",
+		"css": ".a,{color:red}",
+		"errors": [
+			[
+				1,
+				3,
+				"empty-selector"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "empty-selector-leading-comma",
+		"css": ",.a{color:red}",
+		"errors": [
+			[
+				1,
+				1,
+				"empty-selector"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "empty-selector-double-comma",
+		"css": ".a,,.b{color:red}",
+		"errors": [
+			[
+				1,
+				4,
+				"empty-selector"
+			]
+		],
+		"warnings": []
+	}
+]

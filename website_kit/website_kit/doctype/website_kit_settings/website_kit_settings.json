@@ -5,7 +5,9 @@
  "engine": "InnoDB",
  "field_order": [
   "theme_section",
+  "preset_cards",
   "preset",
+  "custom_base",
   "brand_name",
   "contacts_section",
   "contact_email",
@@ -17,15 +19,28 @@
   "recaptcha_secret",
   "recaptcha_keys_ok",
   "contact_form_status",
+  "preview_section",
+  "preview_html",
+  "editor_section",
+  "editor_html",
+  "css_section",
+  "css_help",
+  "custom_css",
+  "css_messages",
+  "versions_section",
+  "versions",
   "visibility_section",
   "allow_search_engines",
   "advanced_section",
   "token_overrides",
-  "custom_css",
+  "draft_state",
+  "draft_file_url",
   "status_section",
   "kit_version",
   "theme_hash",
   "theme_file_url",
+  "safe_file_url",
+  "css_notes",
   "pages_note",
   "pages_state"
  ],
@@ -36,13 +51,27 @@
    "label": "Theme"
   },
   {
+   "fieldname": "preset_cards",
+   "fieldtype": "HTML",
+   "label": "Theme cards"
+  },
+  {
    "fieldname": "preset",
    "fieldtype": "Select",
    "label": "Preset",
-   "options": "clear\nmarket\ncontrast\nnight\nledger",
+   "options": "clear\nmarket\ncontrast\nnight\nledger\ncustom",
    "default": "clear",
    "reqd": 1,
+   "hidden": 1,
    "description": "The ready-made look of the public website."
+  },
+  {
+   "fieldname": "custom_base",
+   "fieldtype": "Select",
+   "label": "Custom theme starts from",
+   "options": "\nclear\nmarket\ncontrast\nnight\nledger",
+   "hidden": 1,
+   "read_only": 1
   },
   {
    "fieldname": "brand_name",
@@ -114,6 +143,64 @@
    "description": "Whether the contact form is shown, and why not."
   },
   {
+   "fieldname": "preview_section",
+   "fieldtype": "Section Break",
+   "label": "Preview"
+  },
+  {
+   "fieldname": "preview_html",
+   "fieldtype": "HTML",
+   "label": "Live preview"
+  },
+  {
+   "fieldname": "editor_section",
+   "fieldtype": "Section Break",
+   "label": "Custom theme editor",
+   "depends_on": "eval:doc.preset==\"custom\""
+  },
+  {
+   "fieldname": "editor_html",
+   "fieldtype": "HTML",
+   "label": "Custom theme controls"
+  },
+  {
+   "fieldname": "css_section",
+   "fieldtype": "Section Break",
+   "label": "Custom CSS",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "css_help",
+   "fieldtype": "HTML",
+   "label": "Custom CSS help"
+  },
+  {
+   "fieldname": "custom_css",
+   "fieldtype": "Code",
+   "label": "Custom CSS",
+   "options": "CSS",
+   "description": "Checked when you type and again on save. It is linked after the theme and only from public pages."
+  },
+  {
+   "fieldname": "css_messages",
+   "fieldtype": "HTML",
+   "label": "Custom CSS messages"
+  },
+  {
+   "fieldname": "versions_section",
+   "fieldtype": "Section Break",
+   "label": "Versions",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "versions",
+   "fieldtype": "Table",
+   "label": "Saved versions",
+   "options": "Website Kit Theme Version",
+   "read_only": 1,
+   "description": "The last 20 saved looks. Restoring one saves it as a new version."
+  },
+  {
    "fieldname": "visibility_section",
    "fieldtype": "Section Break",
    "label": "Search engines"
@@ -139,12 +226,18 @@
    "description": "JSON with the values that differ from the preset: {\"tokens\": {\"color-primary\": \"#1d4ed8\"}, \"variants\": {\"card\": \"raised\"}}."
   },
   {
-   "fieldname": "custom_css",
-   "fieldtype": "Code",
-   "label": "Custom CSS",
-   "options": "CSS",
-   "read_only": 1,
-   "description": "Not applied yet: the validated Custom CSS editor comes in a later release."
+   "fieldname": "draft_state",
+   "fieldtype": "Long Text",
+   "label": "Draft",
+   "hidden": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "draft_file_url",
+   "fieldtype": "Data",
+   "label": "Draft file",
+   "hidden": 1,
+   "read_only": 1
   },
   {
    "fieldname": "status_section",
@@ -171,6 +264,19 @@
    "read_only": 1
   },
   {
+   "fieldname": "safe_file_url",
+   "fieldtype": "Data",
+   "label": "Safe mode file",
+   "read_only": 1
+  },
+  {
+   "fieldname": "css_notes",
+   "fieldtype": "Small Text",
+   "label": "Notes on the Custom CSS",
+   "read_only": 1,
+   "description": "Names in the Custom CSS that this kit version does not know."
+  },
+  {
    "fieldname": "pages_note",
    "fieldtype": "Small Text",
    "label": "Notes on the standard pages",
@@ -189,7 +295,7 @@
  "index_web_pages_for_search": 0,
  "issingle": 1,
  "links": [],
- "modified": "2026-11-26 12:00:00.000000",
+ "modified": "2026-11-27 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Website Kit",
  "name": "Website Kit Settings",

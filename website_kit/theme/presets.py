@@ -13,6 +13,10 @@ from . import fonts, tokens
 PRESETS_DIR = Path(__file__).resolve().parent / "presets"
 PRESET_NAMES = ("clear", "market", "contrast", "night", "ledger")
 DEFAULT_PRESET = "clear"
+# `custom` is not a file: it is a copy of one preset (`custom_base`) with the customer's tokens on top, frozen at the moment
+# of "Duplicate as Custom", so a later change of the base preset never moves it.
+CUSTOM = "custom"
+CHOICES = (*PRESET_NAMES, CUSTOM)
 ENHANCED_PRESETS = frozenset({"contrast"})  # presets that must reach 7:1
 
 
@@ -69,9 +73,18 @@ def parse_overrides(text) -> dict:
 	}
 
 
-def resolve(name: str, overrides: dict | None = None) -> dict:
-	"""The effective tokens and variants: the preset with the validated overrides on top."""
-	preset = load(name)
+def resolve(name: str, overrides: dict | None = None, base: str | None = None) -> dict:
+	"""The effective tokens and variants: the preset with the validated overrides on top.
+
+	For `custom` the starting point is the preset `base` (default `clear`).
+	"""
+	if name == CUSTOM:
+		base = base or DEFAULT_PRESET
+		if base not in PRESET_NAMES:
+			raise tokens.TokenError(f"unknown base preset '{base}'")
+		preset = load(base)
+	else:
+		preset = load(name)
 	overrides = overrides or {"tokens": {}, "variants": {}}
 	return {
 		"preset": name,

@@ -38,6 +38,7 @@ source = ["website_kit"]
 branch = true
 # These modules call Frappe; the bench job exercises them (tests/ in the doctype folder). The rest is unit-tested.
 omit = [
+	"website_kit/api.py",
 	"website_kit/apply.py",
 	"website_kit/install.py",
 	"website_kit/probe.py",

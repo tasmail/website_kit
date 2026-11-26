@@ -15,7 +15,9 @@ after_app_install = ["website_kit.install.after_app_install"]
 update_website_context = ["website_kit.runtime.update_website_context"]
 after_request = ["website_kit.runtime.after_request"]
 # Hands the site's reCAPTCHA keys to the guard for the request that posts the contact form (before the guard's auth hook).
-before_request = ["website_kit.contact.before_request"]
+# Both are listed in one assignment: a second `before_request = ...` line would replace the first.
+# The kit's runtime hook keeps a manager's preview or safe-mode request out of the website page cache.
+before_request = ["website_kit.contact.before_request", "website_kit.runtime.before_request"]
 
 # The filter `wk_esc` of the standard templates: HTML escape plus brace encoding.
 # The functions of `website_kit.jinja_api` are the globals the standard Builder pages call (`wk_brand`, `wk_head`, ...).

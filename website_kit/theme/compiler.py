@@ -7,17 +7,27 @@ properties. The static `public/css/wk.css` reads them.
 
 import hashlib
 
-from .. import WK_THEME_API
+from .. import WK_THEME_API, css_validator
 from . import fonts, presets, tokens
 
+CUSTOM_MARKER = "/* Custom CSS */"
 
-def effective(preset: str, overrides_text=None) -> dict:
+
+class CustomCssError(ValueError):
+	"""The Custom CSS did not pass the validator; `result` holds its messages."""
+
+	def __init__(self, result):
+		self.result = result
+		super().__init__("; ".join(str(message) for message in result.errors))
+
+
+def effective(preset: str, overrides_text=None, base: str | None = None) -> dict:
 	"""Resolve a preset name and the overrides JSON text; raises `tokens.TokenError` for bad input."""
-	return presets.resolve(preset, presets.parse_overrides(overrides_text))
+	return presets.resolve(preset, presets.parse_overrides(overrides_text), base)
 
 
-def compile_css(resolved: dict) -> str:
-	"""The generated stylesheet of an effective token set (see `effective`)."""
+def compile_css(resolved: dict, custom_css: str = "") -> str:
+	"""The generated stylesheet of an effective token set (see `effective`), then the validated Custom CSS."""
 	token_values = resolved["tokens"]
 	variants = resolved["variants"]
 	lines = [f"/* Website Kit theme API {WK_THEME_API}, preset {resolved['preset']}. Generated: do not edit. */"]
@@ -37,6 +47,12 @@ def compile_css(resolved: dict) -> str:
 		for option, props in options.items():
 			body = ";".join(f"{prop}:{value}" for prop, value in props.items())
 			lines.append(f'[data-wk-{variant}="{option}"]{{{body}}}')
+	custom_css = (custom_css or "").strip()
+	if custom_css:
+		result = css_validator.validate(custom_css)
+		if not result.ok:
+			raise CustomCssError(result)
+		lines.extend((CUSTOM_MARKER, custom_css))
 	return "\n".join(lines) + "\n"
 
 
@@ -44,7 +60,11 @@ def content_hash(css: str) -> str:
 	return hashlib.sha256(css.encode("utf-8")).hexdigest()[:16]
 
 
-def build(preset: str, overrides_text=None) -> tuple[str, str]:
-	"""Compile and return `(css, hash)` for a preset name and an overrides JSON text."""
-	css = compile_css(effective(preset, overrides_text))
+def build(preset: str, overrides_text=None, custom_css: str = "", base: str | None = None) -> tuple[str, str]:
+	"""Compile and return `(css, hash)` for a preset name, an overrides JSON text and the Custom CSS.
+
+	The one compile path of the kit: the save, the apply step, the draft and the preview all end here, so the validator
+	runs on every route. Raises `tokens.TokenError` or `CustomCssError`.
+	"""
+	css = compile_css(effective(preset, overrides_text, base), custom_css)
 	return css, content_hash(css)

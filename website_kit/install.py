@@ -50,10 +50,12 @@ def after_migrate() -> None:
 	"""Re-apply after a migrate so that a new kit release reaches the site's file. Stored tokens and CSS stay as they are.
 
 	A failure (bad stored overrides, a busy lock, a disk error) is logged and never aborts `bench migrate`; the previous
-	good file stays in place.
+	good file stays in place. Custom CSS that a stricter rule of the new release rejects is never edited or deleted: `apply`
+	stops serving it (the preset without Custom CSS) and says so in `css_notes` on the settings page.
 	"""
 	try:
 		kit_apply.apply()
+		kit_apply.discard_draft()  # a draft was compiled by the rules of the release before the migrate
 	except Exception:
 		frappe.log_error(title="Website Kit: the theme could not be applied after migrate, the previous file is kept")
 	write_pages()
