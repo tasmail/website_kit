@@ -89,7 +89,7 @@ def test_translations_are_ukrainian_and_keep_placeholders():
 
 def test_the_extractor_finds_the_template_strings():
 	found = sources_in_code()
-	assert {"Skip to content", "Login", "My Account", "Main menu", "Home"} <= found
+	assert {"Skip to content"} <= found
 
 
 def test_no_row_overrides_an_existing_translation_site_wide():

@@ -10,7 +10,7 @@ import frappe
 import frappe.utils
 
 from . import __version__, contact, runtime
-from .pages import markup
+from .pages import header, markup
 from .pages.content import ROUTES, TEXT, URLS
 from .safe import never_raises
 from .theme.escape import esc, safe_url
@@ -100,4 +100,72 @@ def wk_head(lang="uk", key="home"):
 		alternates=alternates,
 		organization=organization,
 		guard_site_key=guard_key,
+	)
+
+
+def _language(lang) -> str:
+	"""The language of the header: the one the page asks for, else the request language when the kit has texts for it, else English."""
+	if lang in TEXT:
+		return lang
+	current = (getattr(frappe.local, "lang", "") or "en")[:2]
+	return current if current in TEXT else "en"
+
+
+def _published_pages(lang) -> tuple[set, bool]:
+	"""The kit pages of `lang` that exist as published Builder pages, and whether the home page of the other language does."""
+	if not frappe.db.exists("DocType", "Builder Page"):
+		return set(), False
+	other = TEXT[lang]["lang_switch_code"]
+	routes = frappe.get_all(
+		"Builder Page",
+		filters={"published": 1, "route": ["in", [r for k in ROUTES.values() for r in k.values()]]},
+		pluck="route",
+	)
+	published = {key for key in header.KIT_KEYS if ROUTES[key][lang] in routes}
+	return published, ROUTES["home"][other] in routes
+
+
+def _site_items() -> list:
+	"""The top bar items of Website Settings (one level of children); the shop entry only while the shop has products."""
+	from . import shop
+
+	rows = frappe.get_website_settings("top_bar_items") or []
+	children = {}
+	for row in rows:
+		if row.parent_label:
+			children.setdefault(row.parent_label, []).append(row)
+	items = [
+		{
+			"label": frappe._(row.label),
+			"url": row.url or "",
+			"new_tab": bool(row.open_in_new_tab),
+			"children": [
+				{"label": frappe._(child.label), "url": child.url or "", "new_tab": bool(child.open_in_new_tab)}
+				for child in children.get(row.label, [])
+			],
+		}
+		for row in rows
+		if not row.parent_label
+	]
+	return shop.visible_menu(items)
+
+
+@never_raises
+def wk_header(lang="", hide_login=""):
+	"""The content of the site header, for the Builder pages (`lang` given) and the stock navbar (`lang` empty: request language).
+
+	One function for both, so the menu is the same on every page: the kit pages that exist, the site's own top bar items, the
+	other language and the login link. Pages that a signed-in user sees are never served from the guest cache.
+	"""
+	lang = _language(lang)
+	published, other_available = _published_pages(lang)
+	return header.inner(
+		lang=lang,
+		published=published,
+		other_available=other_available,
+		site_items=_site_items(),
+		logged_in=frappe.session.user != "Guest",
+		hide_login=bool(hide_login),
+		brand_html=esc(_brand_text()),
+		logo_url=frappe.get_website_settings("banner_image") or "",
 	)

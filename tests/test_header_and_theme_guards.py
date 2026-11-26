@@ -8,6 +8,7 @@ from website_kit import __version__
 ROOT = Path(__file__).resolve().parent.parent
 PKG = ROOT / "website_kit"
 BASE_CSS = (PKG / "public/css/wk.css").read_text(encoding="utf-8")
+HEADER_SRC = (PKG / "pages/header.py").read_text(encoding="utf-8")
 NAVBAR = (PKG / "website_kit/web_template/wk_navbar/wk_navbar.html").read_text(encoding="utf-8")
 
 
@@ -25,35 +26,26 @@ def test_the_patch_is_listed_and_runs_after_the_models_sync():
 	assert "website_kit.patches.v0_3.use_stock_website_theme" in post
 
 
-def test_the_header_menu_is_a_labelled_checkbox_with_a_label_for_it():
-	toggle = re.search(r'<input[^>]*class="wk-header__toggle"[^>]*>', NAVBAR)
-	assert toggle, "the menu checkbox is gone"
-	assert 'type="checkbox"' in toggle.group(0) and "aria-label=" in toggle.group(0)
-	toggle_id = re.search(r'id="([^"]+)"', toggle.group(0)).group(1)
-	assert re.search(rf'<label[^>]*class="wk-header__burger"[^>]*for="{toggle_id}"', NAVBAR)
-	assert NAVBAR.index("wk-header__toggle") < NAVBAR.index('<nav class="wk-header__nav"'), (
-		"the checkbox must come before the nav (sibling selector)"
-	)
+def test_the_header_menu_is_a_native_disclosure_not_a_checkbox():
+	assert "wk-header__toggle" not in BASE_CSS and "wk-header__toggle" not in NAVBAR
+	assert "<details" in HEADER_SRC and "<summary" in HEADER_SRC and "checkbox" not in HEADER_SRC
 
 
 def test_the_menu_is_collapsed_on_narrow_screens_and_open_on_wide_ones():
-	assert re.search(r"\.wk-header__toggle,\s*\.wk-header__burger\s*\{\s*display:\s*none", BASE_CSS), (
-		"hidden by default (wide screens)"
-	)
+	assert re.search(r"\.wk-header__menu\s*\{\s*display:\s*none", BASE_CSS), "the disclosure is hidden on wide screens"
 	narrow = BASE_CSS[BASE_CSS.index("@media (max-width: 48em)") :]
-	assert re.search(r"\.wk-header__nav\s*\{[^}]*display:\s*none", narrow), "the nav collapses on narrow screens"
-	assert re.search(r"\.wk-header__toggle:checked\s*~\s*\.wk-header__nav\s*\{[^}]*display:\s*flex", narrow), (
-		"the checkbox opens it"
+	assert re.search(r"\.wk-header__menu\s*\{[^}]*display:\s*block", narrow), "the disclosure shows on narrow screens"
+	assert re.search(r"\.wk-header__nav--wide\s*\{[^}]*display:\s*none", narrow), (
+		"the wide menu goes away on narrow screens"
 	)
-	assert re.search(r"\.wk-header__burger\s*\{[^}]*display:\s*inline-flex", narrow)
-	assert re.search(r"\.wk-header__toggle:focus-visible\s*\+\s*\.wk-header__burger\s*\{[^}]*outline", narrow), (
-		"a visible focus ring"
+	assert re.search(r"\.wk-header__nav--narrow\s*\{[^}]*display:\s*flex", BASE_CSS), (
+		"the menu inside the open disclosure"
 	)
-
-
-def test_the_invisible_checkbox_is_positioned_against_the_header():
-	assert re.search(r"\.wk-header__inner\s*\{[^}]*position:\s*relative", BASE_CSS)
-	assert re.search(r"\.wk-header__toggle\s*\{[^}]*position:\s*absolute", BASE_CSS)
+	assert re.search(r"\.wk-header__burger\s*\{[^}]*list-style:\s*none", BASE_CSS)
+	assert "::-webkit-details-marker" in BASE_CSS, "no default triangle"
+	assert re.search(r"\.wk-header__burger\s*\{[^}]*block-size:\s*44px", BASE_CSS) or re.search(
+		r"\.wk-header__burger\s*\{[^}]*min-block-size:\s*44px", BASE_CSS
+	)
 
 
 def test_primary_buttons_give_visible_feedback_on_hover_and_focus():

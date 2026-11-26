@@ -98,47 +98,11 @@ def card(ids, title, text):
 
 
 def header_definition(lang):
-	"""The shared header: brand, three menu links, the other language, the login button."""
-	t, ids = TEXT[lang], Ids(f"header-{lang}")
-	menu_items = [
-		(t["menu_home"], URLS["home"][lang], None),
-		(t["menu_about"], URLS["about"][lang], None),
-		(t["menu_contact"], URLS["contact"][lang], None),
-	]
-	other = t["lang_switch_code"]
-	items = [
-		block(ids, "li", children=[link(ids, label, href, classes=["wk-menu__link"])]) for label, href, _ in menu_items
-	]
-	items.append(
-		block(
-			ids,
-			"li",
-			children=[
-				link(
-					ids,
-					t["lang_switch"],
-					URLS["home"][other],
-					classes=["wk-menu__link"],
-					attrs={"hreflang": other},
-					name="lang-switch",
-				)
-			],
-		)
-	)
-	nav = block(
-		ids,
-		"nav",
-		classes=["wk-header__nav"],
-		attrs={},
-		custom={"aria-label": t["menu_label"]},
-		children=[
-			block(ids, "ul", classes=["wk-menu"], children=items),
-			link(ids, t["login"], "/login", classes=["wk-button", "wk-button--secondary"], attrs={"rel": "nofollow"}),
-		],
-	)
-	brand = link(ids, call("wk_brand", lang), URLS["home"][lang], classes=["wk-header__brand"], name="brand")
-	inner = block(ids, "div", classes=["wk-container", "wk-header__inner"], children=[brand, nav])
-	return block(ids, "header", name=f"WK Header {lang}", classes=["wk-header"], children=[inner])
+	"""The shared header: one raw block whose markup comes from `jinja_api.wk_header`, the function that the stock navbar of
+	the standard pages calls too, so a Builder page and a stock page (login, shop, 404) always show the same menu."""
+	ids = Ids(f"header-{lang}")
+	menu = raw(ids, call("wk_header", lang), name="menu")
+	return block(ids, "header", name=f"WK Header {lang}", classes=["wk-header"], children=[menu])
 
 
 def footer_definition(lang):

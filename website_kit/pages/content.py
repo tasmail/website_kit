@@ -24,6 +24,8 @@ TEXT = {
 	"uk": {
 		"skip": "Перейти до змісту",
 		"menu_label": "Головне меню",
+		"menu_button": "Меню",
+		"account": "Мій кабінет",
 		"menu_home": "Головна",
 		"menu_about": "Про нас",
 		"menu_contact": "Контакти",
@@ -96,6 +98,8 @@ TEXT = {
 	"en": {
 		"skip": "Skip to content",
 		"menu_label": "Main menu",
+		"menu_button": "Menu",
+		"account": "My account",
 		"menu_home": "Home",
 		"menu_about": "About",
 		"menu_contact": "Contact",

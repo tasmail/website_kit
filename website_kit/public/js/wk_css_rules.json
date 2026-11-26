@@ -523,8 +523,10 @@
 		"wk-menu__group",
 		"wk-menu__link",
 		"wk-menu__sub",
-		"wk-header__toggle",
-		"wk-header__burger"
+		"wk-header__menu",
+		"wk-header__burger",
+		"wk-header__nav--wide",
+		"wk-header__nav--narrow"
 	],
 	"messages": {
 		"too-large": "The CSS is larger than {0} KB.",

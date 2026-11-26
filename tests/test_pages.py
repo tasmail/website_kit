@@ -5,7 +5,7 @@ import re
 
 import pytest
 
-from website_kit.pages import blocks, catalogue, content, sections, specs
+from website_kit.pages import blocks, catalogue, content, header, specs
 
 LANG_PAGES = [(spec["key"], spec["lang"]) for spec in specs.page_specs()]
 TEXT_TAG = re.compile(r"<[^>]+>")
@@ -170,8 +170,17 @@ def test_pages_point_at_each_other_in_both_languages():
 		for lang in content.LANGUAGES:
 			assert content.URLS[key][lang].startswith("/")
 	for lang, other in (("uk", "en"), ("en", "uk")):
-		header = json.dumps(sections.header_definition(lang), ensure_ascii=False)
-		assert f'"href": "{content.URLS["home"][other]}"'.replace('"href": ', '"href":') in header.replace(": ", ":")
+		html = header.inner(
+			lang=lang,
+			published={"home"},
+			other_available=True,
+			site_items=[],
+			logged_in=False,
+			hide_login=False,
+			brand_html="x",
+			logo_url="",
+		)
+		assert f'href="{content.URLS["home"][other]}"' in html
 
 
 def test_components_are_shared_by_all_pages():
