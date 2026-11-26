@@ -72,6 +72,11 @@ def set_site_config(key, value):
 		config[key] = value
 	with open(path, "w", encoding="utf-8") as handle:
 		json.dump(config, handle, indent=1)
+	try:  # Frappe 16 keeps the site config in a cache that a file write does not reset
+		from frappe.config import clear_site_config_cache
+	except ImportError:  # Frappe 15 reads the file again for each request
+		return
+	clear_site_config_cache()
 
 
 class KitTestCase(TestCase):

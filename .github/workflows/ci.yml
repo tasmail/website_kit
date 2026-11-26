@@ -188,7 +188,11 @@ jobs:
           bench --site shop.localhost set-config allow_tests true
           bench --site shop.localhost install-app website_kit
           bench --site shop.localhost execute website_kit.probe.complete_setup
-          bench --site shop.localhost run-tests --app website_kit --module website_kit.website_kit.doctype.website_kit_settings.test_shop  # the page tests need Builder and the guard, which the first site has
+          # The page tests need Builder and the guard, which the first site has. A skipped shop test would hide a broken setup, so any skip fails the step.
+          set -o pipefail
+          bench --site shop.localhost run-tests --app website_kit --module website_kit.website_kit.doctype.website_kit_settings.test_shop 2>&1 | tee "$RUNNER_TEMP/shop-tests.log"
+          if grep -Eq "skipped=|skipped [0-9]+" "$RUNNER_TEMP/shop-tests.log"; then echo "the shop tests were skipped"; exit 1; fi
+          grep -Eq "^Ran [1-9][0-9]* tests" "$RUNNER_TEMP/shop-tests.log"
       # Last: it leaves customer data (preset market) on the site, and the integration tests expect the install defaults.
       - name: Migrate keeps customer data
         run: |
