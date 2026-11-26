@@ -764,8 +764,8 @@
 		"errors": [
 			[
 				1,
-				29,
-				"url-external"
+				17,
+				"var-in-url-property"
 			]
 		],
 		"warnings": []
@@ -1975,5 +1975,706 @@
 				"font-display-missing"
 			]
 		]
+	},
+	{
+		"id": "var-image-set-string",
+		"css": ".a{--cx-a:\"//evil.example/x.png\";background-image:image-set(var(--cx-a) 1x)}",
+		"errors": [
+			[
+				1,
+				61,
+				"var-in-url-property"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "var-list-style-image",
+		"css": ".a{--cx-a:\"//evil.example/x.png\";list-style-image:image-set(var(--cx-a) 1x)}",
+		"errors": [
+			[
+				1,
+				61,
+				"var-in-url-property"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "var-border-image-source",
+		"css": ".a{--cx-a:\"//evil.example/x.png\";border-image-source:image-set(var(--cx-a) 1x)}",
+		"errors": [
+			[
+				1,
+				64,
+				"var-in-url-property"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "var-cursor",
+		"css": ".a{--cx-a:\"//evil.example/x.png\";cursor:image-set(var(--cx-a) 1x), auto}",
+		"errors": [
+			[
+				1,
+				41,
+				"url-not-allowed"
+			],
+			[
+				1,
+				51,
+				"var-in-url-property"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "var-content",
+		"css": ".a{--cx-a:\"//evil.example/x.png\";content:image-set(var(--cx-a) 1x)}",
+		"errors": [
+			[
+				1,
+				42,
+				"url-not-allowed"
+			],
+			[
+				1,
+				52,
+				"var-in-url-property"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "var-background-shorthand",
+		"css": ".a{--cx-a:\"//evil.example/x.png\";background:var(--cx-a)}",
+		"errors": [
+			[
+				1,
+				45,
+				"var-in-url-property"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "var-fallback-in-image-set",
+		"css": ".a{background-image:image-set(var(--cx-none, \"//evil.example/x.png\") 1x)}",
+		"errors": [
+			[
+				1,
+				31,
+				"var-in-url-property"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "var-in-supports",
+		"css": "@supports (background-image: var(--cx-a)) { a { color: red } }",
+		"errors": [
+			[
+				1,
+				30,
+				"var-in-url-property"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "var-in-colour-is-fine",
+		"css": ".a{--cx-a:#123456;color:var(--cx-a);border-color:var(--wk-color-border);font-family:var(--wk-font-body)}",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "string-in-custom-property-alone",
+		"css": ".a{--cx-label:'//not a url, just text';font-family:var(--cx-label)}",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "nested-calc-800",
+		"css": "a{width:calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(1px))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))}",
+		"errors": [
+			[
+				1,
+				164,
+				"too-nested"
+			],
+			[
+				1,
+				169,
+				"too-nested"
+			],
+			[
+				1,
+				174,
+				"too-nested"
+			],
+			[
+				1,
+				179,
+				"too-nested"
+			],
+			[
+				1,
+				184,
+				"too-nested"
+			],
+			[
+				1,
+				189,
+				"too-nested"
+			],
+			[
+				1,
+				194,
+				"too-nested"
+			],
+			[
+				1,
+				199,
+				"too-nested"
+			],
+			[
+				1,
+				204,
+				"too-nested"
+			],
+			[
+				1,
+				209,
+				"too-nested"
+			],
+			[
+				1,
+				214,
+				"too-nested"
+			],
+			[
+				1,
+				219,
+				"too-nested"
+			],
+			[
+				1,
+				224,
+				"too-nested"
+			],
+			[
+				1,
+				229,
+				"too-nested"
+			],
+			[
+				1,
+				234,
+				"too-nested"
+			],
+			[
+				1,
+				239,
+				"too-nested"
+			],
+			[
+				1,
+				244,
+				"too-nested"
+			],
+			[
+				1,
+				249,
+				"too-nested"
+			],
+			[
+				1,
+				254,
+				"too-nested"
+			],
+			[
+				1,
+				259,
+				"too-nested"
+			],
+			[
+				1,
+				264,
+				"too-nested"
+			],
+			[
+				1,
+				269,
+				"too-nested"
+			],
+			[
+				1,
+				274,
+				"too-nested"
+			],
+			[
+				1,
+				279,
+				"too-nested"
+			],
+			[
+				1,
+				284,
+				"too-nested"
+			],
+			[
+				1,
+				289,
+				"too-nested"
+			],
+			[
+				1,
+				294,
+				"too-nested"
+			],
+			[
+				1,
+				299,
+				"too-nested"
+			],
+			[
+				1,
+				304,
+				"too-nested"
+			],
+			[
+				1,
+				309,
+				"too-nested"
+			],
+			[
+				1,
+				314,
+				"too-nested"
+			],
+			[
+				1,
+				319,
+				"too-nested"
+			],
+			[
+				1,
+				324,
+				"too-nested"
+			],
+			[
+				1,
+				329,
+				"too-nested"
+			],
+			[
+				1,
+				334,
+				"too-nested"
+			],
+			[
+				1,
+				339,
+				"too-nested"
+			],
+			[
+				1,
+				344,
+				"too-nested"
+			],
+			[
+				1,
+				349,
+				"too-nested"
+			],
+			[
+				1,
+				354,
+				"too-nested"
+			],
+			[
+				1,
+				359,
+				"too-nested"
+			],
+			[
+				1,
+				364,
+				"too-nested"
+			],
+			[
+				1,
+				369,
+				"too-nested"
+			],
+			[
+				1,
+				374,
+				"too-nested"
+			],
+			[
+				1,
+				379,
+				"too-nested"
+			],
+			[
+				1,
+				384,
+				"too-nested"
+			],
+			[
+				1,
+				389,
+				"too-nested"
+			],
+			[
+				1,
+				394,
+				"too-nested"
+			],
+			[
+				1,
+				399,
+				"too-nested"
+			],
+			[
+				1,
+				404,
+				"too-nested"
+			],
+			[
+				1,
+				409,
+				"too-nested"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "nested-not-800",
+		"css": "a:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(:not(.x)))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))))){color:red}",
+		"errors": [
+			[
+				1,
+				163,
+				"too-nested"
+			],
+			[
+				1,
+				168,
+				"too-nested"
+			],
+			[
+				1,
+				173,
+				"too-nested"
+			],
+			[
+				1,
+				178,
+				"too-nested"
+			],
+			[
+				1,
+				183,
+				"too-nested"
+			],
+			[
+				1,
+				188,
+				"too-nested"
+			],
+			[
+				1,
+				193,
+				"too-nested"
+			],
+			[
+				1,
+				198,
+				"too-nested"
+			],
+			[
+				1,
+				203,
+				"too-nested"
+			],
+			[
+				1,
+				208,
+				"too-nested"
+			],
+			[
+				1,
+				213,
+				"too-nested"
+			],
+			[
+				1,
+				218,
+				"too-nested"
+			],
+			[
+				1,
+				223,
+				"too-nested"
+			],
+			[
+				1,
+				228,
+				"too-nested"
+			],
+			[
+				1,
+				233,
+				"too-nested"
+			],
+			[
+				1,
+				238,
+				"too-nested"
+			],
+			[
+				1,
+				243,
+				"too-nested"
+			],
+			[
+				1,
+				248,
+				"too-nested"
+			],
+			[
+				1,
+				253,
+				"too-nested"
+			],
+			[
+				1,
+				258,
+				"too-nested"
+			],
+			[
+				1,
+				263,
+				"too-nested"
+			],
+			[
+				1,
+				268,
+				"too-nested"
+			],
+			[
+				1,
+				273,
+				"too-nested"
+			],
+			[
+				1,
+				278,
+				"too-nested"
+			],
+			[
+				1,
+				283,
+				"too-nested"
+			],
+			[
+				1,
+				288,
+				"too-nested"
+			],
+			[
+				1,
+				293,
+				"too-nested"
+			],
+			[
+				1,
+				298,
+				"too-nested"
+			],
+			[
+				1,
+				303,
+				"too-nested"
+			],
+			[
+				1,
+				308,
+				"too-nested"
+			],
+			[
+				1,
+				313,
+				"too-nested"
+			],
+			[
+				1,
+				318,
+				"too-nested"
+			],
+			[
+				1,
+				323,
+				"too-nested"
+			],
+			[
+				1,
+				328,
+				"too-nested"
+			],
+			[
+				1,
+				333,
+				"too-nested"
+			],
+			[
+				1,
+				338,
+				"too-nested"
+			],
+			[
+				1,
+				343,
+				"too-nested"
+			],
+			[
+				1,
+				348,
+				"too-nested"
+			],
+			[
+				1,
+				353,
+				"too-nested"
+			],
+			[
+				1,
+				358,
+				"too-nested"
+			],
+			[
+				1,
+				363,
+				"too-nested"
+			],
+			[
+				1,
+				368,
+				"too-nested"
+			],
+			[
+				1,
+				373,
+				"too-nested"
+			],
+			[
+				1,
+				378,
+				"too-nested"
+			],
+			[
+				1,
+				383,
+				"too-nested"
+			],
+			[
+				1,
+				388,
+				"too-nested"
+			],
+			[
+				1,
+				393,
+				"too-nested"
+			],
+			[
+				1,
+				398,
+				"too-nested"
+			],
+			[
+				1,
+				403,
+				"too-nested"
+			],
+			[
+				1,
+				408,
+				"too-nested"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "nested-33",
+		"css": "a{width:calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(1px)))))))))))))))))))))))))))))))))}",
+		"errors": [
+			[
+				1,
+				164,
+				"too-nested"
+			],
+			[
+				1,
+				169,
+				"too-nested"
+			],
+			[
+				1,
+				208,
+				"unbalanced"
+			],
+			[
+				1,
+				209,
+				"unbalanced"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "nested-20-is-fine",
+		"css": "a{width:calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(calc(1px))))))))))))))))))))}",
+		"errors": [],
+		"warnings": []
+	},
+	{
+		"id": "empty-selector-trailing-comma",
+		"css": ".a,{color:red}",
+		"errors": [
+			[
+				1,
+				3,
+				"empty-selector"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "empty-selector-leading-comma",
+		"css": ",.a{color:red}",
+		"errors": [
+			[
+				1,
+				1,
+				"empty-selector"
+			]
+		],
+		"warnings": []
+	},
+	{
+		"id": "empty-selector-double-comma",
+		"css": ".a,,.b{color:red}",
+		"errors": [
+			[
+				1,
+				4,
+				"empty-selector"
+			]
+		],
+		"warnings": []
 	}
 ]

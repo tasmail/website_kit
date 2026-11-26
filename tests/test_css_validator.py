@@ -217,7 +217,7 @@ def oracle_violations(css):
 	if re.search(r"[{;](behavior|-moz-binding|-ms-filter):", "{" + bare):
 		problems.append("legacy property")
 	spaced = STRING.sub('""', text).lower()
-	for match in re.finditer(r"url\(\s*(.{0,12})", spaced):
+	for match in re.finditer(r"(?<![\w-])url\(\s*(.{0,12})", spaced):
 		target = match.group(1)
 		if not target.startswith(("/files/", "/assets/", "data:image/", '""', "'")):
 			problems.append("url " + target)

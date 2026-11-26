@@ -32,13 +32,20 @@ def apply(settings=None) -> dict:
 	"""Apply the settings (the saved Single by default); returns a dict of the changes made, empty if none.
 
 	Runs under a database lock, so two concurrent applies (a save and a migrate) never write the file at the same time.
-	Custom CSS is validated again inside `compiler.build`: if the stored CSS no longer passes (a stricter rule in a new
-	release), nothing is written and the previous good file stays.
+	Custom CSS is validated again inside `compiler.build`. If the stored CSS no longer passes (a stricter rule in a new
+	release) the site fails closed: the file is rebuilt from the preset and the tokens without any Custom CSS, so the
+	forbidden CSS stops being served. The stored text is never touched; `css_notes` says why it is not applied.
 	"""
 	with apply_lock():
 		settings = settings or frappe.get_doc(SETTINGS)
 		custom = (settings.custom_css or "") if custom_css_enabled() else ""
-		css, digest = compiler.build(settings.preset, settings.token_overrides, custom, settings.custom_base)
+		notes = None
+		try:
+			css, digest = compiler.build(settings.preset, settings.token_overrides, custom, settings.custom_base)
+		except compiler.CustomCssError as error:
+			notes = rejection_notes(error.result)
+			custom = ""
+			css, digest = compiler.build(settings.preset, settings.token_overrides, "", settings.custom_base)
 		changes = {}
 		url, file_change = write_file(THEME_FILE, css)
 		if file_change:
@@ -55,7 +62,7 @@ def apply(settings=None) -> dict:
 			"theme_hash": digest,
 			"theme_file_url": url,
 			"safe_file_url": safe_url,
-			"css_notes": stale_notes(custom),
+			"css_notes": notes if notes is not None else stale_notes(custom),
 			"kit_version": f"{__version__}+api{WK_THEME_API}",
 		}
 		changes.update(record(settings, recorded))
@@ -70,8 +77,9 @@ def apply(settings=None) -> dict:
 
 def rejection_notes(result) -> str:
 	"""Notes text for Custom CSS that the rules of a new release reject (shown on the settings page, English)."""
+	lines = (f"{m.line}:{m.column}: {m.message}" for m in result.errors)
 	return "\n".join(
-		["rejected by the rules of this release:", *(f"{m.line}:{m.column}: {m.message}" for m in result.errors)]
+		["Not applied: the rules of this release reject the stored Custom CSS (it is kept as it is):", *lines]
 	)
 
 

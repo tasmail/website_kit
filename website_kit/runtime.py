@@ -97,9 +97,24 @@ def update_website_context(context):
 		# Strings for the standard templates: already escaped, braces encoded, so they are inert even in a second Jinja pass.
 		"wk": {"brand_name": esc(brand), "theme_api": WK_THEME_API, "mode": mode},
 	}
-	if mode != "normal":
-		values["no_cache"] = 1  # a page that only a manager sees must never be stored for the public
 	return values
+
+
+NOT_PUBLIC_PREFIXES = ("/app", "/api", "/assets", "/files", "/private", "/socket.io", "/desk")
+
+
+def is_public_html(response, request) -> bool:
+	"""True for an HTML page of the public website: not the Desk, the API, assets or file downloads."""
+	path = getattr(request, "path", "") or ""
+	return response.mimetype == "text/html" and not path.startswith(NOT_PUBLIC_PREFIXES)
+
+
+def is_https(request) -> bool:
+	"""True when the visitor reached the site over https, also behind a proxy that says so."""
+	if request is None:
+		return False
+	forwarded = (request.headers.get("X-Forwarded-Proto") or "").split(",")[0].strip().lower()
+	return request.scheme == "https" or forwarded == "https"
 
 
 def after_request(response, request):
@@ -112,11 +127,19 @@ def after_request(response, request):
 	allow = bool(settings and settings.allow_search_engines) and mode == "normal"
 	for name, value in seo.response_headers(allow).items():
 		response.headers.setdefault(name, value)
-	if mode != "normal":
+	request = request or getattr(frappe.local, "request", None)
+	if mode != "normal" and is_public_html(response, request):
 		response.headers["Cache-Control"] = "private, no-store"
 	flag = (frappe.form_dict or {}).get(SAFE_COOKIE)
 	if flag is not None and is_manager():
 		if str(flag) == "1":
-			response.set_cookie(SAFE_COOKIE, "1", max_age=SAFE_COOKIE_SECONDS, httponly=True, samesite="Lax")
+			response.set_cookie(
+				SAFE_COOKIE,
+				"1",
+				max_age=SAFE_COOKIE_SECONDS,
+				httponly=True,
+				samesite="Lax",
+				secure=is_https(request),
+			)
 		else:
 			response.delete_cookie(SAFE_COOKIE)

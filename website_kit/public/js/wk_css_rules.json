@@ -4,7 +4,8 @@
 		"max_rules": 1500,
 		"max_depth": 3,
 		"max_data_url": 4096,
-		"max_errors": 50
+		"max_errors": 50,
+		"max_nesting": 32
 	},
 	"at_rules": [
 		"media",
@@ -561,7 +562,9 @@
 		"contrast": "The text colour and the background have a contrast of {0}:1, below 4.5:1.",
 		"unknown-token": "The custom property {0} is not a token of this kit version.",
 		"unknown-class": "The class .{0} is not part of this kit version.",
-		"font-display-missing": "The @font-face rule has no font-display; add font-display: swap."
+		"font-display-missing": "The @font-face rule has no font-display; add font-display: swap.",
+		"too-nested": "Brackets, parentheses and functions are nested deeper than {0} levels.",
+		"var-in-url-property": "var() is not allowed in '{0}', because a custom property could carry an external address."
 	},
 	"known_custom_properties": [
 		"--wk-border-width",
@@ -600,5 +603,18 @@
 		"--wk-shadow-1",
 		"--wk-shadow-2",
 		"--wk-space-unit"
+	],
+	"url_capable_properties": [
+		"backdrop-filter",
+		"background",
+		"background-image",
+		"border-image",
+		"border-image-source",
+		"clip-path",
+		"content",
+		"cursor",
+		"filter",
+		"list-style",
+		"list-style-image"
 	]
 }

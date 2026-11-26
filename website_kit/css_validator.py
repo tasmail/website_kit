@@ -36,6 +36,7 @@ _SETS = {
 		"functions",
 		"font_face_functions",
 		"url_properties",
+		"url_capable_properties",
 		"pseudo_classes",
 		"pseudo_legacy_elements",
 		"pseudo_elements",
@@ -419,6 +420,11 @@ def build_tree(tokens: list[Tok], sink) -> list:
 	current = root
 	for tok in tokens:
 		if tok.type == "function" or (tok.type == "punct" and tok.value in "([{"):
+			if len(stack) >= LIMITS["max_nesting"]:
+				sink(
+					"too-nested", tok.line, tok.col, LIMITS["max_nesting"]
+				)  # the opener is dropped, so the stack stays bounded
+				continue
 			if tok.type == "function":
 				node = Node("fn", tok.value, tok.line, tok.col)
 				closer = ")"
@@ -683,6 +689,18 @@ class Checker:
 		if not _significant(prelude):
 			self.error("empty-selector", first)
 			return classes
+		has_part = False
+		last_comma = None
+		for item in _significant(prelude):
+			if isinstance(item, Tok) and item.type == "punct" and item.value == ",":
+				if not has_part:
+					self.error("empty-selector", item)
+				has_part = False
+				last_comma = item
+			else:
+				has_part = True
+		if not has_part and last_comma is not None:
+			self.error("empty-selector", last_comma)
 		self.selector_nodes(prelude, classes, nth=False)
 		return classes
 
@@ -900,6 +918,9 @@ class Checker:
 				self.url_target(parts[0].value, node, prop, context)
 			else:
 				self.error("bad-url", node)
+		elif name == "var" and prop in _SETS["url_capable_properties"]:
+			# A custom property may hold a string, and in an image context a string is an address: never resolve one here.
+			self.error("var-in-url-property", node, prop)
 		elif name == "image-set":
 			if prop not in _SETS["url_properties"]:
 				self.error("url-not-allowed", node, prop)

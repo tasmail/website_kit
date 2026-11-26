@@ -66,12 +66,13 @@ def duplicate_as_custom(preset, token_overrides=None, custom_base=None) -> dict:
 		frappe.throw(_("Invalid theme settings: {0}").format(str(error)))
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def save_draft(preset, token_overrides=None, custom_css="", custom_base=None) -> dict:
 	"""Write the unsaved look as a private draft file; only a Website Manager who opens `?wk_preview=1` sees it."""
 	_guard()
+	if not kit_apply.custom_css_enabled():
+		custom_css = ""  # the same rule as `apply` and `preview`: the draft shows what a save would serve
 	css, digest = _build(preset, token_overrides, custom_css, custom_base)
-	url = kit_apply.write_draft(css)
 	state = json.dumps(
 		{
 			"preset": preset,
@@ -81,15 +82,18 @@ def save_draft(preset, token_overrides=None, custom_css="", custom_base=None) ->
 			"hash": digest,
 		}
 	)
-	frappe.db.set_single_value(SETTINGS, {"draft_state": state, "draft_file_url": url})
-	frappe.clear_document_cache(SETTINGS, SETTINGS)
+	with kit_apply.apply_lock():  # two drafts at once must not create two draft files
+		url = kit_apply.write_draft(css)
+		frappe.db.set_single_value(SETTINGS, {"draft_state": state, "draft_file_url": url})
+		frappe.clear_document_cache(SETTINGS, SETTINGS)
 	return {"url": url, "hash": digest, "preview_url": "/?wk_preview=1", "safe_url": "/?wk_safe=1"}
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def discard_draft() -> bool:
 	_guard()
-	return kit_apply.discard_draft()
+	with kit_apply.apply_lock():
+		return kit_apply.discard_draft()
 
 
 def _save(values: dict, reason: str):
@@ -100,7 +104,7 @@ def _save(values: dict, reason: str):
 	return settings
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def restore_version(version) -> dict:
 	"""Make a saved version the current look; this saves it as a new version, so nothing is lost."""
 	_guard()
@@ -120,14 +124,14 @@ def restore_version(version) -> dict:
 	return {"theme_hash": frappe.db.get_single_value(SETTINGS, "theme_hash")}
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def reset_custom_css() -> dict:
 	_guard()
 	_save({"custom_css": ""}, _("Custom CSS reset"))
 	return {"theme_hash": frappe.db.get_single_value(SETTINGS, "theme_hash")}
 
 
-@frappe.whitelist()
+@frappe.whitelist(methods=["POST"])
 def reset_to_preset() -> dict:
 	"""Back to the plain ready-made look: no token overrides and no Custom CSS (a `custom` theme returns to its base)."""
 	_guard()

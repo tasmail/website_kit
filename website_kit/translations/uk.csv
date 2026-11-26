@@ -212,3 +212,5 @@ Product,Товар
 Name,Ім'я
 Your name,Ваше ім'я
 An error looks like this.,Так виглядає помилка.
+"Brackets, parentheses and functions are nested deeper than {0} levels.",Дужки та функції вкладені глибше ніж на {0} рівнів.
+"var() is not allowed in '{0}', because a custom property could carry an external address.","var() заборонений у '{0}', бо власна властивість може містити зовнішню адресу."
