@@ -38,6 +38,9 @@ a { color: var(--wk-color-link); }
 	color: var(--wk-color-primary-contrast);
 }
 
+.btn-primary:hover,
+.btn-primary:focus { filter: brightness(0.88); } /* visible feedback: the fill darkens */
+
 .form-control:focus {
 	border-color: var(--wk-color-accent);
 	box-shadow: none;
@@ -76,6 +79,7 @@ a { color: var(--wk-color-link); }
 
 .wk-header__inner {
 	align-items: center;
+	position: relative; /* the invisible menu checkbox is positioned against it */
 	display: flex;
 	flex-wrap: wrap;
 	gap: var(--wk-space-unit) calc(var(--wk-space-unit) * 3);

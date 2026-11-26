@@ -22,7 +22,7 @@ Anything not listed here (internal classes such as `.wk-header__inner`, Frappe o
    the shop pages, `/assets/website_kit/css/wk-shop.css`. The kit files are never linked from the Desk. Releases before 0.3 assigned
    a kit-owned Website Theme named `Website Kit`; `apply()` and `bench migrate` move a site that holds exactly that value back to
    `Standard` (any other theme is the customer's and is left alone). On the Frappe 15.128.0 CI bench `wk.css` measures
-   5.9 KB / 1.5 KB and `wk-theme.css` 3.7 KB / 1.0 KB (raw / gzip); CI prints them on every run.
+   7.5 KB / 1.8 KB and `wk-theme.css` of the `clear` preset 3.2 KB / 1.0 KB (raw / gzip); CI prints them on every run.
 4. `wk.css` reads only the custom properties below, so a preset change never needs a new stylesheet.
 
 ## Tokens
@@ -169,7 +169,7 @@ Selectors on internal classes (such as the parts of the header) or on Frappe and
 
 ## Shop styling
 
-While Webshop is on, the kit adds the body class `wk-shop` and one more stylesheet, `/assets/website_kit/css/wk-shop.css` (about 1.6 KB
+While Webshop is on, the kit adds the body class `wk-shop` and one more stylesheet, `/assets/website_kit/css/wk-shop.css` (5.4 KB raw, 1.6 KB
 gzip), on the Webshop pages only: the catalogue and its sub-routes, search, cart, orders, wishlist, checkout and the product pages. Webshop's
 markup is written against Frappe's design variables (`var(--gray-800)` even in inline styles), so the stylesheet points those variables
 (`--text-color`, `--gray-*`, `--border-color`, `--bg-color`, `--primary`, ...) at the kit tokens on the `wk-shop` body, plus a few rules for the card

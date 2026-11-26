@@ -210,6 +210,18 @@ jobs:
             LABEL="$preset" node scripts/shop_layout_check.mjs http://shop.localhost:8001 "$RUNNER_TEMP/shop-shots"
           done
           pkill -f "serve --port 8001" || true
+      # A site installed by a release before 0.3 holds the retired theme `Website Kit` (compiled by node here): a real `bench migrate`
+      # must move it to the stock theme, drop the record and its files, and the pages must still render with the base stylesheet.
+      - name: Migrate moves a site off the retired Website Theme
+        run: |
+          cd "$BENCH"
+          bench --site "$SITE" execute website_kit.probe.retire_theme
+          bench --site "$SITE" migrate
+          bench --site "$SITE" execute website_kit.probe.assert_stock_theme
+          (bench --site "$SITE" serve --port 8002 > "$RUNNER_TEMP/serve-migrate.log" 2>&1 &)
+          for _ in $(seq 1 60); do curl -fs -o /dev/null -H "Host: $SITE" http://127.0.0.1:8002/ && break; sleep 1; done
+          python "$GITHUB_WORKSPACE/scripts/check_pages.py" --base http://127.0.0.1:8002 --host "$SITE"
+          pkill -f "serve --port 8002" || true
       # Last: it leaves customer data (preset market) on the site, and the integration tests expect the install defaults.
       - name: Migrate keeps customer data
         run: |

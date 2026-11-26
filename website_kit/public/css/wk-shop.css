@@ -119,6 +119,10 @@ body.wk-shop {
 	color: var(--wk-color-primary-contrast);
 }
 
+.wk-shop .btn-primary:hover,
+.wk-shop .btn-primary:focus,
+.wk-shop .cart-btn:hover { filter: brightness(0.88); }
+
 .wk-shop .btn-default,
 .wk-shop .btn-light {
 	border: 1px solid var(--wk-color-border);
@@ -150,3 +154,6 @@ body.wk-shop {
 	border-color: var(--wk-color-link);
 	color: var(--wk-color-link);
 }
+
+/* Bootstrap's colour utilities are !important and fixed (#6c757d is 4.1:1 on white), so the muted text takes the token the same way. */
+.wk-shop .text-muted { color: var(--wk-color-muted) !important; }

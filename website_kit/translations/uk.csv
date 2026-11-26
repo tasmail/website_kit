@@ -1,6 +1,5 @@
 Website Kit,Website Kit
 Website Kit Settings,Налаштування Website Kit
-Theme,Тема
 Preset,Готова тема
 The ready-made look of the public website.,Готовий вигляд публічного сайту.
 Brand name,Назва бренду
@@ -12,7 +11,6 @@ Advanced,Додатково
 Token overrides,Зміни токенів
 "JSON with the values that differ from the preset: {""tokens"": {""color-primary"": ""#1d4ed8""}, ""variants"": {""card"": ""raised""}}.","JSON зі значеннями, що відрізняються від готової теми: {""tokens"": {""color-primary"": ""#1d4ed8""}, ""variants"": {""card"": ""raised""}}."
 Custom CSS,Власний CSS
-Status,Стан
 Applied kit version,Застосована версія набору
 Theme file hash,Хеш файлу теми
 Theme file,Файл теми
@@ -21,8 +19,6 @@ Invalid theme settings: {0},Некоректні налаштування тем
 Skip to content,Перейти до вмісту
 Home,Головна
 Main menu,Головне меню
-Login,Увійти
-My Account,Мій обліковий запис
 !important is only meant for --wk-* properties; it makes the rule hard to override.,!important призначений лише для властивостей --wk-*: через нього правило важко перевизначити.
 '!' is only allowed as !important at the end of a value.,'!' дозволено лише як !important в кінці значення.
 '{0}' is never closed.,'{0}' не закрито.
@@ -47,12 +43,12 @@ Cards,Картки
 Cards and bands,Картки та смуги
 Check the CSS on the server,Перевірити CSS на сервері
 Checked when you type and again on save. It is linked after the theme and only from public pages.,Перевіряється під час набору і ще раз під час збереження. Підключається після теми і лише на публічних сторінках.
-Clear,Чиста
+Clear,Чиста,Website Kit theme
 Colours,Кольори
 Contrast,Контраст
 Copy a ready-made theme,Скопіювати готову тему
 Corner radius,Заокруглення кутів
-Custom,Власна
+Custom,Власна,Website Kit theme
 Custom CSS help,Довідка про власний CSS
 Custom CSS is switched off for this site by the operator; it is saved but not applied.,"Оператор вимкнув власний CSS для цього сайту: його можна зберегти, але він не застосовується."
 Custom CSS messages,Повідомлення про власний CSS
@@ -63,7 +59,6 @@ Custom theme editor,Редактор власної теми
 Custom theme starts from,Власна тема походить від
 Dark band,Темна смуга
 Density,Щільність
-Desktop,Комп'ютер
 Discard the draft,Відкинути чернетку
 Draft,Чернетка
 Draft file,Файл чернетки
@@ -72,12 +67,10 @@ Draft saved,Чернетку збережено
 Errors,Помилки
 Expected 'property: value'.,Очікується 'властивість: значення'.
 Expected '{' after the rule.,Після правила очікується '{'.
-Footer,Підвал
 Hash,Хеш
-Header,Шапка
 Heading font,Шрифт заголовків
 Leave safe mode,Вийти з безпечного режиму
-Ledger,Облік
+Ledger,Облік,Website Kit theme
 Links,Посилання
 Live preview,Попередній перегляд
 Low contrast,Низький контраст
@@ -92,7 +85,6 @@ Open the site with the draft,Відкрити сайт із чернеткою
 Page background,Тло сторінки
 Page parts,Частини сторінки
 Phone,Телефон
-Preview,Перегляд
 Preview of the theme,Перегляд теми
 Preview width,Ширина перегляду
 Primary (buttons),Основний (кнопки)
@@ -152,7 +144,6 @@ There are no saved versions yet.,Збережених версій ще нема
 This CSS will not be saved,Цей CSS не буде збережено
 This hides a part of the page that the site needs ({0}).,"Це приховує частину сторінки, потрібну сайту ({0})."
 This version does not exist any more.,Цієї версії більше немає.
-Type,Шрифт
 Unexpected '{0}' in the selector.,Несподіване '{0}' у селекторі.
 Unexpected '{0}'.,Несподіване '{0}'.
 Version,Версія
@@ -197,19 +188,15 @@ text on surface,текст на поверхні
 tinted,тонована
 url() is not allowed in '{0}'.,url() заборонений у '{0}'.
 Services,Послуги
-Contacts,Контакти
 Welcome,Ласкаво просимо
 What we do,Чим ми займаємося
 "A short text of the page, with a",Короткий текст сторінки з
-link,посиланням
 Secondary text.,Другорядний текст.
 Call to action,Закликати до дії
 Secondary,Другорядна
 Card,Картка
 Cards follow the card style.,Картки слідують стилю карток.
 Sale,Акція
-Product,Товар
-Name,Ім'я
 Your name,Ваше ім'я
 An error looks like this.,Так виглядає помилка.
 Delete all sample products?,Видалити всі зразкові товари?
@@ -267,19 +254,14 @@ Add notes,Додати примітки
 Add to Cart,Додати в кошик
 Add to Quote,Додати до пропозиції
 All Products,Усі товари
-Applied Coupon Code,Застосований промокод
 Apply Coupon Code,Застосувати промокод
 Available on backorder,Доступно під замовлення
-Billing Address,Адреса виставлення рахунку
 Billing Address is same as Shipping Address,Адреса виставлення рахунку збігається з адресою доставки
 Cannot find a matching Item. Please select some other value for {0}.,Не знайдено відповідного товару. Оберіть інше значення для {0}.
 Cart is Empty,Кошик порожній
 Categories,Категорії
-Checkout,Оформлення замовлення
-Clear All,Скинути все
 Clear Values,Скинути значення
 Clear values,Скинути значення
-Contact Us,Зв'язатися з нами
 Continue Selection,Продовжити вибір
 Continue Shopping,Продовжити покупки
 Coupons,Промокоди
@@ -290,31 +272,22 @@ Explore,Дізнатися більше
 FREE,БЕЗКОШТОВНО
 Go to Cart,Перейти до кошика
 Go to Quote,Перейти до пропозиції
-Grand Total,Усього до сплати
 Headline,Заголовок
 In stock,В наявності
-Item,Товар
 Item Code,Код товару
-Items,Товари
 Items),товарів)
-Make Purchase Invoice,Створити рахунок на закупівлю
-More details,Докладніше
 More...,Ще...
-Move to Cart,Перенести до кошика
-Net Total,Сума без податків
 Net Total (,Сума без податків (
 No Reviews,Відгуків немає
 No products found,Товарів не знайдено
 No searches yet.,Пошуків ще не було.
 No values,Немає значень
-Not in stock,Немає в наявності
 OFF,ЗНИЖКА
 Organization Name,Назва організації
 Out of stock,Немає в наявності
 Overall Rating,Загальна оцінка
 Past Orders,Попередні замовлення
 Past Quotes,Попередні пропозиції
-Pay,Сплатити
 Pay Remaining,Сплатити залишок
 Phone Number,Номер телефону
 Payment Summary,Підсумок оплати
@@ -324,7 +297,6 @@ Please enter a valid coupon code,Введіть чинний промокод
 Prev,Назад
 Price,Ціна
 Product Details,Опис товару
-Products,Товари
 Qty,К-сть
 Quantity,Кількість
 Rate,Ціна
@@ -344,21 +316,15 @@ Select Variant for {0},Оберіть варіант для {0}
 Set Address,Вказати адресу
 Shipping Address,Адреса доставки
 Shop by Category,Товари за категоріями
-Shopping Cart,Кошик
 Something went wrong!,Щось пішло не так!
 Something went wrong. Please refresh or contact us.,Щось пішло не так. Оновіть сторінку або зв'яжіться з нами.
 "Sorry, something went wrong. Please refresh.","Вибачте, щось пішло не так. Оновіть сторінку."
 Subtotal,Проміжна сума
-Terms and Conditions,Умови та положення
 Thank you for submitting your review,Дякуємо за ваш відгук
 Thank you for the review,Дякуємо за відгук
-Total Amount,Загальна сума
-UOM,Од. вим.
-Valid Till,Дійсна до
 Value must be between {0} and {1},Значення має бути від {0} до {1}
 Variant,Варіант
 Variant of,Варіант товару
-View,Переглянути
 View More,Показати ще
 View all reviews,Усі відгуки
 View in Cart,Переглянути в кошику
@@ -372,4 +338,3 @@ Your cart is Empty,Ваш кошик порожній
 Page Not Found,Сторінку не знайдено
 Cart,Кошик
 Orders,Замовлення
-The page you are looking for has gone missing.,"Сторінка, яку ви шукаєте, зникла."

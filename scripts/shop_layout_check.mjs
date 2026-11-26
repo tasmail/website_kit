@@ -131,6 +131,43 @@ function sameLayout(facts, where, expectColumns) {
 	}
 }
 
+// Text against the background it is drawn on (the nearest ancestor with a solid fill): WCAG 4.5:1, 3:1 for large text.
+async function contrastProblems(page) {
+	return page.evaluate(() => {
+		const parse = (c) => (c.match(/[\d.]+/g) || []).map(Number);
+		const lum = ([r, g, b]) => {
+			const f = (v) => ((v /= 255) <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4);
+			return 0.2126 * f(r) + 0.7152 * f(g) + 0.0722 * f(b);
+		};
+		const backdrop = (e) => {
+			for (let n = e; n; n = n.parentElement) {
+				const c = parse(getComputedStyle(n).backgroundColor);
+				if (c.length >= 3 && (c.length === 3 || c[3] > 0.95)) return c.slice(0, 3);
+			}
+			return [255, 255, 255];
+		};
+		const selectors = "h1, h2, h3, h4, .breadcrumb-item, .breadcrumb a, .filters-title, .filter-label, .clear-filters a, .list-row, .list-row a, .list-row p, .list-row div, .card .card-title, .card p, .card a, .product-container h1, .product-container h2, .product-container p, .product-container .product-title, .product-container .product-code, .cart-empty-message, .cart-empty-message a, .cart-container h6, .shopping-cart-header, body > div p";
+		const out = [];
+		const seen = new Set();
+		for (const e of document.querySelectorAll(selectors)) {
+			const own = [...e.childNodes].some((n) => n.nodeType === 3 && n.textContent.trim().length > 1);
+			const box = e.getBoundingClientRect();
+			if (!own || seen.has(e) || box.width < 4 || box.height < 4) continue;
+			seen.add(e);
+			const cs = getComputedStyle(e);
+			if (cs.visibility === "hidden" || cs.display === "none" || parseFloat(cs.opacity) < 0.1) continue;
+			const fg = parse(cs.color).slice(0, 3);
+			const bg = backdrop(e);
+			const a = lum(fg), b = lum(bg);
+			const ratio = (Math.max(a, b) + 0.05) / (Math.min(a, b) + 0.05);
+			const size = parseFloat(cs.fontSize), bold = parseInt(cs.fontWeight, 10) >= 700;
+			const need = size >= 24 || (bold && size >= 18.66) ? 3 : 4.5;
+			if (ratio < need) out.push(`${e.tagName.toLowerCase()}.${(e.className || "").toString().slice(0, 30)} "${e.textContent.trim().slice(0, 24)}" ${ratio.toFixed(2)}:1 (needs ${need})`);
+		}
+		return out;
+	});
+}
+
 async function scrollBottom(page) {
 	await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
 	await pause(600);
@@ -145,6 +182,9 @@ try {
 			await page.goto(new URL(path, base).href, { waitUntil: "networkidle0" });
 			const where = `${size.width}px ${path}`;
 			await common(page, where, path !== "/login");
+			if (!["/login", "/no-such-page-for-the-check"].includes(path)) {
+				for (const text of await contrastProblems(page)) check(false, `${where}: low contrast ${text}`);
+			}
 			if (outDir) await page.screenshot({ path: `${outDir}/${label}-${path.replace(/[^a-z]+/g, "_")}-${size.width}.png`, fullPage: kind !== "list" });
 			if (kind === "list") {
 				await page.waitForSelector(".products-list .list-row");

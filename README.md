@@ -43,7 +43,7 @@ What exists:
 
 What does not exist yet: the "Public website" switch, and any deployment. These are planned in the analysis `docs/site-default-theme-analysis.md` of `tasmail/erpnext-infra`.
 
-Public pages keep Frappe's prebuilt `website.bundle.css` and add `wk.css` and the generated `wk-theme.css` (and `wk-shop.css` on shop pages). Measured on the Frappe 15.128.0 CI bench: `wk.css` 5.9 KB / 1.5 KB, `wk-theme.css` 3.7 KB / 1.0 KB (raw / gzip); the CI job prints the sizes on every run.
+Public pages keep Frappe's prebuilt `website.bundle.css` and add `wk.css` and the generated `wk-theme.css` (and `wk-shop.css` on shop pages). Measured on a Frappe 15.128.0 bench (raw / gzip): `wk.css` 7.5 KB / 1.8 KB, `wk-theme.css` of the `clear` preset 3.2 KB / 1.0 KB, `wk-shop.css` 5.4 KB / 1.6 KB; on `/all-products` with ten samples the three together are 4.4 KB gzip (the page is 4.5 KB heavier than the same page with them removed). The CI job prints the sizes of the first two on every run.
 
 Not verified: behaviour with the real Webshop (a stand-in of its two DocTypes is used in the tests), a real reCAPTCHA call,
 Frappe 16, Builder newer than 1.36.6, Lighthouse.
@@ -62,8 +62,8 @@ bench --site <site> install-app website_kit
 Builder is needed for the pages and `frappe_guard` for the contact form; the theme alone needs neither. Install Builder (and the
 guard) before the kit, or later: the kit writes its pages when Builder appears.
 
-Installing sets the `clear` preset, writes the theme file, assigns the Website Kit theme and templates in Website Settings (only
-where the site has the Frappe defaults), and closes the site to search engines. Installing again, or running `bench migrate`,
+Installing sets the `clear` preset, writes the theme file, assigns the Navbar and Footer templates in Website Settings (only
+where the site has the Frappe defaults; the Website Theme stays the stock `Standard` one, and a site that an older release had moved to the retired `Website Kit` theme is moved back by `bench migrate`), and closes the site to search engines. Installing again, or running `bench migrate`,
 changes nothing that the customer set.
 
 ## Development
