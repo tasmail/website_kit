@@ -140,7 +140,10 @@ NOT_PUBLIC_PREFIXES = ("/app", "/api", "/assets", "/files", "/private", "/socket
 def is_public_html(response, request) -> bool:
 	"""True for an HTML page of the public website: not the Desk, the API, assets or file downloads."""
 	path = getattr(request, "path", "") or ""
-	return response.mimetype == "text/html" and not path.startswith(NOT_PUBLIC_PREFIXES)
+	not_public = any(
+		path == prefix or path.startswith(prefix + "/") for prefix in NOT_PUBLIC_PREFIXES
+	)  # whole segments
+	return response.mimetype == "text/html" and not not_public
 
 
 def is_https(request) -> bool:
@@ -156,6 +159,8 @@ def after_request(response, request):
 
 	Also keeps the safe-mode cookie: `?wk_safe=1` sets it for a manager, `?wk_safe=0` clears it.
 	"""
+	if response is None:  # an error page that could not be built
+		return
 	settings = _settings()
 	mode = render_mode(settings)
 	allow = bool(settings and settings.allow_search_engines) and mode == "normal"

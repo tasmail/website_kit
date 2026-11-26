@@ -1,10 +1,13 @@
 import frappe
 from frappe import _
 from frappe.model.document import Document
-from frappe.utils import now_datetime
+from frappe.utils import now_datetime, validate_email_address
 
-from website_kit import apply
+from website_kit import apply, guard_keys
 from website_kit.theme import compiler, editor, presets, tokens
+
+# Fields whose value appears on the public pages: a change must reach pages that Frappe cached.
+PUBLIC_FIELDS = ("brand_name", "contact_email", "contact_phone", "address", "controller_name")
 
 
 class WebsiteKitSettings(Document):
@@ -23,6 +26,8 @@ class WebsiteKitSettings(Document):
 		except compiler.CustomCssError as error:
 			frappe.throw(editor.rejection_html(error.result, _), title=_("The Custom CSS was rejected"))
 		self.record_version(digest)
+		self.validate_contacts()
+		self.validate_recaptcha()
 
 	def record_version(self, digest: str) -> None:
 		"""Add a row to the version list when the compiled look differs from the newest version; keep the last 20."""
@@ -39,7 +44,41 @@ class WebsiteKitSettings(Document):
 		for row in list(self.versions)[: -editor.MAX_VERSIONS]:
 			self.remove(row)  # also renumbers the rows that stay
 
+	def validate_contacts(self):
+		self.contact_email = (self.contact_email or "").strip()
+		if self.contact_email:
+			validate_email_address(self.contact_email, throw=True)
+			if guard_keys.is_forbidden_recipient(self.contact_email):
+				frappe.throw(_("Use your own e-mail address: the contact form never sends to this domain."))
+			single = guard_keys.single_recipient(self.contact_email)
+			if not single:
+				frappe.throw(_("Enter one plain e-mail address, without a name or a list."))
+			self.contact_email = single
+		self.contact_phone = (self.contact_phone or "").strip()
+		self.address = (self.address or "").strip()
+		self.controller_name = (self.controller_name or "").strip()
+		if len(self.controller_name) > 140:
+			frappe.throw(_("The data controller name is too long (at most 140 characters)."))
+
+	def validate_recaptcha(self):
+		self.recaptcha_site_key = (self.recaptcha_site_key or "").strip()
+		if self.recaptcha_site_key and not guard_keys.valid_key(self.recaptcha_site_key):
+			frappe.throw(_("The reCAPTCHA site key looks wrong: it has letters, digits, - and _ only."))
+		if bool(self.recaptcha_site_key) != bool(self.recaptcha_secret):
+			frappe.throw(_("Enter both reCAPTCHA keys of the pair, or neither."))
+
 	def on_update(self):
-		apply.apply(self)
+		# The render path cannot read a password, so whether the pair is readable is recorded here.
+		ok = int(bool(self.recaptcha_site_key and self.get_password("recaptcha_secret", raise_exception=False)))
+		if self.recaptcha_keys_ok != ok:
+			frappe.db.set_single_value(self.doctype, "recaptcha_keys_ok", ok)
+			self.recaptcha_keys_ok = ok
+			frappe.clear_document_cache(self.doctype, self.name)
+		previous = self.get_doc_before_save()
+		apply.apply(self, previous_email=previous.contact_email if previous else None)
 		if not self.flags.keep_draft:
 			apply.discard_draft()
+		if previous is None or any(previous.get(field) != self.get(field) for field in PUBLIC_FIELDS):
+			from frappe.website.utils import clear_website_cache
+
+			clear_website_cache()

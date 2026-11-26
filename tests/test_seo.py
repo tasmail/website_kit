@@ -62,3 +62,44 @@ def test_the_stock_defaults_may_be_replaced():
 	changes = settings_sync.website_settings_changes(current, True)
 	assert changes["website_theme"] == "Website Kit"
 	assert changes["navbar_template"] == "WK Navbar"
+
+
+def test_contact_us_settings_follow_the_customers_address_and_the_guard():
+	changes = settings_sync.contact_us_changes
+	# the page is enabled only while the form is usable (guard, keys, enforce)
+	assert changes({"is_disabled": 1}, "me@example.com", None, True) == {
+		"forward_to_email": "me@example.com",
+		"is_disabled": 0,
+	}
+	assert changes({"is_disabled": 1}, "me@example.com", None, False) == {"forward_to_email": "me@example.com"}
+	# already the customer's address but disabled: enabled as soon as the form becomes usable (no stuck state)
+	assert changes({"forward_to_email": "me@example.com", "is_disabled": 1}, "me@example.com", None, True) == {
+		"is_disabled": 0
+	}
+	assert changes({"forward_to_email": "me@example.com", "is_disabled": 1}, "me@example.com", None, False) == {}
+	# and disabled again when the guard state stops being usable
+	assert changes({"forward_to_email": "me@example.com", "is_disabled": 0}, "me@example.com", None, False) == {
+		"is_disabled": 1
+	}
+	assert changes({"forward_to_email": "me@example.com", "is_disabled": 0}, "me@example.com", None, True) == {}
+	# the address moves along while it is the one the kit wrote last time, never over a different one
+	assert changes(
+		{"forward_to_email": "old@example.com", "is_disabled": 0}, "new@example.com", "old@example.com", True
+	) == {"forward_to_email": "new@example.com"}
+	assert (
+		changes({"forward_to_email": "mine@example.com", "is_disabled": 0}, "new@example.com", "old@example.com", True)
+		== {}
+	)
+	assert changes({"forward_to_email": "", "is_disabled": 0}, "", None, True) == {"is_disabled": 1}
+	# only one plain address is ever copied
+	for bad in ("a@foss.ua", "b@x.com, c@x.com", "Name <b@x.com>", "a@FOSS.UA."):
+		assert "forward_to_email" not in changes({"is_disabled": 1}, bad, None, True), bad
+	# the acknowledgement mail is switched off when the kit takes the page over, and a later choice is left alone
+	assert (
+		changes({"send_acknowledgement_email": 1, "is_disabled": 1}, "a@b.c", None, True)["send_acknowledgement_email"]
+		== 0
+	)
+	assert (
+		changes({"send_acknowledgement_email": 1, "forward_to_email": "a@b.c", "is_disabled": 0}, "a@b.c", None, True)
+		== {}
+	)

@@ -66,6 +66,8 @@ def test_the_default_settings_match_the_presets():
 	assert fields["custom_css"]["fieldtype"] == "Code" and not fields["custom_css"].get("read_only")
 	assert fields["versions"]["options"] == "Website Kit Theme Version"
 	assert {"token_overrides", "brand_name"} <= set(fields)
+	assert fields["recaptcha_secret"]["fieldtype"] == "Password" and fields["contact_email"]["options"] == "Email"
+	assert fields["pages_state"]["read_only"] == 1 and fields["pages_note"]["read_only"] == 1
 
 
 def test_the_version_is_semver():
@@ -76,6 +78,17 @@ def test_hooks_name_existing_functions():
 	text = (PKG / "hooks.py").read_text(encoding="utf-8")
 	for dotted in re.findall(r'"(website_kit\.[a-z_.]+)"', text):
 		module, _, function = dotted.rpartition(".")
+		if (ROOT / (dotted.replace(".", "/") + ".py")).is_file():
+			continue  # a module: `jinja.methods` registers every function it defines
 		source = (ROOT / (module.replace(".", "/") + ".py")).read_text(encoding="utf-8")
 		assert f"def {function}(" in source, dotted
 	assert 'app_license = "mit"' in text
+
+
+def test_hooks_register_every_before_request_function_in_one_assignment():
+	"""A second `before_request = [...]` line in hooks.py would silently replace the first (the contact guard hook and the kit's cache hook)."""
+	text = (PKG / "hooks.py").read_text(encoding="utf-8")
+	assert len(re.findall(r"^before_request\s*=", text, flags=re.M)) == 1
+	assert "website_kit.runtime.before_request" in text and "website_kit.contact.before_request" in text
+	for name in ("after_request", "update_website_context", "after_install", "after_migrate"):
+		assert len(re.findall(rf"^{name}\s*=", text, flags=re.M)) == 1, name

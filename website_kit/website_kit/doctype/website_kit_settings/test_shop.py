@@ -104,28 +104,60 @@ class TestShop(TestCase):
 		self.assertEqual(shop.load_samples()["created"], len(samples.ITEMS))
 		self.assertTrue(frappe.db.get_value("Item Price", {"item_code": samples.item_code("mug")}, "price_list"))
 
+	def own_file(self, name, private=0, attach=None, content="<svg xmlns='http://www.w3.org/2000/svg'/>"):
+		doc = frappe.get_doc(
+			{
+				"doctype": "File",
+				"file_name": name,
+				"content": content,
+				"is_private": private,
+				"attached_to_doctype": attach[0] if attach else None,
+				"attached_to_name": attach[1] if attach else None,
+			}
+		).insert(ignore_permissions=True)
+		return doc.name
+
 	def test_a_customers_own_files_named_like_samples_are_never_deleted(self):
 		shop.load_samples()
-		mine = []
-		for name, private, attach in (
-			("wk-sample-price-list.txt", 0, None),
-			("wk-sample-own.svg", 0, None),
-			("wk-sample-private.svg", 1, None),
-		):
-			doc = frappe.get_doc(
-				{
-					"doctype": "File",
-					"file_name": name,
-					"content": "<svg xmlns='http://www.w3.org/2000/svg'/>" if name.endswith("svg") else "prices",
-					"is_private": private,
-					"attached_to_doctype": attach[0] if attach else None,
-					"attached_to_name": attach[1] if attach else None,
-				}
-			).insert(ignore_permissions=True)
-			mine.append(doc.name)
+		# the customer's own Item (not tagged) that carries files named like the kit's pictures
+		own_item = frappe.get_doc(
+			{
+				"doctype": "Item",
+				"item_code": "WK-OWN-FILES",
+				"item_name": "Own",
+				"item_group": "All Item Groups",
+				"stock_uom": "Nos",
+				"is_stock_item": 0,
+			}
+		).insert(ignore_permissions=True)
+		self.addCleanup(lambda: frappe.delete_doc("Item", own_item.name, force=True, ignore_permissions=True))
+		own = {
+			"unattached public svg": self.own_file("wk-sample-own.svg"),
+			"unattached private svg": self.own_file("wk-sample-private.svg", private=1),
+			"public text": self.own_file("wk-sample-price-list.txt", content="prices"),
+			"public svg on the customer's item": self.own_file("wk-sample-item.svg", attach=("Item", own_item.name)),
+			"private svg on the customer's item": self.own_file(
+				"wk-sample-item-private.svg", private=1, attach=("Item", own_item.name)
+			),
+			"text on the customer's item": self.own_file(
+				"wk-sample-notes.txt", attach=("Item", own_item.name), content="notes"
+			),
+		}
+		mug = samples.item_code("mug")
+		on_sample = self.own_file(
+			"wk-sample-on-a-sample.txt", attach=("Item", mug), content="x"
+		)  # a non-svg on a sample item
+		private_on_sample = self.own_file("wk-sample-private-on-a-sample.svg", private=1, attach=("Item", mug))
+		found = set(shop.sample_files())
+		self.assertFalse(found & set(own.values()), "the selector picked a customer's file")
+		self.assertNotIn(on_sample, found)
+		self.assertNotIn(private_on_sample, found)
+		self.assertEqual(
+			len(found), 2 * len(samples.ITEMS), "the kit's own pictures are found (Item and Website Item records)"
+		)
 		shop.remove_samples()
-		for name in mine:
-			self.assertTrue(frappe.db.exists("File", name), name)
+		for label, name in own.items():
+			self.assertTrue(frappe.db.exists("File", name), label)
 			frappe.delete_doc("File", name, force=True, ignore_permissions=True)
 		self.assertEqual(shop.leftovers()["files"], 0)
 
@@ -277,6 +309,20 @@ class TestShop(TestCase):
 		self.assertTrue(shop.has_products())
 		frappe.db.rollback(save_point="wk_menu")
 		self.assertFalse(shop.has_products())  # a cold or warm cache gives the same answer: there is none
+
+	def test_a_rolled_back_change_never_flushes_the_page_cache(self):
+		"""The flush is queued for the commit; a full rollback drops the queue, so a failed request flushes nothing."""
+		shop.enable_shop()
+		frappe.db.commit()  # nothing of the setup may be left in the queue
+		with mock.patch.object(shop, "clear_website_pages") as flushed:
+			shop.load_samples()  # publishes the first Website Item: the answer flips, a flush is queued
+			frappe.db.rollback()
+			frappe.db.commit()
+			flushed.assert_not_called()
+			self.assertFalse(shop.has_products())
+			shop.load_samples()
+			frappe.db.commit()
+			flushed.assert_called()  # the same change, committed, does flush
 
 	def test_a_page_cache_flush_is_queued_only_when_the_answer_flips(self):
 		shop.enable_shop()
