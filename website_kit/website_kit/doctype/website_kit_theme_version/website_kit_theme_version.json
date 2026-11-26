@@ -1,0 +1,98 @@
+{
+ "actions": [],
+ "creation": "2026-11-27 12:00:00.000000",
+ "doctype": "DocType",
+ "editable_grid": 0,
+ "engine": "InnoDB",
+ "field_order": [
+  "saved_at",
+  "author",
+  "reason",
+  "preset",
+  "hash",
+  "custom_base",
+  "api_version",
+  "token_overrides",
+  "custom_css"
+ ],
+ "fields": [
+  {
+   "fieldname": "saved_at",
+   "fieldtype": "Datetime",
+   "label": "Saved at",
+   "in_list_view": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "author",
+   "fieldtype": "Link",
+   "label": "Saved by",
+   "options": "User",
+   "in_list_view": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "reason",
+   "fieldtype": "Data",
+   "label": "Reason",
+   "in_list_view": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "preset",
+   "fieldtype": "Data",
+   "label": "Preset",
+   "in_list_view": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "hash",
+   "fieldtype": "Data",
+   "label": "Hash",
+   "in_list_view": 1,
+   "read_only": 1
+  },
+  {
+   "fieldname": "custom_base",
+   "fieldtype": "Data",
+   "label": "Custom theme starts from",
+   "read_only": 1,
+   "hidden": 1
+  },
+  {
+   "fieldname": "api_version",
+   "fieldtype": "Int",
+   "label": "Theme API version",
+   "read_only": 1,
+   "hidden": 1
+  },
+  {
+   "fieldname": "token_overrides",
+   "fieldtype": "Code",
+   "label": "Token overrides",
+   "options": "JSON",
+   "read_only": 1,
+   "hidden": 1
+  },
+  {
+   "fieldname": "custom_css",
+   "fieldtype": "Code",
+   "label": "Custom CSS",
+   "options": "CSS",
+   "read_only": 1,
+   "hidden": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "istable": 1,
+ "links": [],
+ "modified": "2026-11-27 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Website Kit",
+ "name": "Website Kit Theme Version",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

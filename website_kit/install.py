@@ -3,7 +3,7 @@
 import frappe
 
 from . import apply as kit_apply
-from .theme import presets
+from .theme import compiler, presets
 
 SETTINGS = kit_apply.SETTINGS
 
@@ -32,9 +32,15 @@ def after_migrate() -> None:
 	"""Re-apply after a migrate so that a new kit release reaches the site's file. Stored tokens and CSS stay as they are.
 
 	A failure (bad stored overrides, a busy lock, a disk error) is logged and never aborts `bench migrate`; the previous
-	good file stays in place.
+	good file stays in place. Custom CSS that a stricter rule of the new release rejects is never edited or deleted: it is
+	reported on the settings page (`css_notes`) and the previous file stays.
 	"""
 	try:
 		kit_apply.apply()
+	except compiler.CustomCssError as error:
+		frappe.db.set_single_value(SETTINGS, "css_notes", kit_apply.rejection_notes(error.result))
+		frappe.log_error(
+			title="Website Kit: the stored Custom CSS fails the rules of this release, the previous file is kept"
+		)
 	except Exception:
 		frappe.log_error(title="Website Kit: the theme could not be applied after migrate, the previous file is kept")

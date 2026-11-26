@@ -45,7 +45,7 @@ def test_json_files_are_valid_and_name_the_module():
 		for folder in ("doctype", "web_template", "website_theme")
 		for path in (PKG / "website_kit" / folder).rglob("*.json")
 	]
-	assert len(files) == 4
+	assert len(files) >= 5
 	for path in files:
 		assert json.loads(path.read_text(encoding="utf-8"))["module"] == "Website Kit", path
 
@@ -59,11 +59,12 @@ def test_the_default_settings_match_the_presets():
 		(PKG / "website_kit/doctype/website_kit_settings/website_kit_settings.json").read_text(encoding="utf-8")
 	)
 	fields = {field["fieldname"]: field for field in doctype["fields"]}
-	assert fields["preset"]["options"].split("\n") == list(presets.PRESET_NAMES)
+	assert fields["preset"]["options"].split("\n") == list(presets.CHOICES)
 	assert fields["preset"]["default"] == presets.DEFAULT_PRESET
 	assert fields["allow_search_engines"]["default"] == "0"
 	assert doctype["issingle"] == 1
-	assert fields["custom_css"]["fieldtype"] == "Code" and fields["custom_css"]["read_only"] == 1
+	assert fields["custom_css"]["fieldtype"] == "Code" and not fields["custom_css"].get("read_only")
+	assert fields["versions"]["options"] == "Website Kit Theme Version"
 	assert {"token_overrides", "brand_name"} <= set(fields)
 
 

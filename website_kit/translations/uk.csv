@@ -12,7 +12,6 @@ Advanced,Додатково
 Token overrides,Зміни токенів
 "JSON with the values that differ from the preset: {""tokens"": {""color-primary"": ""#1d4ed8""}, ""variants"": {""card"": ""raised""}}.","JSON зі значеннями, що відрізняються від готової теми: {""tokens"": {""color-primary"": ""#1d4ed8""}, ""variants"": {""card"": ""raised""}}."
 Custom CSS,Власний CSS
-Not applied yet: the validated Custom CSS editor comes in a later release.,Поки не застосовується: редактор власного CSS із перевіркою з'явиться в наступному випуску.
 Status,Стан
 Applied kit version,Застосована версія набору
 Theme file hash,Хеш файлу теми
@@ -24,3 +23,192 @@ Home,Головна
 Main menu,Головне меню
 Login,Увійти
 My Account,Мій обліковий запис
+!important is only meant for --wk-* properties; it makes the rule hard to override.,!important призначений лише для властивостей --wk-*: через нього правило важко перевизначити.
+'!' is only allowed as !important at the end of a value.,'!' дозволено лише як !important в кінці значення.
+'{0}' is never closed.,'{0}' не закрито.
+"'{0}' is not allowed anywhere in the CSS, because it could end the style element.","'{0}' заборонено в будь-якому місці CSS, бо воно може закрити елемент style."
+'{0}' is not allowed in a @supports condition.,'{0}' заборонено в умові @supports.
+'{0}' is not allowed in a media query.,'{0}' заборонено в медіазапиті.
+@font-face may only use local() sources.,@font-face може використовувати лише джерела local().
+A colour is written as #rrggbb.,Колір записується як #rrggbb.
+"A draft is waiting. Saving this page publishes the values on the page, not the draft.","Є чернетка. Збереження цієї сторінки публікує значення зі сторінки, а не чернетку."
+A script URL is not allowed.,Адреса зі скриптом заборонена.
+"Accent (focus, badges)","Акцент (фокус, позначки)"
+"Accessible and public-sector sites: text and interface contrast of at least 7:1, 18 px text, strong borders, square buttons.","Доступні та публічні сайти: контраст тексту й елементів не нижче 7:1, текст 18 px, виразні рамки, квадратні кнопки."
+All colour pairs are readable,Усі пари кольорів читабельні
+At most {0} KB.,Не більше {0} КБ.
+"B2B, accounting and consulting: neutral greys, one dark accent, Source Sans 3, flat cards, dense tables.","B2B, облік і консалтинг: нейтральні сірі тони, один темний акцент, Source Sans 3, пласкі картки, щільні таблиці."
+Base text size,Базовий розмір тексту
+Body font,Шрифт тексту
+Borders,Рамки
+Button,Кнопка
+Buttons,Кнопки
+Cards,Картки
+Cards and bands,Картки та смуги
+Check the CSS on the server,Перевірити CSS на сервері
+Checked when you type and again on save. It is linked after the theme and only from public pages.,Перевіряється під час набору і ще раз під час збереження. Підключається після теми і лише на публічних сторінках.
+Clear,Чиста
+Colours,Кольори
+Contrast,Контраст
+Copy a ready-made theme,Скопіювати готову тему
+Corner radius,Заокруглення кутів
+Custom,Власна
+Custom CSS help,Довідка про власний CSS
+Custom CSS is switched off for this site by the operator; it is saved but not applied.,"Оператор вимкнув власний CSS для цього сайту: його можна зберегти, але він не застосовується."
+Custom CSS messages,Повідомлення про власний CSS
+Custom CSS reset,Власний CSS скинуто
+Custom properties must start with --wk- or --cx-.,Власні властивості мають починатися з --wk- або --cx-.
+Custom theme controls,Керування власною темою
+Custom theme editor,Редактор власної теми
+Custom theme starts from,Власна тема походить від
+Dark band,Темна смуга
+Density,Щільність
+Desktop,Комп'ютер
+Discard the draft,Відкинути чернетку
+Draft,Чернетка
+Draft file,Файл чернетки
+Draft saved,Чернетку збережено
+"Drop your own colours, sizes and Custom CSS and save? They stay in the versions.","Прибрати власні кольори, розміри та власний CSS і зберегти? Вони залишаться у версіях."
+Errors,Помилки
+Expected 'property: value'.,Очікується 'властивість: значення'.
+Expected '{' after the rule.,Після правила очікується '{'.
+Footer,Підвал
+Hash,Хеш
+Header,Шапка
+Heading font,Шрифт заголовків
+Leave safe mode,Вийти з безпечного режиму
+Ledger,Облік
+Links,Посилання
+Live preview,Попередній перегляд
+Low contrast,Низький контраст
+Market,Ринок
+Names in the Custom CSS that this kit version does not know.,"Назви у власному CSS, яких ця версія набору не знає."
+Nested rules are not allowed.,Вкладені правила заборонені.
+Night,Ніч
+Notes on the Custom CSS,Примітки до власного CSS
+"Only /files/ and /assets/ paths and small image data: URLs are allowed, not '{0}'.","Дозволені лише шляхи /files/ і /assets/ та малі зображення у вигляді data:, а не '{0}'."
+Open the draft on the site,Відкрити чернетку на сайті
+Open the site with the draft,Відкрити сайт із чернеткою
+Page background,Тло сторінки
+Page parts,Частини сторінки
+Phone,Телефон
+Preview,Перегляд
+Preview of the theme,Перегляд теми
+Preview width,Ширина перегляду
+Primary (buttons),Основний (кнопки)
+Reason,Причина
+Remove the Custom CSS and save? The old CSS stays in the versions.,Прибрати власний CSS і зберегти? Старий CSS залишиться у версіях.
+Reset Custom CSS,Скинути власний CSS
+Reset to preset,Скинути до готової теми
+Reset to the preset,Скинуто до готової теми
+Restore,Відновити
+Restore a version,Відновити версію
+Restored a version,Відновлено версію
+"Retail, shops and food: warm off-white, one warm accent, Lora headings with Source Sans 3, raised cards, pill buttons.","Роздріб, магазини та їжа: теплий білий, один теплий акцент, заголовки Lora з Source Sans 3, піднесені картки, круглі кнопки."
+Rules are nested deeper than {0} levels.,Правила вкладені глибше ніж на {0} рівні.
+Safe mode file,Файл безпечного режиму
+Save as draft,Зберегти як чернетку
+Saved,Збережено
+Saved at,Збережено о
+Saved by,Хто зберіг
+Saved versions,Збережені версії
+Saving publishes this look to the site. Use Save as draft to see it on the real pages first.,"Збереження публікує цей вигляд на сайті. Щоб спершу побачити його на справжніх сторінках, скористайтеся «Зберегти як чернетку»."
+Secondary text,Другорядний текст
+"Services and general business: white, one blue accent, Inter, outlined cards.","Послуги та загальний бізнес: білий, один синій акцент, Inter, картки з рамкою."
+Shape and space,Форма та відступи
+Start again from,Почати знову з
+"Start from any theme and change its colours, font, corners and spacing.","Почніть з будь-якої теми та змініть її кольори, шрифт, кути й відступи."
+"Technology and agencies: dark surfaces, light text, one bright accent, Manrope, dark header.","Технології та агенції: темні поверхні, світлий текст, один яскравий акцент, Manrope, темна шапка."
+Text,Текст
+Text on dark band,Текст на темній смузі
+Text on primary,Текст на основному кольорі
+The @font-face rule has no font-display; add font-display: swap.,У правилі @font-face немає font-display; додайте font-display: swap.
+The CSS has more than {0} rules.,У CSS понад {0} правил.
+The CSS is larger than {0} KB.,CSS більший за {0} КБ.
+The CSS is not valid UTF-8.,CSS не є коректним UTF-8.
+The CSS is valid,CSS коректний
+The Custom CSS was rejected,Власний CSS відхилено
+The at-rule @{0} is not allowed.,Правило @{0} заборонене.
+The character U+{0} (control or invisible) is not allowed.,Символ U+{0} (керівний або невидимий) заборонений.
+The class .{0} is not part of this kit version.,Клас .{0} не входить до цієї версії набору.
+The comment is never closed.,Коментар не закрито.
+The custom property {0} is not a token of this kit version.,Власна властивість {0} не є токеном цієї версії набору.
+The draft is ready. Open the site while you are logged in as a Website Manager to see it; visitors do not see it.,"Чернетка готова. Відкрийте сайт, увійшовши як Website Manager, щоб її побачити; відвідувачі її не бачать."
+The function {0}() is not allowed.,Функція {0}() заборонена.
+The last 20 saved looks. Restoring one saves it as a new version.,Останні 20 збережених виглядів. Відновлення зберігає вибраний як нову версію.
+The name of a @keyframes rule must start with cx-.,Назва правила @keyframes має починатися з cx-.
+The property '{0}' is not allowed.,Властивість '{0}' заборонена.
+The pseudo-class or pseudo-element '{0}' is not allowed.,Псевдоклас або псевдоелемент '{0}' заборонений.
+The selector is empty.,Селектор порожній.
+The selector part '{0}' could match the Desk or the system UI.,Частина селектора '{0}' може зачепити Desk або системний інтерфейс.
+The string is never closed.,Рядок не закрито.
+"The text colour and the background have a contrast of {0}:1, below 4.5:1.","Контраст кольору тексту й тла {0}:1, нижче 4,5:1."
+The url( is never closed.,url( не закрито.
+The url() is malformed.,url() має хибний формат.
+Theme API version,Версія API теми
+Theme cards,Картки тем
+Themes,Теми
+There are no saved versions yet.,Збережених версій ще немає.
+This CSS will not be saved,Цей CSS не буде збережено
+This hides a part of the page that the site needs ({0}).,"Це приховує частину сторінки, потрібну сайту ({0})."
+This version does not exist any more.,Цієї версії більше немає.
+Type,Шрифт
+Unexpected '{0}' in the selector.,Несподіване '{0}' у селекторі.
+Unexpected '{0}'.,Несподіване '{0}'.
+Version,Версія
+Versions,Версії
+View without Custom CSS,Переглянути без власного CSS
+Warnings,Попередження
+Website Kit Theme Version,Версія теми Website Kit
+"Written after the theme and linked only from the public pages, never from the Desk. Allowed: @media, @supports, @font-face (local fonts), @keyframes cx-*, most layout, colour and type properties, custom properties --wk-* and --cx-*, and url() to /files/ and /assets/ only. Selectors on internal classes or on Frappe and Webshop markup are outside the theming contract and may change in a release.","Записується після теми і підключається лише на публічних сторінках, ніколи в Desk. Дозволено: @media, @supports, @font-face (локальні шрифти), @keyframes cx-*, більшість властивостей розмітки, кольору й шрифту, власні властивості --wk-* і --cx-*, а url() лише на /files/ і /assets/. Селектори на внутрішні класи або на розмітку Frappe і Webshop не входять до контракту теми і можуть змінитися в релізі."
+Your company,Ваша компанія
+Your own colours and sizes are dropped when you pick a ready-made theme. Continue?,"Ваші кольори та розміри буде скинуто, якщо обрати готову тему. Продовжити?"
+accent on background,акцент на тлі
+accent on surface,акцент на поверхні
+button text on primary,текст кнопки на основному кольорі
+comfortable,звичайна
+compact,щільна
+danger text on background,текст помилки на тлі
+danger text on surface,текст помилки на поверхні
+dark,темна
+expression() is not allowed.,expression() заборонений.
+flat,пласкі
+large,велике
+light,світла
+link on background,посилання на тлі
+link on surface,посилання на поверхні
+medium,середнє
+muted text on background,другорядний текст на тлі
+muted text on surface,другорядний текст на поверхні
+needs,потрібно
+none,немає
+outlined,з рамкою
+pill,круглі
+primary on background,основний колір на тлі
+primary on surface,основний колір на поверхні
+raised,піднесені
+small,мале
+solid,суцільні
+spacious,просторова
+square,квадратні
+text on background,текст на тлі
+text on inverse (dark header and footer),текст на темному (шапка й підвал)
+text on surface,текст на поверхні
+tinted,тонована
+url() is not allowed in '{0}'.,url() заборонений у '{0}'.
+Services,Послуги
+Contacts,Контакти
+Welcome,Ласкаво просимо
+What we do,Чим ми займаємося
+"A short text of the page, with a",Короткий текст сторінки з
+link,посиланням
+Secondary text.,Другорядний текст.
+Call to action,Закликати до дії
+Secondary,Другорядна
+Card,Картка
+Cards follow the card style.,Картки слідують стилю карток.
+Sale,Акція
+Product,Товар
+Name,Ім'я
+Your name,Ваше ім'я
+An error looks like this.,Так виглядає помилка.

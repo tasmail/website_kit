@@ -14,33 +14,70 @@ from contextlib import contextmanager
 import frappe
 
 from . import WK_THEME_API, __version__, settings_sync
-from .theme import compiler
+from .theme import compiler, editor
 
 SETTINGS = "Website Kit Settings"
-THEME_FILE = "wk-theme.css"
+THEME_FILE = "wk-theme.css"  # public: tokens, then the validated Custom CSS
+SAFE_FILE = "wk-safe.css"  # public, written only while Custom CSS exists: the tokens alone, for safe mode
+DRAFT_FILE = "wk-draft.css"  # private: the draft, linked only for a Website Manager who asks for the preview
+
+
+def custom_css_enabled() -> bool:
+	"""The operator switch `website_kit_custom_css_enabled` of the site config (default on); no plan gating."""
+	value = frappe.conf.get("website_kit_custom_css_enabled", 1)
+	return str(value).strip().lower() not in ("0", "false", "no", "off", "")
 
 
 def apply(settings=None) -> dict:
 	"""Apply the settings (the saved Single by default); returns a dict of the changes made, empty if none.
 
 	Runs under a database lock, so two concurrent applies (a save and a migrate) never write the file at the same time.
+	Custom CSS is validated again inside `compiler.build`: if the stored CSS no longer passes (a stricter rule in a new
+	release), nothing is written and the previous good file stays.
 	"""
 	with apply_lock():
 		settings = settings or frappe.get_doc(SETTINGS)
-		css, digest = compiler.build(settings.preset, settings.token_overrides)
+		custom = (settings.custom_css or "") if custom_css_enabled() else ""
+		css, digest = compiler.build(settings.preset, settings.token_overrides, custom, settings.custom_base)
 		changes = {}
-		url, file_change = write_theme_file(css)
+		url, file_change = write_file(THEME_FILE, css)
 		if file_change:
 			changes["theme_file"] = file_change
-		recorded = {"theme_hash": digest, "theme_file_url": url, "kit_version": f"{__version__}+api{WK_THEME_API}"}
+		safe_url = ""
+		if custom.strip():
+			safe_css = compiler.build(settings.preset, settings.token_overrides, "", settings.custom_base)[0]
+			safe_url, safe_change = write_file(SAFE_FILE, safe_css)
+			if safe_change:
+				changes["safe_file"] = safe_change
+		elif remove_file(SAFE_FILE):
+			changes["safe_file"] = "removed"
+		recorded = {
+			"theme_hash": digest,
+			"theme_file_url": url,
+			"safe_file_url": safe_url,
+			"css_notes": stale_notes(custom),
+			"kit_version": f"{__version__}+api{WK_THEME_API}",
+		}
 		changes.update(record(settings, recorded))
 		changes.update(sync_website_settings(bool(settings.allow_search_engines)))
-		if "theme_file" in changes or "theme_hash" in changes:
+		if {"theme_file", "safe_file", "theme_hash"} & set(changes):
 			# Cached pages still link the old ?v=<hash>.
 			from frappe.website.utils import clear_website_cache
 
 			clear_website_cache()
 		return changes
+
+
+def rejection_notes(result) -> str:
+	"""Notes text for Custom CSS that the rules of a new release reject (shown on the settings page, English)."""
+	return "\n".join(
+		["rejected by the rules of this release:", *(f"{m.line}:{m.column}: {m.message}" for m in result.errors)]
+	)
+
+
+def stale_notes(custom_css: str) -> str:
+	"""The notes of the settings page about names in the Custom CSS that this kit version no longer knows."""
+	return "\n".join(f"{m['line']}:{m['column']}: {m['message']}" for m in editor.stale_names(custom_css))
 
 
 @contextmanager
@@ -67,15 +104,16 @@ def lock_is_free() -> bool:
 	return frappe.db.sql("SELECT IS_FREE_LOCK(%s)", (name,))[0][0] == 1
 
 
-def find_theme_file():
-	"""The File record of the kit: attached to the settings, never a file that only has the same name."""
+def find_theme_file(file_name: str = THEME_FILE, private: bool = False):
+	"""The File record of the kit named `file_name`: attached to the settings, never a file that only has the same name."""
+	stem = file_name.removesuffix(".css")
 	rows = frappe.get_all(
 		"File",
 		filters={
 			"attached_to_doctype": SETTINGS,
 			"attached_to_name": SETTINGS,
-			"is_private": 0,
-			"file_name": ["like", "wk-theme%.css"],
+			"is_private": 1 if private else 0,
+			"file_name": ["like", f"{stem}%.css"],
 		},
 		fields=["name"],
 		order_by="creation asc",
@@ -84,20 +122,20 @@ def find_theme_file():
 	return rows[0].name if rows else None
 
 
-def write_theme_file(css: str) -> tuple[str, str | None]:
-	"""Write the CSS as the public File of the kit; returns `(file_url, change)` with change None when equal.
+def write_file(file_name: str, css: str, private: bool = False) -> tuple[str, str | None]:
+	"""Write the CSS as a File of the kit; returns `(file_url, change)` with change None when equal.
 
-	A new file is named `wk-theme.css`; if some other file already uses that name, Frappe picks a suffixed name for ours and
+	A new file is named `file_name`; if some other file already uses that name, Frappe picks a suffixed name for ours and
 	the other file is left alone. An existing file is replaced atomically (temp file, then rename).
 	"""
-	name = find_theme_file()
+	name = find_theme_file(file_name, private)
 	if not name:
 		doc = frappe.get_doc(
 			{
 				"doctype": "File",
-				"file_name": THEME_FILE,
+				"file_name": file_name,
 				"content": css,
-				"is_private": 0,
+				"is_private": 1 if private else 0,
 				"attached_to_doctype": SETTINGS,
 				"attached_to_name": SETTINGS,
 			}
@@ -109,6 +147,32 @@ def write_theme_file(css: str) -> tuple[str, str | None]:
 		return doc.file_url, None
 	_replace_atomically(doc, css)
 	return doc.file_url, "updated"
+
+
+def remove_file(file_name: str, private: bool = False) -> bool:
+	"""Delete the kit's File of that name (record and file on disk); True when there was one."""
+	name = find_theme_file(file_name, private)
+	if not name:
+		return False
+	frappe.delete_doc("File", name, ignore_permissions=True, force=True)
+	return True
+
+
+def discard_draft() -> bool:
+	"""Remove the draft file and forget the draft; True when there was one."""
+	removed = remove_file(DRAFT_FILE, private=True)
+	remembered = frappe.db.get_single_value(SETTINGS, "draft_file_url") or frappe.db.get_single_value(
+		SETTINGS, "draft_state"
+	)
+	if remembered:
+		frappe.db.set_single_value(SETTINGS, {"draft_state": "", "draft_file_url": ""})
+		frappe.clear_document_cache(SETTINGS, SETTINGS)
+	return bool(removed or remembered)
+
+
+def write_draft(css: str) -> str:
+	"""Write the draft CSS as a private File (only users who may read the settings can fetch it); returns its URL."""
+	return write_file(DRAFT_FILE, css, private=True)[0]
 
 
 def _replace_atomically(doc, css: str) -> None:

@@ -5,10 +5,14 @@ import json
 import re
 from pathlib import Path
 
+from website_kit.theme import contrast
+
 PKG = Path(__file__).resolve().parent.parent / "website_kit"
-DOCTYPE = PKG / "website_kit/doctype/website_kit_settings/website_kit_settings.json"
+DOCTYPES = sorted((PKG / "website_kit/doctype").glob("*/*.json"))
+RULES = PKG / "public/js/wk_css_rules.json"
 UK = {row[0]: row[1] for row in csv.reader((PKG / "translations" / "uk.csv").open(encoding="utf-8"))}
 CALL = re.compile(r"""\b_\(\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)')\s*\)""")
+JS_CALL = re.compile(r"""\b__\(\s*(?:"((?:[^"\\]|\\.)*)"|'((?:[^'\\]|\\.)*)')\s*\)""")
 
 
 def sources_in_code():
@@ -18,27 +22,42 @@ def sources_in_code():
 			continue
 		for double, single in CALL.findall(path.read_text(encoding="utf-8")):
 			found.add((double or single).replace('\\"', '"').replace("\\'", "'"))
+	for path in PKG.rglob("*.js"):
+		for double, single in JS_CALL.findall(path.read_text(encoding="utf-8")):
+			found.add((double or single).replace('\\"', '"').replace("\\'", "'"))
+	return found
+
+
+def sources_in_data():
+	"""Strings that live in data files: the validator messages, the preset names and texts, the contrast pair labels."""
+	found = set(json.loads(RULES.read_text(encoding="utf-8"))["messages"].values())
+	for path in (PKG / "theme" / "presets").glob("*.json"):
+		data = json.loads(path.read_text(encoding="utf-8"))
+		found |= {data["label"], data["description"]}
+	found |= {label for label, *_ in contrast.PAIRS}
 	return found
 
 
 def sources_in_doctype():
-	data = json.loads(DOCTYPE.read_text(encoding="utf-8"))
-	found = {data["name"], data["module"]}
-	for field in data["fields"]:
-		found.add(field["label"])
-		if field.get("description"):
-			found.add(field["description"])
+	found = set()
+	for doctype in DOCTYPES:
+		data = json.loads(doctype.read_text(encoding="utf-8"))
+		found |= {data["name"], data["module"]}
+		for field in data["fields"]:
+			found.add(field["label"])
+			if field.get("description"):
+				found.add(field["description"])
 	return found  # the Select options are the preset names, which stay as the product names
 
 
 def test_every_string_is_translated():
-	needed = sources_in_code() | sources_in_doctype()
+	needed = sources_in_code() | sources_in_doctype() | sources_in_data()
 	assert needed, "no strings found"
 	assert sorted(needed - set(UK)) == []
 
 
 def test_no_dead_rows():
-	assert sorted(set(UK) - (sources_in_code() | sources_in_doctype())) == []
+	assert sorted(set(UK) - (sources_in_code() | sources_in_doctype() | sources_in_data())) == []
 
 
 def test_translations_are_ukrainian_and_keep_placeholders():

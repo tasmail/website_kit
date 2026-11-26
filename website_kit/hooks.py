@@ -12,6 +12,7 @@ after_migrate = ["website_kit.install.after_migrate"]
 
 # The stylesheet links and the robots tag are added to public website pages only, never to the Desk.
 update_website_context = ["website_kit.runtime.update_website_context"]
+before_request = ["website_kit.runtime.before_request"]
 after_request = ["website_kit.runtime.after_request"]
 
 # The filter `wk_esc` of the standard templates: HTML escape plus brace encoding.
