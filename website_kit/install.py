@@ -54,6 +54,13 @@ def after_migrate() -> None:
 	stops serving it (the preset without Custom CSS) and says so in `css_notes` on the settings page.
 	"""
 	try:
+		from . import shop
+
+		if shop.shop_installed():
+			shop.ensure_tag_fields()  # DDL: done here so that loading samples never commits halfway
+	except Exception:
+		frappe.log_error(title="Website Kit: the sample tag fields could not be created")
+	try:
 		kit_apply.apply()
 		kit_apply.discard_draft()  # a draft was compiled by the rules of the release before the migrate
 	except Exception:

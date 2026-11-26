@@ -86,6 +86,31 @@ def assert_customized() -> None:
 	print("customer data kept")
 
 
+def complete_setup() -> None:
+	"""CI only: run the setup wizard on a site that has ERPNext, so that a Company exists for the shop tests."""
+	from frappe.desk.page.setup_wizard.setup_wizard import setup_complete
+
+	setup_complete(
+		{
+			"language": "en",
+			"country": "Ukraine",
+			"timezone": "Europe/Kiev",
+			"currency": "UAH",
+			"company_name": "CI Company",
+			"company_abbr": "CI",
+			"chart_of_accounts": "Standard",
+			"fy_start_date": "2026-01-01",
+			"fy_end_date": "2026-12-31",
+			"full_name": "CI Admin",
+			"email": "ci-admin@example.com",
+			"password": "ci-admin-pass-12345",
+			"domains": [],
+		}
+	)
+	frappe.db.commit()
+	print("setup complete")
+
+
 def http_cache_check() -> None:
 	"""CI and local check, over real WSGI requests with the website page cache on: a manager's `?wk_safe=1` page is never served
 	from the cache, a guest never receives it, and the cookie keeps safe mode for the manager only.

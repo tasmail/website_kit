@@ -16,6 +16,11 @@ What exists:
   The settings page has preset cards with a live preview, a `custom` theme editor (colours with contrast checks, fonts, corners,
   density, variants), Custom CSS with a parser-based validator and a client twin, draft preview, safe mode (`?wk_safe=1`),
   versions and "Reset to preset" (see [docs/theming.md](docs/theming.md)).
+- The shop actions of the settings page (they need ERPNext and Webshop): "Enable shop" (company, price list, 12 products per page,
+  the menu link), opt-in sample products (ten non-stock items with pictures the kit draws itself, every record tagged
+  `website_kit_sample`) and their complete removal, `wk-shop.css` for the Webshop cards, filters and cart, the rule that an
+  empty shop hides its menu entry, the setup-wizard stage (brand name and Contact Us Settings, filled once) and the opt-in
+  "Personalize this site" action for sites that existed before the kit.
 - The token layer (`--wk-*` custom properties and `data-wk-*` variants) and five presets as data: `clear` (default), `market`,
   `contrast` (7:1), `night`, `ledger`. They compile into one small plain CSS file per site (`/files/wk-theme.css`); there is
   no SCSS or node step at runtime. The public names are documented in [docs/theming.md](docs/theming.md) and guarded by a
