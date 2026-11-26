@@ -45,12 +45,14 @@ jobs:
             python: "3.11"
             node: "20"
             mariadb: "10.6"
+            builder: v1.36.6
             experimental: false
           - frappe: "16"
             branch: version-16
             python: "3.14"
             node: "24"
             mariadb: "11.8"
+            builder: v1.36.6
             experimental: true
     services:
       mariadb:
@@ -95,9 +97,14 @@ jobs:
             for _ in $(seq 1 30); do redis-cli -p "$port" ping 2>/dev/null | grep -q PONG && break; sleep 1; done
             redis-cli -p "$port" ping
           done
-      - name: Get the app
+      # Builder is pinned like the platform pins it (PINNED_APPS); frappe_guard is our own app and floats on its main branch.
+      - name: Get Builder, frappe_guard and the app
         run: |
           cd "$BENCH"
+          bench get-app builder https://github.com/frappe/builder --branch "${{ matrix.builder }}" --skip-assets
+          bench get-app frappe_guard https://github.com/tasmail/frappe-guard --skip-assets
+          git -C apps/builder log -1 --format='builder %h %s'
+          git -C apps/frappe_guard log -1 --format='frappe_guard %h %s'
           bench get-app website_kit "$GITHUB_WORKSPACE" --skip-assets
       - name: New site
         run: |
@@ -107,6 +114,8 @@ jobs:
       - name: Install the app
         run: |
           cd "$BENCH"
+          bench --site "$SITE" install-app builder
+          bench --site "$SITE" install-app frappe_guard
           bench --site "$SITE" install-app website_kit
           bench build --app website_kit
           test -f sites/assets/website_kit/css/wk.css
@@ -132,6 +141,24 @@ jobs:
         run: |
           cd "$BENCH"
           bench --site "$SITE" run-tests --app website_kit
+      - name: Pages on the wire (weight, script files) and accessibility (axe), with and without the contact form
+        run: |
+          cd "$BENCH"
+          (bench --site "$SITE" serve --port 8000 > "$RUNNER_TEMP/serve.log" 2>&1 &)
+          for _ in $(seq 1 60); do curl -fs -o /dev/null -H "Host: $SITE" http://127.0.0.1:8000/ && break; sleep 1; done
+          python "$GITHUB_WORKSPACE/scripts/check_pages.py" --base http://127.0.0.1:8000 --host "$SITE"
+          cd "$GITHUB_WORKSPACE"
+          npm install --no-save --no-audit --no-fund puppeteer-core@23.11.1 axe-core@4.10.2
+          export CHROME="$(which google-chrome)"
+          node scripts/axe_check.mjs "http://$SITE:8000"
+          cd "$BENCH"
+          bench --site "$SITE" set-config guard_mode enforce
+          bench --site "$SITE" execute website_kit.probe.contact_demo
+          python "$GITHUB_WORKSPACE/scripts/check_pages.py" --base http://127.0.0.1:8000 --host "$SITE"
+          (cd "$GITHUB_WORKSPACE" && node scripts/axe_check.mjs "http://$SITE:8000" && node scripts/form_check.mjs "http://$SITE:8000")
+          bench --site "$SITE" execute website_kit.probe.contact_demo_off
+          bench --site "$SITE" set-config guard_mode monitor
+          pkill -f "serve --port 8000" || true
       # Last: it leaves customer data (preset market) on the site, and the integration tests expect the install defaults.
       - name: Migrate keeps customer data
         run: |

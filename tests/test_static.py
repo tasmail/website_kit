@@ -65,6 +65,8 @@ def test_the_default_settings_match_the_presets():
 	assert doctype["issingle"] == 1
 	assert fields["custom_css"]["fieldtype"] == "Code" and fields["custom_css"]["read_only"] == 1
 	assert {"token_overrides", "brand_name"} <= set(fields)
+	assert fields["recaptcha_secret"]["fieldtype"] == "Password" and fields["contact_email"]["options"] == "Email"
+	assert fields["pages_state"]["read_only"] == 1 and fields["pages_note"]["read_only"] == 1
 
 
 def test_the_version_is_semver():
@@ -75,6 +77,8 @@ def test_hooks_name_existing_functions():
 	text = (PKG / "hooks.py").read_text(encoding="utf-8")
 	for dotted in re.findall(r'"(website_kit\.[a-z_.]+)"', text):
 		module, _, function = dotted.rpartition(".")
+		if (ROOT / (dotted.replace(".", "/") + ".py")).is_file():
+			continue  # a module: `jinja.methods` registers every function it defines
 		source = (ROOT / (module.replace(".", "/") + ".py")).read_text(encoding="utf-8")
 		assert f"def {function}(" in source, dotted
 	assert 'app_license = "mit"' in text

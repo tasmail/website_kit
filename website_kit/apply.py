@@ -13,14 +13,14 @@ from contextlib import contextmanager
 
 import frappe
 
-from . import WK_THEME_API, __version__, settings_sync
+from . import WK_THEME_API, __version__, contact, settings_sync
 from .theme import compiler
 
 SETTINGS = "Website Kit Settings"
 THEME_FILE = "wk-theme.css"
 
 
-def apply(settings=None) -> dict:
+def apply(settings=None, previous_email=None) -> dict:
 	"""Apply the settings (the saved Single by default); returns a dict of the changes made, empty if none.
 
 	Runs under a database lock, so two concurrent applies (a save and a migrate) never write the file at the same time.
@@ -35,6 +35,7 @@ def apply(settings=None) -> dict:
 		recorded = {"theme_hash": digest, "theme_file_url": url, "kit_version": f"{__version__}+api{WK_THEME_API}"}
 		changes.update(record(settings, recorded))
 		changes.update(sync_website_settings(bool(settings.allow_search_engines)))
+		changes.update(contact.sync_contact_settings(settings.contact_email, previous_email))
 		if "theme_file" in changes or "theme_hash" in changes:
 			# Cached pages still link the old ?v=<hash>.
 			from frappe.website.utils import clear_website_cache
