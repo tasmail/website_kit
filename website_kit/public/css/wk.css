@@ -2,6 +2,51 @@
  * Every value comes from the --wk-* custom properties that the generated per-site file defines (docs/theming.md).
  * Classes carry the wk- prefix, so Frappe forms and the Desk are left alone. Logical properties keep RTL possible. */
 
+/* Frappe's design variables point at the kit tokens on every page that loads the kit: Webshop's markup, the login and
+ * update-password pages, the 404 page and the breadcrumb are written against them (`var(--gray-800)`, even in inline styles), so a
+ * dark or high-contrast preset restyles the stock markup without light text on a white card or grey text under 4.5:1. */
+:root {
+	--bg-color: var(--wk-color-bg);
+	--fg-color: var(--wk-color-bg);
+	--card-bg: var(--wk-card-bg);
+	--control-bg: var(--wk-color-bg);
+	--white: var(--wk-color-bg);
+	--gray-50: var(--wk-color-surface);
+	--gray-100: var(--wk-color-surface);
+	--fg-hover-color: var(--wk-color-surface);
+	--btn-default-bg: var(--wk-color-surface);
+	--btn-default-hover-bg: var(--wk-color-surface);
+	--blue-50: var(--wk-color-surface);
+	--gray-200: var(--wk-color-border);
+	--gray-300: var(--wk-color-border);
+	--border-color: var(--wk-color-border);
+	--dark-border-color: var(--wk-color-border);
+	--gray-400: var(--wk-color-muted);
+	--gray-500: var(--wk-color-muted);
+	--gray-600: var(--wk-color-muted);
+	--text-muted: var(--wk-color-muted);
+	--text-light: var(--wk-color-muted);
+	--gray-700: var(--wk-color-text);
+	--gray-800: var(--wk-color-text);
+	--gray-900: var(--wk-color-text);
+	--text-color: var(--wk-color-text);
+	--heading-color: var(--wk-color-text);
+	--primary: var(--wk-color-primary);
+	--btn-primary: var(--wk-color-primary);
+	--blue-500: var(--wk-color-link);
+	--blue-600: var(--wk-color-link);
+	--blue-700: var(--wk-color-link);
+	--border-radius: var(--wk-radius-sm);
+	--border-radius-md: var(--wk-radius-md);
+	--border-radius-lg: var(--wk-radius-lg);
+	--card-border-radius: var(--wk-radius-md);
+	--product-bg-color: var(--wk-card-bg);
+	--body-bg-color: var(--wk-color-bg);
+}
+
+/* Bootstrap's colour utilities are !important and fixed (#6c757d is 4.1:1 on white), so the muted text takes the token the same way. */
+.text-muted { color: var(--wk-color-muted) !important; }
+
 body {
 	background: var(--wk-color-bg);
 	color: var(--wk-color-text);
@@ -23,8 +68,9 @@ h3 { font-size: calc(1rem * var(--wk-heading-scale)); }
 
 a { color: var(--wk-color-link); }
 
+/* !important: Webshop's `.btn:focus { outline: none }` and Bootstrap's focus shadows would otherwise hide the keyboard ring. */
 :focus-visible {
-	outline: max(2px, var(--wk-border-width)) solid var(--wk-color-accent);
+	outline: max(2px, var(--wk-border-width)) solid var(--wk-color-accent) !important;
 	outline-offset: 2px;
 }
 

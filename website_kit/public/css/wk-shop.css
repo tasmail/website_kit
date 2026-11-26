@@ -1,49 +1,13 @@
 /* Website Kit shop stylesheet: the stock Webshop pages (catalogue, search, product, cart, orders, wishlist) follow the tokens.
  *
  * Linked, and the body class `wk-shop` added, only on those pages while the shop is on (runtime.is_shop_page); every rule is under
- * `.wk-shop`, so the login page, the Builder pages and the Desk are never touched. Webshop's own markup is written against Frappe's
- * design variables (`var(--gray-800)` even in inline styles), so the main job is to point those variables at the kit tokens: a dark
- * preset then restyles the stock markup without light text on a white card. The few rules after that set radii, borders and fonts.
+ * `.wk-shop`, so the Builder pages and the Desk are never touched. Webshop's own markup is written against Frappe's design
+ * variables (`var(--gray-800)` even in inline styles); those are pointed at the kit tokens on `:root` in wk.css, for every page
+ * that loads the kit (login, 404 and the breadcrumb read them too). The rules here set radii, borders and fonts of the shop.
  * No images, no fonts, no layout rules: Frappe's website.bundle.css and Webshop's bundle stay in charge of the layout.
  * Webshop's markup is outside the theming contract (docs/theming.md); a Webshop release can change it. */
 
 body.wk-shop {
-	--bg-color: var(--wk-color-bg);
-	--fg-color: var(--wk-color-bg);
-	--card-bg: var(--wk-card-bg);
-	--control-bg: var(--wk-color-bg);
-	--white: var(--wk-color-bg);
-	--gray-50: var(--wk-color-surface);
-	--gray-100: var(--wk-color-surface);
-	--fg-hover-color: var(--wk-color-surface);
-	--btn-default-bg: var(--wk-color-surface);
-	--btn-default-hover-bg: var(--wk-color-surface);
-	--blue-50: var(--wk-color-surface);
-	--gray-200: var(--wk-color-border);
-	--gray-300: var(--wk-color-border);
-	--border-color: var(--wk-color-border);
-	--dark-border-color: var(--wk-color-border);
-	--gray-400: var(--wk-color-muted);
-	--gray-500: var(--wk-color-muted);
-	--gray-600: var(--wk-color-muted);
-	--text-muted: var(--wk-color-muted);
-	--text-light: var(--wk-color-muted);
-	--gray-700: var(--wk-color-text);
-	--gray-800: var(--wk-color-text);
-	--gray-900: var(--wk-color-text);
-	--text-color: var(--wk-color-text);
-	--heading-color: var(--wk-color-text);
-	--primary: var(--wk-color-primary);
-	--btn-primary: var(--wk-color-primary);
-	--blue-500: var(--wk-color-link);
-	--blue-600: var(--wk-color-link);
-	--blue-700: var(--wk-color-link);
-	--border-radius: var(--wk-radius-sm);
-	--border-radius-md: var(--wk-radius-md);
-	--border-radius-lg: var(--wk-radius-lg);
-	--card-border-radius: var(--wk-radius-md);
-	--product-bg-color: var(--wk-card-bg);
-	--body-bg-color: var(--wk-color-bg);
 	background: var(--wk-color-bg);
 	color: var(--wk-color-text);
 	font-family: var(--wk-font-body);
@@ -155,5 +119,11 @@ body.wk-shop {
 	color: var(--wk-color-link);
 }
 
-/* Bootstrap's colour utilities are !important and fixed (#6c757d is 4.1:1 on white), so the muted text takes the token the same way. */
-.wk-shop .text-muted { color: var(--wk-color-muted) !important; }
+
+/* The grid and list toggles are a touch target: at least 44 by 44 px on a phone or a touch screen. */
+@media (max-width: 48em), (pointer: coarse) {
+	.wk-shop .toggle-container .btn {
+		min-block-size: 44px;
+		min-inline-size: 44px;
+	}
+}
