@@ -42,6 +42,8 @@ body.wk-shop {
 	--border-radius-md: var(--wk-radius-md);
 	--border-radius-lg: var(--wk-radius-lg);
 	--card-border-radius: var(--wk-radius-md);
+	--product-bg-color: var(--wk-card-bg);
+	--body-bg-color: var(--wk-color-bg);
 	background: var(--wk-color-bg);
 	color: var(--wk-color-text);
 	font-family: var(--wk-font-body);
@@ -62,6 +64,7 @@ body.wk-shop {
 
 /* Cards, list rows and the cart panels take the card variant of the preset (flat, outlined or raised). */
 .wk-shop .list-row,
+.wk-shop .product-container,
 .wk-shop .card,
 .wk-shop .frappe-card,
 .wk-shop .address-card,
@@ -140,4 +143,10 @@ body.wk-shop {
 @media (max-width: 48em) {
 	.wk-shop .list-row > .list-image { flex: 0 0 34%; max-inline-size: 34%; }
 	.wk-shop .list-row > .list-image + div { flex: 0 0 66%; max-inline-size: 66%; }
+}
+
+.wk-shop .btn-outline-primary {
+	background: transparent;
+	border-color: var(--wk-color-link);
+	color: var(--wk-color-link);
 }
