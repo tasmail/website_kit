@@ -140,7 +140,7 @@ jobs:
           bench get-app payments --branch version-15 --skip-assets https://github.com/frappe/payments
           bench get-app erpnext --branch version-15 --skip-assets https://github.com/frappe/erpnext
           bench get-app webshop --branch version-15 --skip-assets https://github.com/frappe/webshop
-          bench --site "$SITE" install-app payments erpnext webshop
+          for app in payments erpnext webshop; do bench --site "$SITE" install-app "$app"; done
           bench --site "$SITE" execute website_kit.probe.complete_setup
       - name: Frappe integration tests
         run: |
