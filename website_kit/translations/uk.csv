@@ -233,3 +233,5 @@ The shop needs the ERPNext and Webshop apps on this site.,Для магазин�
 There is no enabled selling price list in {0}.,Немає увімкненого прайс-листа продажу у валюті {0}.
 sample products,зразкові товари
 Shop,Магазин
+"Brackets, parentheses and functions are nested deeper than {0} levels.",Дужки та функції вкладені глибше ніж на {0} рівнів.
+"var() is not allowed in '{0}', because a custom property could carry an external address.","var() заборонений у '{0}', бо власна властивість може містити зовнішню адресу."

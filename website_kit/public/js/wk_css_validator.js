@@ -90,7 +90,7 @@
 		const S = {};
 		[
 			"at_rules", "media_idents", "media_features", "properties", "font_face_properties", "functions",
-			"font_face_functions", "url_properties", "pseudo_classes", "pseudo_legacy_elements", "pseudo_elements",
+			"font_face_functions", "url_properties", "url_capable_properties", "pseudo_classes", "pseudo_legacy_elements", "pseudo_elements",
 			"pseudo_selector_functions", "pseudo_nth_functions", "forbidden_classes", "forbidden_attributes", "hook_classes",
 			"known_classes", "known_custom_properties",
 		].forEach((key) => {
@@ -394,6 +394,10 @@
 			let current = root;
 			for (const tok of tokens) {
 				if (tok.type === "function" || (tok.type === "punct" && "([{".includes(tok.value))) {
+					if (stack.length >= LIMITS.max_nesting) {
+						sink("too-nested", tok.line, tok.col, LIMITS.max_nesting);
+						continue;
+					}
 					let node;
 					let closer;
 					if (tok.type === "function") {
@@ -751,6 +755,18 @@
 					this.error("empty-selector", firstItem);
 					return classes;
 				}
+				let hasPart = false;
+				let lastComma = null;
+				for (const item of significant(prelude)) {
+					if (isTok(item) && item.type === "punct" && item.value === ",") {
+						if (!hasPart) this.error("empty-selector", item);
+						hasPart = false;
+						lastComma = item;
+					} else {
+						hasPart = true;
+					}
+				}
+				if (!hasPart && lastComma !== null) this.error("empty-selector", lastComma);
 				this.selectorNodes(prelude, classes);
 				return classes;
 			}
@@ -970,6 +986,8 @@
 					const parts = significant(node.children);
 					if (parts.length === 1 && isTok(parts[0]) && parts[0].type === "string") this.urlTarget(parts[0].value, node, prop, context);
 					else this.error("bad-url", node);
+				} else if (name === "var" && S.url_capable_properties.has(prop)) {
+					this.error("var-in-url-property", node, prop);
 				} else if (name === "image-set") {
 					if (!S.url_properties.has(prop)) this.error("url-not-allowed", node, prop);
 					this.value(node.children, prop, Object.assign({}, context, { in_image_set: true }));

@@ -11,7 +11,7 @@ try:  # Frappe 16
 except ImportError:  # Frappe 15
 	from frappe.tests.utils import FrappeTestCase as TestCase
 
-from website_kit import api, apply, runtime
+from website_kit import api, apply, install, runtime
 from website_kit.theme import compiler, editor
 
 SETTINGS = "Website Kit Settings"
@@ -98,16 +98,26 @@ class TestThemeSettings(TestCase):
 			api.save_draft("clear", "", bad, "")
 		self.assertFalse(api.preview("clear", "", bad)["ok"])
 		with self.assertRaises(compiler.CustomCssError):
-			apply.apply(frappe._dict(preset="clear", token_overrides="", custom_css=bad, custom_base=""))
+			compiler.build("clear", "", bad)
 
-	def test_a_stored_css_that_no_longer_passes_keeps_the_previous_file(self):
+	def test_a_stored_css_that_no_longer_passes_fails_closed(self):
 		save(custom_css=CSS)
-		before = read(apply.THEME_FILE)
-		frappe.db.set_single_value(SETTINGS, "custom_css", "@import 'x';")
+		self.assertIn(CSS, read(apply.THEME_FILE))
+		frappe.db.set_single_value(
+			SETTINGS, "custom_css", ".a{--cx-a:'//evil.example/x.png';background-image:image-set(var(--cx-a) 1x)}"
+		)
 		frappe.clear_document_cache(SETTINGS, SETTINGS)
-		with self.assertRaises(compiler.CustomCssError):
-			apply.apply()
-		self.assertEqual(read(apply.THEME_FILE), before)
+		install.after_migrate()  # what `bench migrate` runs after a release with stricter rules
+		served = read(apply.THEME_FILE)
+		self.assertNotIn("evil.example", served)
+		self.assertNotIn(compiler.CUSTOM_MARKER, served)
+		self.assertEqual(served, compiler.build("clear")[0])
+		doc = settings()
+		self.assertIn("evil.example", doc.custom_css)  # the stored text is untouched
+		self.assertIn("Not applied", doc.css_notes)
+		self.assertIn("1:", doc.css_notes)
+		self.assertFalse(doc.safe_file_url)
+		self.assertEqual(apply.apply(), {})  # stable
 
 	def test_the_operator_switch_turns_custom_css_off(self):
 		doc = save(custom_css=CSS)
@@ -188,7 +198,7 @@ class TestThemeSettings(TestCase):
 		frappe.form_dict["wk_preview"] = "1"
 		values = runtime.update_website_context(frappe._dict())
 		self.assertIn(result["url"] + "?v=" + result["hash"], values["head_include"])
-		self.assertEqual(values["no_cache"], 1)
+		self.assertNotIn("no_cache", values)  # the cache bypass is `frappe.local.no_cache`, set by before_request
 		self.assertEqual(values["metatags"]["robots"], "noindex, nofollow")
 		frappe.set_user("Guest")
 		self.assertNotIn("wk-draft", runtime.update_website_context(frappe._dict())["head_include"])
@@ -210,7 +220,7 @@ class TestThemeSettings(TestCase):
 		safe = runtime.update_website_context(frappe._dict())
 		self.assertIn(doc.safe_file_url + "?v=", safe["head_include"])
 		self.assertNotIn(doc.theme_file_url, safe["head_include"])
-		self.assertEqual((safe["no_cache"], safe["wk"]["mode"]), (1, "safe"))
+		self.assertEqual(safe["wk"]["mode"], "safe")
 		self.assertEqual(safe["metatags"]["robots"], "noindex, nofollow")
 		frappe.set_user("Guest")
 		guest = runtime.update_website_context(frappe._dict())
@@ -222,11 +232,41 @@ class TestThemeSettings(TestCase):
 		frappe.form_dict["wk_safe"] = "1"
 		self.assertIn(doc.theme_file_url, runtime.update_website_context(frappe._dict())["head_include"])
 
+	def page(self, path="/about", scheme="http", forwarded=None):
+		headers = {"X-Forwarded-Proto": forwarded} if forwarded else {}
+		return Response("x", mimetype="text/html"), mock.Mock(path=path, scheme=scheme, headers=headers)
+
+	def test_the_safe_cookie_is_secure_over_https_and_no_store_stays_on_public_pages(self):
+		save(custom_css=CSS)
+		frappe.form_dict["wk_safe"] = "1"
+		response, request = self.page(scheme="https")
+		runtime.after_request(response=response, request=request)
+		cookie = response.headers["Set-Cookie"]
+		for part in ("wk_safe=1", "Secure", "HttpOnly", "SameSite=Lax"):
+			self.assertIn(part, cookie)
+		self.assertEqual(response.headers["Cache-Control"], "private, no-store")
+		response, request = self.page(forwarded="https")
+		runtime.after_request(response=response, request=request)
+		self.assertIn("Secure", response.headers["Set-Cookie"])
+		response, request = self.page()
+		runtime.after_request(response=response, request=request)
+		self.assertNotIn("Secure", response.headers["Set-Cookie"])
+		for path, mimetype in (
+			("/app/website-kit-settings", "text/html"),
+			("/api/method/ping", "application/json"),
+			("/files/x.pdf", "application/pdf"),
+			("/assets/x.js", "text/html"),
+		):
+			response, request = self.page(path)
+			response.mimetype = mimetype
+			runtime.after_request(response=response, request=request)
+			self.assertNotIn("Cache-Control", response.headers, path)
+
 	def test_safe_mode_cookie_and_cache_bypass(self):
 		save(custom_css=CSS)
 		frappe.form_dict["wk_safe"] = "1"
-		response = Response("x")
-		runtime.after_request(response=response, request=None)
+		response, request = self.page()
+		runtime.after_request(response=response, request=request)
 		self.assertIn("wk_safe=1", response.headers["Set-Cookie"])
 		self.assertEqual(response.headers["Cache-Control"], "private, no-store")
 		frappe.local.no_cache = 0
@@ -234,8 +274,8 @@ class TestThemeSettings(TestCase):
 		self.assertEqual(frappe.local.no_cache, 1)
 		frappe.local.no_cache = 0
 		frappe.form_dict["wk_safe"] = "0"
-		response = Response("x")
-		runtime.after_request(response=response, request=None)
+		response, request = self.page()
+		runtime.after_request(response=response, request=request)
 		self.assertIn("wk_safe=;", response.headers["Set-Cookie"])
 		runtime.before_request()
 		self.assertEqual(frappe.local.no_cache, 0)
@@ -251,6 +291,25 @@ class TestThemeSettings(TestCase):
 			self.assertEqual(runtime.update_website_context(frappe._dict())["wk"]["mode"], "safe")
 
 	# the whitelisted methods
+	def test_the_mutating_methods_accept_post_only(self):
+		allowed = frappe.allowed_http_methods_for_whitelisted_func
+		for name in ("save_draft", "discard_draft", "restore_version", "reset_custom_css", "reset_to_preset"):
+			self.assertEqual(allowed[getattr(api, name)], ["POST"], name)
+		for name in ("theme_data", "preview", "check_css", "duplicate_as_custom"):
+			self.assertIn("GET", allowed[getattr(api, name)], name)
+
+	def test_a_draft_honours_the_operator_switch_and_takes_the_lock(self):
+		with mock.patch.dict(frappe.conf, {"website_kit_custom_css_enabled": 0}):
+			api.save_draft("clear", "", CSS, "")
+		self.assertNotIn(compiler.CUSTOM_MARKER, read(apply.DRAFT_FILE, private=True))
+		api.save_draft("clear", "", CSS, "")
+		self.assertIn(compiler.CUSTOM_MARKER, read(apply.DRAFT_FILE, private=True))
+		with mock.patch.object(apply, "apply_lock", wraps=apply.apply_lock) as lock:
+			api.save_draft("clear", "", CSS, "")
+			api.discard_draft()
+		self.assertEqual(lock.call_count, 2)
+		self.assertEqual(frappe.db.count("File", {"file_name": ["like", "wk-draft%"]}), 0)
+
 	def test_the_methods_need_a_website_manager_and_none_is_open_to_guests(self):
 		for name in (
 			"theme_data",

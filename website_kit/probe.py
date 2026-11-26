@@ -90,3 +90,73 @@ def complete_setup() -> None:
 	)
 	frappe.db.commit()
 	print("setup complete")
+
+
+def http_cache_check() -> None:
+	"""CI and local check, over real WSGI requests with the website page cache on: a manager's `?wk_safe=1` page is never served
+	from the cache, a guest never receives it, and the cookie keeps safe mode for the manager only.
+
+	It needs `developer_mode` off (else Frappe disables the cache) and the Administrator password `admin`.
+	"""
+	import re
+
+	from frappe.app import application
+	from werkzeug.test import Client
+
+	site = frappe.local.site
+	route = "wk-cache-probe"
+	if not frappe.db.exists("Web Page", {"route": route}):
+		frappe.get_doc(
+			{
+				"doctype": "Web Page",
+				"title": "Website Kit cache probe",
+				"route": route,
+				"published": 1,
+				"content_type": "Rich Text",
+				"main_section": "<p>probe</p>",
+			}
+		).insert(ignore_permissions=True)
+	settings = frappe.get_doc(SETTINGS)
+	settings.custom_css = ".wk-card { color: #111 }"
+	settings.save(ignore_permissions=True)
+	frappe.db.commit()
+	theme_url, safe_url = settings.theme_file_url, settings.safe_file_url
+	assert theme_url and safe_url and theme_url != safe_url
+	frappe.destroy()  # the WSGI application opens its own connection for each request
+
+	def fetch(client, path):
+		response = client.get(path, base_url=f"http://{site}", buffered=True)
+		body = response.get_data(as_text=True)
+		return response, re.findall(r'href="(/files/wk-(?:theme|safe)[^"?]*)', body)
+
+	guest, admin = Client(application), Client(application)
+	response = admin.post("/api/method/login", data={"usr": "Administrator", "pwd": "admin"}, base_url=f"http://{site}")
+	assert response.status_code == 200, "login failed"
+	path = "/" + route
+	fetch(guest, path)  # warm the cache
+	response, links = fetch(guest, path)
+	assert response.headers.get("X-From-Cache") == "True", "the page cache is off: set developer_mode to 0"
+	assert links == [theme_url], links
+	response, links = fetch(admin, path + "?wk_safe=1")
+	assert response.headers.get("X-From-Cache") in (None, "False"), "a safe-mode page came from the cache"
+	assert links == [safe_url], links
+	assert "wk_safe=1" in ",".join(response.headers.getlist("Set-Cookie"))
+	response, links = fetch(admin, path)  # the cookie alone keeps safe mode
+	assert links == [safe_url] and response.headers.get("X-From-Cache") in (None, "False")
+	response, links = fetch(guest, path)
+	assert links == [theme_url] and response.headers.get("X-From-Cache") == "True", (
+		f"a safe-mode page reached the guests: {links} {response.headers.get('X-From-Cache')}"
+	)
+	response, links = fetch(guest, path + "?wk_safe=1")
+	assert links == [theme_url], "a guest switched safe mode on"
+	response = admin.get("/api/method/website_kit.api.reset_to_preset", base_url=f"http://{site}", buffered=True)
+	assert response.status_code in (403, 405), f"a GET was not refused: {response.status_code}"
+	frappe.init(site=site)
+	frappe.connect()
+	settings = frappe.get_doc(SETTINGS)
+	settings.custom_css = ""
+	settings.save(ignore_permissions=True)
+	for name in frappe.get_all("Web Page", filters={"route": route}, pluck="name"):
+		frappe.delete_doc("Web Page", name, force=True, ignore_permissions=True)
+	frappe.db.commit()
+	print("http cache check ok")

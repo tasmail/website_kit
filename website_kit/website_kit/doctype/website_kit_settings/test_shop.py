@@ -328,6 +328,8 @@ class TestShop(TestCase):
 		self.assertEqual(api.shop_status()["samples"], len(samples.ITEMS))
 		self.assertEqual(api.shop_status()["published"], len(samples.ITEMS))
 		api.remove_samples()
+		for name in ("enable_shop", "load_samples", "remove_samples", "personalize"):
+			self.assertEqual(frappe.allowed_http_methods_for_whitelisted_func[getattr(api, name)], ["POST"], name)
 		for name in ("shop_status", "enable_shop", "load_samples", "remove_samples", "personalize"):
 			self.assertIn(getattr(api, name), frappe.whitelisted)
 			self.assertNotIn(getattr(api, name), frappe.guest_methods)
