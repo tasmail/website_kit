@@ -2,11 +2,13 @@
 
 import re
 import xml.etree.ElementTree as ET
+from pathlib import Path
 
 import pytest
 
 from website_kit import samples, shop_menu
 
+ROOT = Path(__file__).resolve().parent.parent
 KINDS = {entry[1] for entry in samples.ITEMS}
 
 
@@ -61,3 +63,29 @@ def test_the_menu_hides_only_the_shop_entry_while_the_shop_is_empty():
 	assert shop_menu.is_shop_entry({"url": "/all-products/"})
 	assert shop_menu.is_shop_entry(type("Row", (), {"url": "/all-products"})())
 	assert not shop_menu.is_shop_entry({"url": "/products"}) and not shop_menu.is_shop_entry({})
+
+
+def test_the_shop_entry_is_matched_by_path_whatever_the_spelling():
+	for url in (
+		"/all-products",
+		"/all-products/",
+		"all-products",
+		"/All-Products?x=1",
+		"https://shop.example.com/all-products#top",
+		"/uk/all-products",
+	):
+		assert shop_menu.is_shop_entry({"url": url}), url
+	assert shop_menu.is_shop_entry({"route": "all-products"})
+	for url in ("/all-products-old", "/products", "https://all-products.example.com/", ""):
+		assert not shop_menu.is_shop_entry({"url": url}), url
+
+
+def test_the_shop_stylesheet_never_restyles_other_pages():
+	"""Every rule is under .wk-shop and names a Webshop class; generic Bootstrap and Frappe classes are not restyled."""
+	css = (ROOT / "website_kit/public/css/wk-shop.css").read_text(encoding="utf-8")
+	body = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+	selectors = [s.strip() for block in re.findall(r"([^{}]+)\{", body) for s in block.split(",")]
+	assert selectors and all(s.startswith(".wk-shop ") for s in selectors), selectors
+	for generic in (".btn-primary", ".frappe-card", ".in-green"):
+		assert generic not in body
+	assert not any(re.fullmatch(r"\.wk-shop \.(card-title|card|btn[\w-]*)( a)?", s) for s in selectors)

@@ -33,6 +33,20 @@ def _shop_enabled() -> bool:
 		return False
 
 
+SHOP_ROUTES = ("/all-products", "/cart", "/orders", "/search", "/wishlist", "/checkout")
+
+
+def is_shop_page(context) -> bool:
+	"""True for the Webshop pages: the catalogue and its sub-routes, search, cart, orders, wishlist and product pages."""
+	route = "/" + str(context.get("route") or "").strip("/")
+	if not context.get("route"):
+		request = getattr(frappe.local, "request", None)
+		route = (getattr(request, "path", "") or "").rstrip("/")
+	if any(route == shop or route.startswith(shop + "/") for shop in SHOP_ROUTES):
+		return True
+	return context.get("doctype") == "Website Item" or "product-page" in str(context.get("body_class") or "")
+
+
 def is_manager() -> bool:
 	"""A logged-in user who may edit the website (the roles that can already put script into `head_html`)."""
 	user = frappe.session.user
@@ -101,7 +115,7 @@ def update_website_context(context):
 	link = theme_link(settings, mode) if settings else ""
 	if link:
 		links += f'<link rel="stylesheet" href="{esc(link)}">'
-	shop_on = _shop_enabled()
+	shop_on = _shop_enabled() and is_shop_page(context)
 	if shop_on:
 		links += f'<link rel="stylesheet" href="{SHOP_CSS}?v={__version__}">'
 	brand = (settings.brand_name if settings else "") or frappe.get_website_settings("app_name") or ""

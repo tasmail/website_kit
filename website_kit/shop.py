@@ -5,14 +5,17 @@ Manager). Sample records are non-stock items, so they leave no stock ledger or G
 custom field `website_kit_sample`; removal deletes exactly the tagged records.
 """
 
+import os
+
 import frappe
 from frappe import _
 
 from . import samples, shop_menu
 
 TAGGED = ("Item", "Item Group", "Item Price", "Website Item")
-CACHE_KEY = "wk_shop_has_products"
-CACHE_SECONDS = 300
+MENU_MARKER = "website_kit_shop_menu_added"
+# What Webshop Settings holds on a fresh site; the kit sets its own values only where the customer has not changed them.
+WEBSHOP_DEFAULTS = {"show_price": 0, "products_per_page": 6, "enable_field_filters": 0}
 WEBSHOP_SETTINGS = "Webshop Settings"
 
 
@@ -50,7 +53,30 @@ def tagged(doctype: str) -> list[str]:
 
 
 def sample_files() -> list[str]:
-	return frappe.get_all("File", filters={"file_name": ["like", samples.FILE_PREFIX + "%"]}, pluck="name")
+	"""The File records that the kit made for its samples, and only those.
+
+	A file qualifies when it is public, an SVG named like the generated pictures, and attached to a tagged Item or to the Website
+	Item of a tagged Item. A customer's own file, even one named `wk-sample-...`, never matches.
+	"""
+	item_names = tagged("Item")
+	if not item_names:
+		return []
+	website_items = frappe.get_all("Website Item", filters={"item_code": ["in", item_names]}, pluck="name")
+	names = []
+	for doctype, parents in (("Item", item_names), ("Website Item", website_items)):
+		if not parents:
+			continue
+		names += frappe.get_all(
+			"File",
+			filters={
+				"attached_to_doctype": doctype,
+				"attached_to_name": ["in", parents],
+				"is_private": 0,
+				"file_name": ["like", samples.FILE_PREFIX + "%.svg"],
+			},
+			pluck="name",
+		)
+	return names
 
 
 def status() -> dict:
@@ -72,27 +98,34 @@ def status() -> dict:
 # ---------------------------------------------------------------- the menu rule
 
 
-def has_products() -> bool:
-	"""True when at least one Website Item is published; cached for a few minutes and cleared when a Website Item changes."""
-	cached = frappe.cache.get_value(CACHE_KEY)
-	if cached is not None:
-		return bool(cached)
-	value = 0
-	if frappe.db.exists("DocType", "Website Item"):
-		value = 1 if frappe.db.exists("Website Item", {"published": 1}) else 0
-	frappe.cache.set_value(CACHE_KEY, value, expires_in_sec=CACHE_SECONDS)
-	return bool(value)
+def has_products(excluding: str | None = None) -> bool:
+	"""True when a Website Item is published (not counting `excluding`). Never cached: one indexed lookup per uncached page."""
+	if not frappe.db.exists("DocType", "Website Item"):
+		return False
+	filters = {"published": 1}
+	if excluding:
+		filters["name"] = ["!=", excluding]
+	return bool(frappe.db.exists("Website Item", filters))
+
+
+def menu_flips(doc, method) -> bool:
+	"""Would this change of a Website Item switch "the shop has products" on or off?"""
+	others = has_products(excluding=doc.name)
+	if others:
+		return False
+	if method == "on_trash":
+		return bool(doc.published)
+	if method == "after_insert":
+		return bool(doc.published)
+	return bool(doc.has_value_changed("published"))
 
 
 def clear_cache(doc=None, method=None) -> None:
-	"""`doc_events` hook of Website Item: the menu follows the data.
-
-	The cached page HTML carries the menu, so the website cache is cleared when "there are products" flips.
-	"""
-	before = frappe.cache.get_value(CACHE_KEY)
-	frappe.cache.delete_value(CACHE_KEY)
-	if before is not None and bool(before) != has_products():
-		clear_website_pages()
+	"""`doc_events` hook of Website Item. The cached page HTML carries the menu, so the website cache is cleared when the
+	answer to "does the shop have products" flips. The check excludes the item being deleted and the clearing waits for the
+	commit, so a rollback leaves the cache alone."""
+	if doc is None or menu_flips(doc, method):
+		frappe.db.after_commit.add(clear_website_pages)
 
 
 def clear_website_pages() -> None:
@@ -101,8 +134,16 @@ def clear_website_pages() -> None:
 	clear_website_cache()
 
 
+def webshop_enabled() -> bool:
+	try:
+		return bool(frappe.db.get_single_value(WEBSHOP_SETTINGS, "enabled"))
+	except Exception:
+		return False
+
+
 def visible_menu(items):
-	return shop_menu.visible_items(items, has_products())
+	"""The top bar items; the shop entry is shown only while Webshop is on and a Website Item is published."""
+	return shop_menu.visible_items(items, webshop_enabled() and has_products())
 
 
 # ---------------------------------------------------------------- enable the shop
@@ -137,31 +178,30 @@ def default_customer_group() -> str:
 def enable_shop() -> dict:
 	"""Switch Webshop on with the company and price list of the site, and add the shop link to the menu; returns what changed.
 
-	A company, price list or customer group the customer already chose is kept. Repeating the action changes nothing.
+	A company, price list, customer group, price display, page size or filter choice the customer already made is kept: the
+	kit's values go only where the field still holds the Webshop default. Repeating the action changes nothing.
 	"""
 	_require_shop()
 	settings = frappe.get_doc(WEBSHOP_SETTINGS)
 	company = settings.company or default_company()
 	currency = frappe.get_cached_value("Company", company, "default_currency")
-	wanted = {
-		"enabled": 1,
-		"company": company,
-		"price_list": settings.price_list or default_price_list(currency),
-		"default_customer_group": settings.default_customer_group or default_customer_group(),
-		"show_price": 1,
-		"products_per_page": 12,
-	}
-	changes = {
-		field: value
-		for field, value in wanted.items()
-		if settings.get(field) != value
-		and (field in ("enabled", "show_price", "products_per_page") or not settings.get(field))
-	}
-	if not settings.enable_field_filters:
-		changes["enable_field_filters"] = 1
+	changes = {}
+	if not settings.enabled:
+		changes["enabled"] = 1
+	for field, value in (
+		("company", company),
+		("price_list", settings.price_list or default_price_list(currency)),
+		("default_customer_group", settings.default_customer_group or default_customer_group()),
+	):
+		if not settings.get(field):
+			changes[field] = value
+	fresh = not settings.enabled  # a shop that was already on keeps every display choice
+	for field, value in (("show_price", 1), ("products_per_page", 12), ("enable_field_filters", 1)):
+		if fresh and settings.get(field) == WEBSHOP_DEFAULTS[field]:
+			changes[field] = value
 	if changes:
 		settings.update(changes)
-		if not settings.filter_fields:
+		if changes.get("enable_field_filters") and not settings.filter_fields:
 			settings.append("filter_fields", {"fieldname": "item_group"})
 		settings.save(ignore_permissions=True)
 	menu = add_menu_entry()
@@ -171,12 +211,14 @@ def enable_shop() -> dict:
 
 
 def add_menu_entry() -> dict:
-	"""Add the shop link to the top bar of Website Settings when it is not there."""
-	website_settings = frappe.get_doc("Website Settings")
-	if any(shop_menu.is_shop_entry(row) for row in website_settings.top_bar_items):
+	"""Add the shop link to the top bar once. A link that the customer removed later is not added again."""
+	if frappe.defaults.get_global_default(MENU_MARKER):
 		return {}
-	website_settings.append("top_bar_items", {"label": _("Shop"), "url": shop_menu.SHOP_URLS[0]})
-	website_settings.save(ignore_permissions=True)
+	website_settings = frappe.get_doc("Website Settings")
+	if not any(shop_menu.is_shop_entry(row) for row in website_settings.top_bar_items):
+		website_settings.append("top_bar_items", {"label": _("Shop"), "url": shop_menu.SHOP_URLS[0]})
+		website_settings.save(ignore_permissions=True)
+	frappe.defaults.set_global_default(MENU_MARKER, "1")
 	return {"menu": "shop link added"}
 
 
@@ -184,11 +226,38 @@ def add_menu_entry() -> dict:
 
 
 def load_samples() -> dict:
-	"""Create the sample products (idempotent: an existing sample item is left as it is); returns the counts."""
+	"""Create the sample products (idempotent: an existing sample item is left as it is); returns the counts.
+
+	It does not switch the shop on and does not touch Webshop Settings; prices go into the shop's price list, or into the
+	site's default selling price list while the shop has none yet. If anything fails, the picture files already written are
+	removed from the disk (the database part rolls back).
+	"""
 	_require_shop()
-	enable_info = enable_shop() if not frappe.db.get_single_value(WEBSHOP_SETTINGS, "enabled") else {}
-	ensure_tag_fields()
-	settings = frappe.get_doc(WEBSHOP_SETTINGS)
+	if not tag_fields_exist():
+		ensure_tag_fields()  # DDL commits, so it runs before the first record is written (the migrate hook normally did it)
+	company = frappe.db.get_single_value(WEBSHOP_SETTINGS, "company") or default_company()
+	price_list = frappe.db.get_single_value(WEBSHOP_SETTINGS, "price_list") or default_price_list(
+		frappe.get_cached_value("Company", company, "default_currency")
+	)
+	written = []
+	try:
+		created = _create_samples(price_list, written)
+	except Exception:
+		for path in written:
+			try:
+				os.remove(path)
+			except OSError:
+				pass
+		raise
+	clear_cache()
+	return {"created": created, "samples": len(tagged("Item"))}
+
+
+def tag_fields_exist() -> bool:
+	return all(frappe.get_meta(doctype).has_field(samples.TAG_FIELD) for doctype in TAGGED)
+
+
+def _create_samples(price_list: str, written: list) -> int:
 	tag = {samples.TAG_FIELD: 1}
 	if not frappe.db.exists("Item Group", samples.ITEM_GROUP):
 		frappe.get_doc(
@@ -226,13 +295,13 @@ def load_samples() -> dict:
 			{
 				"doctype": "Item Price",
 				"item_code": item.name,
-				"price_list": settings.price_list,
+				"price_list": price_list,
 				"price_list_rate": entry[5],
 				"selling": 1,
 				**tag,
 			}
 		).insert(ignore_permissions=True)
-		image = _picture(entry, lang, item.name)
+		image = _picture(entry, lang, item.name, written)
 		frappe.get_doc(
 			{
 				"doctype": "Website Item",
@@ -249,11 +318,10 @@ def load_samples() -> dict:
 			}
 		).insert(ignore_permissions=True)
 		created += 1
-	clear_cache()
-	return {"created": created, "samples": len(tagged("Item")), **enable_info}
+	return created
 
 
-def _picture(entry: tuple, lang: str, item_name: str) -> str:
+def _picture(entry: tuple, lang: str, item_name: str, written: list) -> str:
 	"""Write the generated SVG as a public File attached to the sample item; returns its URL."""
 	doc = frappe.get_doc(
 		{
@@ -266,12 +334,14 @@ def _picture(entry: tuple, lang: str, item_name: str) -> str:
 		}
 	)
 	doc.insert(ignore_permissions=True)
+	written.append(doc.get_full_path())
 	return doc.file_url
 
 
 def remove_samples() -> dict:
-	"""Delete exactly the tagged records and the sample pictures; an item that a document already uses is kept and named."""
+	"""Delete exactly the tagged records and the files the kit made for them; an item that a document uses is kept and named."""
 	_require_shop()
+	files = sample_files()  # chosen first: they are found through the records that are deleted below
 	removed = {"Website Item": 0, "Item Price": 0, "Item": 0, "Item Group": 0, "File": 0}
 	kept = []
 	for doctype in ("Website Item", "Item Price"):
@@ -284,15 +354,17 @@ def remove_samples() -> dict:
 			removed["Item"] += 1
 		except frappe.LinkExistsError:
 			kept.append(name)
-	if not kept:
-		for name in tagged("Item Group"):
-			if not frappe.db.exists("Item", {"item_group": name}):
-				frappe.delete_doc("Item Group", name, ignore_permissions=True, force=True)
-				removed["Item Group"] += 1
-		for name in sample_files():
+	for name in tagged("Item Group"):
+		if not kept and not frappe.db.exists("Item", {"item_group": name}):
+			frappe.delete_doc("Item Group", name, ignore_permissions=True, force=True)
+			removed["Item Group"] += 1
+	if kept:
+		kept_files = set(sample_files())
+		files = [name for name in files if name not in kept_files]
+	for name in files:
+		if frappe.db.exists("File", name):
 			frappe.delete_doc("File", name, ignore_permissions=True, force=True)
 			removed["File"] += 1
-	clear_cache()
 	return {"removed": removed, "kept": kept}
 
 

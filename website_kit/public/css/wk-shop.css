@@ -1,5 +1,6 @@
 /* Website Kit shop stylesheet: the Webshop pages (product cards, filters, cart) follow the theme tokens.
- * Scoped by the body class `wk-shop`, which the kit adds only while the shop is on, so nothing else is touched.
+ * Scoped by the body class `wk-shop`, which the kit adds only on the shop pages (the catalogue, search, cart, orders, wishlist
+ * and product pages) while the shop is on; every selector below also names a Webshop class, so no other page is touched.
  * Plain CSS, no images, no fonts, no build step; every value is a --wk-* custom property (docs/theming.md). */
 
 .wk-shop .item-card-group-section .card,
@@ -11,8 +12,8 @@
 	overflow: hidden;
 }
 
-.wk-shop .card-title,
-.wk-shop .card-title a {
+.wk-shop .item-card-group-section .card-title,
+.wk-shop .item-card-group-section .card-title a {
 	color: var(--wk-color-text);
 	font-family: var(--wk-font-heading);
 	font-weight: var(--wk-heading-weight);
@@ -54,20 +55,12 @@
 }
 
 /* Cart */
-.wk-shop .frappe-card,
-.wk-shop .cart-empty.frappe-card {
-	background: var(--wk-color-bg);
-	border: 1px solid var(--wk-color-border);
-	border-radius: var(--wk-radius-md);
-}
-
 .wk-shop .cart-table th,
 .wk-shop .cart-table td {
 	border-color: var(--wk-color-border);
 }
 
-.wk-shop .cart-btn,
-.wk-shop .btn-primary {
+.wk-shop .cart-btn {
 	background: var(--wk-color-primary);
 	border-color: var(--wk-color-primary);
 	border-radius: var(--wk-button-radius);
@@ -78,8 +71,4 @@
 	background: var(--wk-color-surface);
 	border-color: var(--wk-color-border);
 	color: var(--wk-color-text);
-}
-
-.wk-shop .in-green {
-	color: var(--wk-color-link);
 }

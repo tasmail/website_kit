@@ -36,6 +36,13 @@ def after_migrate() -> None:
 	reported on the settings page (`css_notes`) and the previous file stays.
 	"""
 	try:
+		from . import shop
+
+		if shop.shop_installed():
+			shop.ensure_tag_fields()  # DDL: done here so that loading samples never commits halfway
+	except Exception:
+		frappe.log_error(title="Website Kit: the sample tag fields could not be created")
+	try:
 		kit_apply.apply()
 	except compiler.CustomCssError as error:
 		frappe.db.set_single_value(SETTINGS, "css_notes", kit_apply.rejection_notes(error.result))
