@@ -1,0 +1,51 @@
+[project]
+name = "website_kit"
+authors = [{ name = "FOSS-On-Line", email = "foss@foss.ua" }]
+description = "A default theme for Frappe sites: design tokens, five presets and self-hosted fonts"
+requires-python = ">=3.10"
+readme = "README.md"
+license = { file = "LICENSE" }
+dynamic = ["version"]
+dependencies = []
+
+[build-system]
+requires = ["flit_core >=3.4,<4"]
+build-backend = "flit_core.buildapi"
+
+# Declared for bench, not as a pip dependency: pip could resolve the wrong `frappe` package from PyPI.
+[tool.bench.frappe-dependencies]
+frappe = ">=15.0.0,<17.0.0"
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.format]
+indent-style = "tab"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+# E501 is off: the formatter wraps code, and prose in docstrings is kept unwrapped (width 120).
+ignore = ["W191", "E501"]
+
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.coverage.run]
+source = ["website_kit"]
+branch = true
+# These modules call Frappe; the bench job exercises them (tests/ in the doctype folder). The rest is unit-tested.
+omit = [
+	"website_kit/apply.py",
+	"website_kit/install.py",
+	"website_kit/probe.py",
+	"website_kit/runtime.py",
+	"website_kit/hooks.py",
+	"website_kit/website_kit/*",
+]
+
+[tool.coverage.report]
+fail_under = 90
+show_missing = true

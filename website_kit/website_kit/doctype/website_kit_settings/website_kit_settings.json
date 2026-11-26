@@ -1,0 +1,124 @@
+{
+ "actions": [],
+ "creation": "2026-11-26 12:00:00.000000",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "theme_section",
+  "preset",
+  "brand_name",
+  "visibility_section",
+  "allow_search_engines",
+  "advanced_section",
+  "token_overrides",
+  "custom_css",
+  "status_section",
+  "kit_version",
+  "theme_hash",
+  "theme_file_url"
+ ],
+ "fields": [
+  {
+   "fieldname": "theme_section",
+   "fieldtype": "Section Break",
+   "label": "Theme"
+  },
+  {
+   "fieldname": "preset",
+   "fieldtype": "Select",
+   "label": "Preset",
+   "options": "clear\nmarket\ncontrast\nnight\nledger",
+   "default": "clear",
+   "reqd": 1,
+   "description": "The ready-made look of the public website."
+  },
+  {
+   "fieldname": "brand_name",
+   "fieldtype": "Data",
+   "label": "Brand name",
+   "description": "Shown in the header. Empty: the app name of Website Settings."
+  },
+  {
+   "fieldname": "visibility_section",
+   "fieldtype": "Section Break",
+   "label": "Search engines"
+  },
+  {
+   "fieldname": "allow_search_engines",
+   "fieldtype": "Check",
+   "label": "Allow search engines",
+   "default": "0",
+   "description": "Off: the site sends X-Robots-Tag noindex and robots.txt disallows everything."
+  },
+  {
+   "fieldname": "advanced_section",
+   "fieldtype": "Section Break",
+   "label": "Advanced",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "token_overrides",
+   "fieldtype": "Code",
+   "label": "Token overrides",
+   "options": "JSON",
+   "description": "JSON with the values that differ from the preset: {\"tokens\": {\"color-primary\": \"#1d4ed8\"}, \"variants\": {\"card\": \"raised\"}}."
+  },
+  {
+   "fieldname": "custom_css",
+   "fieldtype": "Code",
+   "label": "Custom CSS",
+   "options": "CSS",
+   "read_only": 1,
+   "description": "Not applied yet: the validated Custom CSS editor comes in a later release."
+  },
+  {
+   "fieldname": "status_section",
+   "fieldtype": "Section Break",
+   "label": "Status",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "kit_version",
+   "fieldtype": "Data",
+   "label": "Applied kit version",
+   "read_only": 1
+  },
+  {
+   "fieldname": "theme_hash",
+   "fieldtype": "Data",
+   "label": "Theme file hash",
+   "read_only": 1
+  },
+  {
+   "fieldname": "theme_file_url",
+   "fieldtype": "Data",
+   "label": "Theme file",
+   "read_only": 1
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "issingle": 1,
+ "links": [],
+ "modified": "2026-11-26 12:00:00.000000",
+ "modified_by": "Administrator",
+ "module": "Website Kit",
+ "name": "Website Kit Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "read": 1,
+   "role": "System Manager",
+   "write": 1
+  },
+  {
+   "create": 1,
+   "read": 1,
+   "role": "Website Manager",
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
