@@ -67,3 +67,26 @@ def test_the_docs_list_every_family_and_the_real_total():
 	docs = (FONTS_DIR.parent.parent.parent / "docs" / "fonts.md").read_text(encoding="utf-8")
 	for font in fonts.FONTS.values():
 		assert font.family.replace(" Variable", "") in docs
+
+
+def _cmap(path):
+	ttfont = pytest.importorskip("fontTools.ttLib")
+	pytest.importorskip("brotli")
+	return set(ttfont.TTFont(path).getBestCmap())
+
+
+UKRAINIAN = [ord(char) for char in "АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯабвгґдеєжзиіїйклмнопрстуфхцчшщьюя№"]
+
+
+@pytest.mark.parametrize("slug", sorted(fonts.FONTS))
+def test_the_cyrillic_files_cover_ukrainian_and_the_shipped_range(slug):
+	cmap = _cmap(FONTS_DIR / slug / fonts.FONTS[slug].files()["cyrillic"])
+	assert [hex(cp) for cp in UKRAINIAN if cp not in cmap] == []
+	# the range the stylesheet declares for the file (U+0400-045F, U+0490-0491, U+2116)
+	assert [hex(cp) for cp in [*range(0x400, 0x460), 0x490, 0x491, 0x2116] if cp not in cmap] == []
+
+
+@pytest.mark.parametrize("slug", sorted(fonts.FONTS))
+def test_the_latin_files_cover_basic_latin(slug):
+	cmap = _cmap(FONTS_DIR / slug / fonts.FONTS[slug].files()["latin"])
+	assert [hex(cp) for cp in range(0x20, 0x7F) if cp not in cmap] == []

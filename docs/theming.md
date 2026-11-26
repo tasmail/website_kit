@@ -16,8 +16,10 @@ Anything not listed here (internal classes such as `.wk-header__inner`, Frappe o
    `token_overrides`).
 2. `apply()` compiles them into one plain CSS file, `/files/wk-theme.css` (custom properties and `@font-face` rules, no
    SCSS, no node step). The result is deterministic: the same settings give the same bytes.
-3. Public website pages link two stylesheets: the shared `/assets/website_kit/css/wk.css` and the generated file. Neither is
-   ever linked from the Desk.
+3. Public website pages load three stylesheets: the compiled Website Theme CSS of Frappe (`/files/website_theme/website_kit_style.css`,
+   the Bootstrap and Frappe website styles, compiled once by node when the theme is imported; it is not minimal), the shared
+   `/assets/website_kit/css/wk.css`, and the generated `/files/wk-theme.css`. The two kit files are never linked from the Desk.
+   The CI bench prints the raw and gzip size of all three; a browser measurement has not been made.
 4. `wk.css` reads only the custom properties below, so a preset change never needs a new stylesheet.
 
 ## Tokens

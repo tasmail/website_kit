@@ -7,7 +7,17 @@
 			{%- if not item.parent_label -%}
 			{%- set url = item.url or '' -%}
 			{%- set url = url if url.startswith('#') else url | abs_url -%}
-			<li><a href="{{ url | wk_esc }}"{% if item.open_in_new_tab %} target="_blank" rel="noopener"{% endif %}>{{ _(item.label) | wk_esc }}</a></li>
+			<li><a href="{{ url | wk_esc }}"{% if item.open_in_new_tab %} target="_blank" rel="noopener"{% endif %}>{{ _(item.label) | wk_esc }}</a>
+				{%- if item.child_items -%}
+				<ul class="wk-footer__sub">
+					{%- for child in item.child_items -%}
+					{%- set url = child.url or '' -%}
+					{%- set url = url if url.startswith('#') else url | abs_url -%}
+					<li><a href="{{ url | wk_esc }}"{% if child.open_in_new_tab %} target="_blank" rel="noopener"{% endif %}>{{ _(child.label) | wk_esc }}</a></li>
+					{%- endfor -%}
+				</ul>
+				{%- endif -%}
+			</li>
 			{%- endif -%}
 			{%- endfor -%}
 		</ul>

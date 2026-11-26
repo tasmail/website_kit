@@ -1,6 +1,9 @@
 """Frappe integration tests: they run on a bench site (`bench --site <site> run-tests --app website_kit`)."""
 
 import json
+import os
+import re
+from unittest import mock
 
 import frappe
 from werkzeug.wrappers import Response
@@ -17,7 +20,12 @@ SETTINGS = "Website Kit Settings"
 
 
 def theme_files():
-	return frappe.get_all("File", filters={"file_name": apply.THEME_FILE, "is_private": 0}, fields=["name", "file_url"])
+	"""The File records of the kit (attached to the settings)."""
+	return frappe.get_all(
+		"File",
+		filters={"attached_to_doctype": SETTINGS, "attached_to_name": SETTINGS, "is_private": 0},
+		fields=["name", "file_url"],
+	)
 
 
 def website_settings_state():
@@ -63,7 +71,8 @@ class TestWebsiteKitSettings(TestCase):
 			css,
 		)
 		self.assertEqual(doc.theme_hash, digest)
-		self.assertEqual(doc.theme_file_url, "/files/wk-theme.css")
+		self.assertEqual(doc.theme_file_url, file_doc.file_url)
+		self.assertRegex(doc.theme_file_url, r"^/files/wk-theme[0-9a-f]*\.css$")
 		self.assertEqual(file_doc.is_private, 0)
 
 	def test_apply_is_idempotent(self):
@@ -102,12 +111,91 @@ class TestWebsiteKitSettings(TestCase):
 		self.assertIn("preset night", content)
 		self.assertEqual(frappe.get_doc(SETTINGS).theme_hash, compiler.build("night")[1])
 
-	def test_an_orphan_file_on_disk_does_not_change_the_stable_name(self):
-		frappe.db.delete("File", {"file_name": apply.THEME_FILE})
-		self.assertEqual(theme_files(), [])
+	def test_a_foreign_file_with_the_same_name_is_never_adopted_or_deleted(self):
+		ours = frappe.get_doc("File", apply.find_theme_file())
+		ours.delete()  # removes the record and the file on disk
+		foreign = frappe.get_doc(
+			{"doctype": "File", "file_name": apply.THEME_FILE, "content": "/* foreign */", "is_private": 0}
+		).insert(ignore_permissions=True)
+		self.addCleanup(lambda: frappe.delete_doc("File", foreign.name, force=True, ignore_permissions=True))
+		self.assertEqual(foreign.file_url, "/files/wk-theme.css")  # the foreign file took the stable name
 		self.assertEqual(apply.apply().get("theme_file"), "created")
-		files = theme_files()
-		self.assertEqual([f.file_url for f in files], ["/files/wk-theme.css"])
+		mine = frappe.get_doc("File", apply.find_theme_file())
+		self.assertNotEqual(mine.name, foreign.name)
+		self.assertNotEqual(mine.file_url, foreign.file_url)
+		self.assertEqual(frappe.get_doc("File", foreign.name).get_content(), "/* foreign */")
+		self.assertEqual(frappe.get_doc(SETTINGS).theme_file_url, mine.file_url)
+		self.assertEqual(apply.apply(), {})  # stable afterwards, no new file
+		self.assertEqual(frappe.db.count("File", {"attached_to_doctype": SETTINGS, "attached_to_name": SETTINGS}), 1)
+
+	def test_the_update_leaves_no_temp_file_and_the_lock_is_released(self):
+		doc = frappe.get_doc(SETTINGS)
+		doc.preset = "ledger"
+		doc.save()
+		folder = os.path.dirname(frappe.get_doc("File", apply.find_theme_file()).get_full_path())
+		self.assertEqual([f for f in os.listdir(folder) if f.endswith(".tmp")], [])
+		if frappe.db.db_type != "postgres":
+			self.assertTrue(apply.lock_is_free())
+		with self.assertRaises(RuntimeError), apply.apply_lock():
+			raise RuntimeError("boom")
+		if frappe.db.db_type != "postgres":
+			self.assertTrue(apply.lock_is_free())
+
+	def test_the_website_cache_is_cleared_only_when_the_theme_changes(self):
+		with mock.patch("frappe.website.utils.clear_website_cache") as clear:
+			self.assertEqual(apply.apply(), {})
+			clear.assert_not_called()
+			doc = frappe.get_doc(SETTINGS)
+			doc.preset = "night"
+			doc.save()
+			clear.assert_called()
+
+	def test_pages_link_the_new_hash_after_a_preset_change(self):
+		"""The context that feeds every public page follows the preset at once. (A full guest page render needs a request
+		object and built assets, which a plain test site does not have; the cache clearing is tested above.)"""
+
+		def linked_hash():
+			head = runtime.update_website_context(frappe._dict())["head_include"]
+			return re.search(r"wk-theme[0-9a-f]*\.css\?v=([0-9a-f]{16})", head).group(1)
+
+		self.assertEqual(linked_hash(), compiler.build("clear")[1])
+		doc = frappe.get_doc(SETTINGS)
+		doc.preset = "night"
+		doc.save()
+		self.assertEqual(linked_hash(), compiler.build("night")[1])
+
+	def test_a_failing_apply_does_not_abort_install_or_migrate(self):
+		with mock.patch("website_kit.apply.apply", side_effect=RuntimeError("disk full")):
+			self.assertIsNone(install.after_migrate())
+			frappe.db.set_single_value(SETTINGS, "kit_version", "")
+			frappe.clear_document_cache(SETTINGS, SETTINGS)
+			self.assertIn("error", install.after_install())
+		self.assertTrue(frappe.db.exists("Error Log", {"error": ["like", "%disk full%"]}))
+		apply.apply()  # restores kit_version
+
+	def test_the_menus_render_one_level_of_children(self):
+		context = {
+			"wk": {"brand_name": "Brand"},
+			"url_prefix": "",
+			"top_bar_items": [
+				frappe._dict(label="Shop", url="/shop", child_items=[frappe._dict(label="{{ 7*7 }}", url="/shop/a")]),
+				frappe._dict(label="About", url="/about"),
+			],
+			"footer_items": [
+				frappe._dict(label="Legal", url="/legal", child_items=[frappe._dict(label="Terms", url="/terms")]),
+			],
+		}
+		nav = frappe.get_doc("Web Template", "WK Navbar").render(context)
+		self.assertIn("<details", nav)
+		self.assertIn("<summary", nav)
+		self.assertIn(">Shop</summary>", nav)
+		self.assertIn("/shop/a", nav)
+		self.assertIn(">About</a>", nav)
+		self.assertNotIn("49", nav)
+		self.assertNotIn("{{", nav)
+		footer = frappe.get_doc("Web Template", "WK Footer").render(context)
+		self.assertIn("Legal", footer)
+		self.assertIn(">Terms</a>", footer)
 
 	def test_invalid_overrides_are_rejected(self):
 		doc = frappe.get_doc(SETTINGS)
@@ -151,7 +239,7 @@ class TestWebsiteKitSettings(TestCase):
 	def test_context_links_the_stylesheets_and_closes_the_page(self):
 		values = runtime.update_website_context(frappe._dict())
 		self.assertIn("/assets/website_kit/css/wk.css", values["head_include"])
-		self.assertIn("/files/wk-theme.css?v=", values["head_include"])
+		self.assertIn(f"{frappe.get_doc(SETTINGS).theme_file_url}?v=", values["head_include"])
 		self.assertEqual(values["metatags"]["robots"], "noindex, nofollow")
 
 	def test_templates_render_site_data_inert(self):

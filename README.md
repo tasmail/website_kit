@@ -31,6 +31,9 @@ What does not exist yet: Builder pages (home, contact, about), the settings page
 validator, the shop (Webshop) styling and sample products, the guard integration for the contact form, the "Public website"
 switch, and any deployment. These are planned in the analysis `docs/site-default-theme-analysis.md` of `tasmail/erpnext-infra`.
 
+Public pages load three stylesheets: the Website Theme CSS that Frappe compiles (full Bootstrap and website styles, not minimal), `wk.css`
+and the generated `wk-theme.css`. The CI job prints their sizes; nothing was measured in a browser.
+
 Not verified: how the pages look (no screenshots), behaviour with Webshop and Builder installed, Frappe 16.
 
 ## Install

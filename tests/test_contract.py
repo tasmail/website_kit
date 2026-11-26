@@ -107,3 +107,17 @@ def test_templates_use_only_documented_classes():
 			for name in classes.split():
 				if name.startswith("wk-"):
 					assert f".{name}" in CLASSES or internal.match(name), (template.name, name)
+
+
+def test_every_class_of_the_stylesheet_is_documented_or_internal():
+	"""The other direction: a new public-looking class in wk.css must be added to the contract or be internal."""
+	internal = re.compile(r"^wk-(header__|footer__|menu)")
+	found = {f".{name}" for name in re.findall(r"\.(wk-[a-z0-9_-]+)", BASE_CSS) if not internal.match(name)}
+	assert found == CLASSES
+
+
+def test_the_documented_variant_values_are_exactly_the_code_values():
+	rows = dict(re.findall(r"^\| `data-wk-([a-z]+)` \| ([^|]+) \|", DOC, flags=re.M))
+	assert set(rows) == set(tokens.VARIANTS)
+	for variant, cell in rows.items():
+		assert set(re.findall(r"`([a-z]+)`", cell)) == set(tokens.VARIANTS[variant]), variant

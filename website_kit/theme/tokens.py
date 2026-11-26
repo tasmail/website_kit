@@ -9,11 +9,11 @@ import re
 
 PREFIX = "--wk-"
 
-HEX = re.compile(r"^#[0-9a-fA-F]{6}$")
-LENGTH = re.compile(r"^(0|\d{1,4}(\.\d{1,3})?(px|rem|em))$")
-NUMBER = re.compile(r"^\d{1,2}(\.\d{1,3})?$")
-WEIGHT = re.compile(r"^[1-9]00$")
-SHADOW = re.compile(r"^[0-9a-zA-Z#(),.% -]{1,120}$")
+HEX = re.compile(r"#[0-9a-fA-F]{6}", re.ASCII)
+LENGTH = re.compile(r"(0|[0-9]{1,4}(\.[0-9]{1,3})?(px|rem|em))", re.ASCII)
+NUMBER = re.compile(r"[0-9]{1,2}(\.[0-9]{1,3})?", re.ASCII)
+WEIGHT = re.compile(r"[1-9]00", re.ASCII)
+SHADOW = re.compile(r"[0-9a-zA-Z#(),.% -]{1,120}", re.ASCII)
 SHADOW_FUNCTIONS = {"rgb", "rgba", "hsl", "hsla"}
 
 # name -> value type, in the order of the generated file
@@ -124,11 +124,11 @@ def validate_value(name: str, value, font_slugs: set[str]) -> str:
 		raise TokenError(f"unknown token '{name}'")
 	text = str(value).strip()
 	ok = {
-		"color": lambda: bool(HEX.match(text)),
+		"color": lambda: bool(HEX.fullmatch(text)),
 		"font": lambda: text in font_slugs,
-		"length": lambda: bool(LENGTH.match(text)),
-		"number": lambda: bool(NUMBER.match(text)),
-		"weight": lambda: bool(WEIGHT.match(text)),
+		"length": lambda: bool(LENGTH.fullmatch(text)),
+		"number": lambda: bool(NUMBER.fullmatch(text)),
+		"weight": lambda: bool(WEIGHT.fullmatch(text)),
 		"shadow": lambda: _shadow_ok(text),
 	}[kind]()
 	if not ok:
@@ -139,7 +139,7 @@ def validate_value(name: str, value, font_slugs: set[str]) -> str:
 def _shadow_ok(text: str) -> bool:
 	if text == "none":
 		return True
-	if not SHADOW.match(text):
+	if not SHADOW.fullmatch(text):
 		return False
 	return all(fn.lower() in SHADOW_FUNCTIONS for fn in re.findall(r"([A-Za-z-]+)\(", text))
 

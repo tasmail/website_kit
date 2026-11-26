@@ -41,6 +41,11 @@ def test_valid_values_are_normalised(name, value, expected):
 		("shadow-1", "0 0 5px red;}"),
 		("shadow-1", "</style>"),
 		("shadow-1", "x" * 200),
+		("font-size-base", "\u0661\u0666px"),  # Arabic-Indic digits
+		("line-height", "\u0661.\u0666"),
+		("heading-weight", "\u0667\u0660\u0660"),
+		("color-primary", "#\u0661\u0662\u0663\u0664\u0665\u0666"),
+		("font-size-base", "16\npx"),
 		("unknown-token", "1"),
 	],
 )

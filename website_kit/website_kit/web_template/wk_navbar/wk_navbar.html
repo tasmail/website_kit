@@ -12,11 +12,27 @@
 		</a>
 		<nav class="wk-header__nav" aria-label="{{ _('Main menu') }}">
 			<ul class="wk-menu">
+				{#- One level of children: a top item with children is a details/summary group (no JavaScript, keyboard accessible). -#}
 				{%- for item in top_bar_items or [] -%}
 				{%- if not item.parent_label -%}
+				{%- if item.child_items -%}
+				<li class="wk-menu__item">
+					<details class="wk-menu__group">
+						<summary class="wk-menu__link">{{ _(item.label) | wk_esc }}</summary>
+						<ul class="wk-menu__sub">
+							{%- for child in item.child_items -%}
+							{%- set url = child.url or '' -%}
+							{%- set url = url if url.startswith('#') else url | abs_url -%}
+							<li><a class="wk-menu__link" href="{{ url | wk_esc }}"{% if child.open_in_new_tab %} target="_blank" rel="noopener"{% endif %}>{{ _(child.label) | wk_esc }}</a></li>
+							{%- endfor -%}
+						</ul>
+					</details>
+				</li>
+				{%- else -%}
 				{%- set url = item.url or '' -%}
 				{%- set url = url if url.startswith('#') else url | abs_url -%}
 				<li class="wk-menu__item"><a class="wk-menu__link" href="{{ url | wk_esc }}"{% if item.open_in_new_tab %} target="_blank" rel="noopener"{% endif %}>{{ _(item.label) | wk_esc }}</a></li>
+				{%- endif -%}
 				{%- endif -%}
 				{%- endfor -%}
 			</ul>

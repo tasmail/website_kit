@@ -48,3 +48,20 @@ def reapply() -> None:
 	from .install import after_install
 
 	print(json.dumps({"after_install": after_install(), "apply": apply()}, sort_keys=True))
+
+
+def customize() -> None:
+	"""Set customer data (preset, brand, overrides) the way a customer would, to prove that migrate keeps it."""
+	settings = frappe.get_doc(SETTINGS)
+	settings.preset = "market"
+	settings.brand_name = "CI Brand"
+	settings.token_overrides = '{"tokens": {"color-primary": "#112233"}}'
+	settings.save(ignore_permissions=True)
+	frappe.db.commit()
+
+
+def assert_customized() -> None:
+	settings = frappe.get_doc(SETTINGS)
+	assert (settings.preset, settings.brand_name) == ("market", "CI Brand"), "customer data was overwritten"
+	assert "#112233" in settings.token_overrides, "token overrides were overwritten"
+	print("customer data kept")
