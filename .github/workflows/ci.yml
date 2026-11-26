@@ -121,17 +121,6 @@ jobs:
           test "$(cat "$RUNNER_TEMP/reapply.json")" = '{"after_install": {}, "apply": {}}'
           bench --site "$SITE" execute website_kit.probe.state | tail -1 > "$RUNNER_TEMP/state2.json"
           diff "$RUNNER_TEMP/state1.json" "$RUNNER_TEMP/state2.json"
-      - name: Migrate keeps customer data
-        run: |
-          cd "$BENCH"
-          bench --site "$SITE" execute website_kit.probe.customize
-          bench --site "$SITE" execute website_kit.probe.state | tail -1 > "$RUNNER_TEMP/state3.json"
-          bench --site "$SITE" migrate
-          bench --site "$SITE" execute website_kit.probe.reapply | tail -1 | tee "$RUNNER_TEMP/reapply2.json"
-          test "$(cat "$RUNNER_TEMP/reapply2.json")" = '{"after_install": {}, "apply": {}}'
-          bench --site "$SITE" execute website_kit.probe.assert_customized
-          bench --site "$SITE" execute website_kit.probe.state | tail -1 > "$RUNNER_TEMP/state4.json"
-          diff "$RUNNER_TEMP/state3.json" "$RUNNER_TEMP/state4.json"
       - name: Sizes of the stylesheets a public page loads
         run: |
           cd "$BENCH/sites"
@@ -143,3 +132,15 @@ jobs:
         run: |
           cd "$BENCH"
           bench --site "$SITE" run-tests --app website_kit
+      # Last: it leaves customer data (preset market) on the site, and the integration tests expect the install defaults.
+      - name: Migrate keeps customer data
+        run: |
+          cd "$BENCH"
+          bench --site "$SITE" execute website_kit.probe.customize
+          bench --site "$SITE" execute website_kit.probe.state | tail -1 > "$RUNNER_TEMP/state3.json"
+          bench --site "$SITE" migrate
+          bench --site "$SITE" execute website_kit.probe.reapply | tail -1 | tee "$RUNNER_TEMP/reapply2.json"
+          test "$(cat "$RUNNER_TEMP/reapply2.json")" = '{"after_install": {}, "apply": {}}'
+          bench --site "$SITE" execute website_kit.probe.assert_customized
+          bench --site "$SITE" execute website_kit.probe.state | tail -1 > "$RUNNER_TEMP/state4.json"
+          diff "$RUNNER_TEMP/state3.json" "$RUNNER_TEMP/state4.json"
