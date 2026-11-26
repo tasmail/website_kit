@@ -36,6 +36,8 @@ def update_website_context(context):
 
 def after_request(response, request):
 	"""Hook `after_request`: `X-Robots-Tag: noindex, nofollow` while the site is closed to search engines."""
+	if response is None:  # an error page that could not be built
+		return
 	settings = _settings()
 	for name, value in seo.response_headers(bool(settings and settings.allow_search_engines)).items():
 		response.headers.setdefault(name, value)

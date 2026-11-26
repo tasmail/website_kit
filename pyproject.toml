@@ -42,6 +42,10 @@ omit = [
 	"website_kit/install.py",
 	"website_kit/probe.py",
 	"website_kit/runtime.py",
+	"website_kit/contact.py",
+	"website_kit/jinja_api.py",
+	"website_kit/safe.py",
+	"website_kit/pages/sync.py",
 	"website_kit/hooks.py",
 	"website_kit/website_kit/*",
 ]

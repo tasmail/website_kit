@@ -62,3 +62,22 @@ def test_the_stock_defaults_may_be_replaced():
 	changes = settings_sync.website_settings_changes(current, True)
 	assert changes["website_theme"] == "Website Kit"
 	assert changes["navbar_template"] == "WK Navbar"
+
+
+def test_contact_us_settings_follow_the_customers_address():
+	changes = settings_sync.contact_us_changes
+	# a fresh site: stock Frappe ships the contact page disabled; the first address switches it on
+	assert changes({"is_disabled": 1}, "me@example.com") == {"forward_to_email": "me@example.com", "is_disabled": 0}
+	assert (
+		changes({"forward_to_email": "me@example.com", "is_disabled": 1}, "me@example.com") == {}
+	)  # a later choice stays
+	# the address moves along while it is the one the kit wrote last time, never over a different one
+	assert changes({"forward_to_email": "old@example.com"}, "new@example.com", "old@example.com") == {
+		"forward_to_email": "new@example.com"
+	}
+	assert changes({"forward_to_email": "mine@example.com"}, "new@example.com", "old@example.com") == {}
+	assert changes({"forward_to_email": "x@y.z"}, "", None) == {}
+	# the acknowledgement mail is always off
+	assert changes({"send_acknowledgement_email": 1, "forward_to_email": "a@b.c"}, "a@b.c") == {
+		"send_acknowledgement_email": 0
+	}
