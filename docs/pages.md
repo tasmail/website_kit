@@ -9,6 +9,11 @@ client script. Ukrainian is the default language and lives at the root; English 
 | About | `/about` | `/en/about` | text, the contact facts, the call to action |
 | Contact | `/contact` | `/en/contact` | the form, or the mail-to and phone block (see below) |
 | Privacy | `/privacy` | `/en/privacy` | a template with placeholders, closed to indexing as shipped |
+| Not found | `/404` (one page, both languages) | | the header, a short message and the footer, in the language of the request; never indexed |
+
+Builder replaces Frappe's 404 template with one that has no navbar and no footer and looks for a published Builder Page with the route
+`404`; `wk-notfound` is that page, so a mistyped address still shows the site's menu. A customer's own `404` page is kept: the
+kit then writes its page as a draft with another route.
 
 The object names are fixed: Builder Pages `wk-<page>-<lang>`, Builder Components `wk-header-<lang>`, `wk-footer-<lang>` and
 `wk-cta-<lang>`, and the Builder Client Script `WK Contact` (loaded by the two Contact pages only). The pages are written only
@@ -33,6 +38,8 @@ defined in `website_kit/jinja_api.py`); each escapes what it returns, never rais
 | Call | Returns |
 | --- | --- |
 | `wk_head(lang, page)` | stylesheet links, `noindex` while the site is closed, hreflang pairs, Organization JSON-LD when the site is open, the guard client on the Contact page when the form is shown |
+| `wk_header(lang)` | the content of the header: brand, the menu (the kit pages that exist, the Website Settings top bar items, the other language) and the login or account link; the stock navbar calls the same function, so every page shows the same menu (see `docs/theming.md`) |
+| `wk_footer(lang)`, `wk_text(key)`, `wk_url(key)` | for the not-found page only: the footer content, one text and one page URL in the language of the request |
 | `wk_brand(lang)` | the brand name (Settings, else the app name of Website Settings, else the site name) |
 | `wk_contact_list(lang, variant)` | the e-mail, phone and address entered in Website Kit Settings, as a list |
 | `wk_contact_form(lang)` | the form, or the fallback block |

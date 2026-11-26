@@ -47,6 +47,19 @@
 /* Bootstrap's colour utilities are !important and fixed (#6c757d is 4.1:1 on white), so the muted text takes the token the same way. */
 .text-muted { color: var(--wk-color-muted) !important; }
 
+/* Frappe's login card is `#fff` in login.bundle.css (a constant, not a variable): on a dark preset the light text sat on white (2.2:1). */
+.for-login .page-card,
+.for-forgot .page-card,
+.for-login-with-email-link .page-card,
+.for-signup .page-card,
+.for-email-login .page-card {
+	background-color: var(--wk-card-bg);
+	color: var(--wk-color-text);
+}
+
+/* The current breadcrumb is a Sass constant of the website bundle (#7c7c7c, 4.17:1 on white), not a variable. */
+.breadcrumb-item.active { color: var(--wk-color-muted); }
+
 body {
 	background: var(--wk-color-bg);
 	color: var(--wk-color-text);

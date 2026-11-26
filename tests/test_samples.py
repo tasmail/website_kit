@@ -104,3 +104,13 @@ def test_the_unit_is_tagged_like_every_other_record_the_kit_creates():
 	source = (ROOT / "website_kit/shop.py").read_text(encoding="utf-8")
 	assert re.search(r'TAGGED = \((?=[^)]*"UOM")', source)
 	assert "samples.uom_name" in source and '"stock_uom": "Nos"' not in source
+
+
+def test_the_shop_link_colour_does_not_reach_the_header_and_footer():
+	"""`.wk-shop a:not(.btn)` outranks `.wk-menu__link` and `.wk-footer a`, so the menu turned blue on shop pages (and the footer
+	link unreadable on a dark footer); the link colour is scoped to the page content."""
+	css = (ROOT / "website_kit/public/css/wk-shop.css").read_text(encoding="utf-8")
+	assert not re.search(r"(?m)^\.wk-shop a:not\(\.btn\)", css)
+	assert re.search(
+		r"(?m)^\.wk-shop \.page-content-wrapper a:not\(\.btn\)\s*\{\s*color:\s*var\(--wk-color-link\)", css
+	)

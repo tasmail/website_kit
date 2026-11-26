@@ -188,3 +188,9 @@ def test_the_stock_navbar_emits_the_stylesheets_and_scripts_itself():
 	"""Frappe's login page replaces the whole head_include block, so the links must travel with the navbar."""
 	html = _render_navbar()
 	assert html.index("<!--LINKS-->") < html.index("<header") and "<!--SCRIPTS-->" in html
+
+
+def test_the_stock_navbar_still_renders_when_the_context_has_no_links_or_scripts():
+	"""A template render without the kit's context (a test, a preview) must not print Jinja's error text into the page."""
+	html = _render_navbar(wk={"brand_name": "B"})
+	assert "no such element" not in html and "<header" in html

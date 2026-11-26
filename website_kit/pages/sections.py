@@ -377,6 +377,23 @@ def page_hero(ids, lang, title, lead, art_html=None):
 # --- whole pages -------------------------------------------------------------------------------------------------------
 
 
+def notfound_tree():
+	"""The not-found page (route `404`, the one Builder's 404 template looks up): the shared header and footer functions and a short
+	message, every word through `wk_text` in the language of the request, because one page serves both languages."""
+	ids = Ids("page-notfound")
+	text = lambda key: call("wk_text", key)  # noqa: E731
+	head = block(
+		ids, "header", name="WK Header", classes=["wk-header"], children=[raw(ids, call("wk_header", ""), name="menu")]
+	)
+	foot = block(
+		ids, "footer", name="WK Footer", classes=["wk-footer"], children=[raw(ids, call("wk_footer", ""), name="links")]
+	)
+	home = link(ids, text("notfound_home"), call("wk_url", "home"), classes=["wk-button"], name="home-link")
+	body = hero(ids, "en", title_html=text("notfound_title"), lead=text("notfound_lead"), actions=None)
+	skip = link(ids, text("skip"), "#wk-main", classes=["wk-skip-link"])
+	return [root(ids, [skip, head, main(ids, [body, section(ids, [home], name="actions")]), foot])]
+
+
 def page_tree(lang, key, definitions):
 	"""The block tree of one page: skip link, header, main, footer."""
 	t, ids = TEXT[lang], Ids(f"page-{key}-{lang}")

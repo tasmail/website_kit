@@ -35,7 +35,7 @@ const browser = await puppeteer.launch({
 // The links of the menu that is reachable (visible, or inside the open disclosure), in document order.
 const menuLinks = (page) =>
 	page.evaluate(() => {
-		const nav = [...document.querySelectorAll(".wk-header__nav")].find((n) => n.getBoundingClientRect().width > 0);
+		const nav = [...document.querySelectorAll(".wk-header__nav")].find((n) => n.getBoundingClientRect().width > 0 && !n.closest("details:not([open])"));
 		return nav ? [...nav.querySelectorAll("a")].map((a) => [a.getAttribute("href"), a.textContent.trim()]) : null;
 	});
 
@@ -81,7 +81,9 @@ try {
 				}
 				const got = await menuLinks(page);
 				// Same links, same labels, same order as the Builder page, in the same language.
-				check(JSON.stringify(got) === JSON.stringify(expected), `${size.width}px ${path} (${lang}): menu ${JSON.stringify(got)} differs from ${builder}: ${JSON.stringify(expected)}`);
+				// The login page itself has no login link (Frappe's `hide_login`); everything else must match.
+				const want = path === "/login" ? expected.filter(([href]) => href !== "/login") : expected;
+				check(JSON.stringify(got) === JSON.stringify(want), `${size.width}px ${path} (${lang}): menu ${JSON.stringify(got)} differs from ${builder}: ${JSON.stringify(want)}`);
 				if (outDir) await page.screenshot({ path: `${outDir}/header-${lang}-${path.replace(/[^a-z]+/g, "_")}-${size.width}.png` });
 				await page.close();
 			}

@@ -7,7 +7,7 @@ reach them; the WK Navbar template therefore emits the links itself, and the two
   page `frappe.boot.assets_json` does not exist, so the call fails with an uncaught promise rejection. The guard wraps
   `frappe.require` the moment the bundle assigns it and skips only that one call while the asset map is missing;
 * the Webshop strings: Frappe loads no translations into website pages, so the JavaScript of Webshop (`__("Add to Cart")`) stays
-  English. The server translates the strings that Webshop's scripts use and hands them over as one JSON block.
+  English. The server translates the strings that Webshop's scripts use and hands them over inside one inline script.
 """
 
 import functools
@@ -16,7 +16,6 @@ from pathlib import Path
 from .pages.markup import json_script
 from .theme.escape import esc
 
-I18N_ID = "wk-webshop-i18n"
 # Rows of uk.csv with this context are the shop wording where Frappe's translation of the same word means something else on a shop
 # page ("Submit" is "Провести", a posting, in the Desk). Only `translated()` asks for the context, so the Desk is not affected.
 CONTEXT = "Webshop page"
@@ -40,14 +39,6 @@ GUARD_SCRIPT = """(function (f) {
 	});
 })(window.frappe);"""
 
-LOADER_SCRIPT = (
-	"(function (f) {"
-	f'var e = document.getElementById("{I18N_ID}");'
-	"if (!e) return;"
-	"try { f._messages = Object.assign(f._messages || {}, JSON.parse(e.textContent)); } catch (x) {}"
-	"})(window.frappe);"
-)
-
 
 def links(base_css: str, theme_css: str = "", shop_css: str = "") -> str:
 	"""The stylesheet links: the base sheet, the generated token file, and the shop sheet on shop pages.
@@ -58,10 +49,14 @@ def links(base_css: str, theme_css: str = "", shop_css: str = "") -> str:
 
 
 def i18n(messages: dict) -> str:
-	"""The JSON block of translated Webshop strings and the script that merges it into `frappe._messages`; empty for no strings."""
+	"""The translated Webshop strings as one inline script that merges them into `frappe._messages`; empty for no strings.
+
+	The strings are a JSON object literal written by `json_script` (`<`, `>`, `&` and braces inside a value are escaped). Frappe
+	rewrites the opening tag of every script of a web template and drops its attributes, so a `type="application/json"` block would
+	run as JavaScript: the data travels inside the one script instead."""
 	if not messages:
 		return ""
-	return f'<script type="application/json" id="{I18N_ID}">{json_script(messages)}</script><script>{LOADER_SCRIPT}</script>'
+	return f"<script>(function (f) {{ f._messages = Object.assign(f._messages || {{}}, {json_script(messages)}); }})(window.frappe);</script>"
 
 
 def scripts(*, guard: bool, messages: dict) -> str:

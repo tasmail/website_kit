@@ -105,3 +105,16 @@ def test_the_grid_and_list_toggles_are_touch_sized():
 	assert touch, "no touch-size media query in wk-shop.css"
 	rule = re.search(r"\.wk-shop \.toggle-container \.btn[^{]*\{([^}]*)\}", touch.group(1))
 	assert rule and "min-block-size: 44px" in rule.group(1) and "min-inline-size: 44px" in rule.group(1)
+
+
+def test_the_current_breadcrumb_follows_the_muted_token():
+	"""Frappe compiles `.breadcrumb-item.active` to a constant colour (4.17:1 on white), so a variable remap does not reach it."""
+	assert re.search(r"(?m)^\.breadcrumb-item\.active\s*\{\s*color:\s*var\(--wk-color-muted\)", BASE_CSS)
+
+
+def test_the_login_card_follows_the_card_token():
+	"""login.bundle.css paints `.page-card` with a literal `#fff`; under the dark preset that left light text on white."""
+	rule = re.search(r"\.for-login \.page-card,[^{]*\{([^}]*)\}", BASE_CSS)
+	assert rule and "background-color: var(--wk-card-bg)" in rule.group(1)
+	for page in ("for-forgot", "for-login-with-email-link", "for-signup", "for-email-login"):
+		assert f".{page} .page-card" in BASE_CSS

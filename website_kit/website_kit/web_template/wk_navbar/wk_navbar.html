@@ -1,7 +1,7 @@
 {#- Standard navbar of Website Kit. The menu is not written here: `wk_header` (website_kit.jinja_api) builds it, the same function as on the
     Builder pages. Site data is escaped there; `wk.links` and `wk.scripts` are built by website_kit.runtime (already escaped, braces encoded).
     The stylesheet links travel with the navbar because Frappe's own pages (login, update-password) replace the whole head_include block. -#}
-{{ wk.links }}{{ wk.scripts }}
+{{ wk.get("links", "") }}{{ wk.get("scripts", "") }}
 <a class="wk-skip-link" href="#wk-main">{{ _("Skip to content") }}</a>
 <header class="wk-header">{{ wk_header('', 'x' if hide_login else '') }}</header>
 <a id="wk-main" tabindex="-1"></a>

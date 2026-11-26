@@ -21,7 +21,8 @@ body.wk-shop {
 	font-family: var(--wk-font-heading);
 }
 
-.wk-shop a:not(.btn) { color: var(--wk-color-link); }
+/* Inside the page content only: the header and footer links keep their own colours (a bare `.wk-shop a` made the menu blue). */
+.wk-shop .page-content-wrapper a:not(.btn) { color: var(--wk-color-link); }
 .wk-shop .product-link,
 .wk-shop .card-title a,
 .wk-shop .list-row a { text-decoration: none; }

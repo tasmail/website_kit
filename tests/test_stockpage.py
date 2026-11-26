@@ -34,23 +34,23 @@ def test_the_guard_and_the_strings_hold_no_template_syntax_and_cannot_close_thei
 	for text in (stockpage.GUARD_SCRIPT, stockpage.i18n({"a {{ 7*7 }}": "b {% x %} </script> {#"})):
 		assert "{{" not in text and "{%" not in text and "{#" not in text
 	html = stockpage.i18n({"x": "</script><b>"})
-	assert (
-		html.count("</script>") == 2 and "<b>" not in html
-	)  # the closing tags of the two elements, nothing from the data
+	assert html.count("</script>") == 1 and "<b>" not in html  # only its own closing tag, nothing from the data
 
 
-def test_the_strings_block_round_trips_as_json_and_fills_frappe_messages():
-	messages = {"Add to Cart": "Додати в кошик", "{0} items found.": "Знайдено позицій: {0}."}
+def test_the_strings_round_trip_as_a_json_literal_inside_one_plain_script():
+	"""Frappe drops the attributes of every script tag of a web template, so there is no `type="application/json"` block."""
+	messages = {"Add to Cart": "Додати в кошик", "{0} items found.": "Знайдено: {0}.", "a</b>&c": "x"}
 	html = stockpage.i18n(messages)
-	body = re.search(r'<script type="application/json" id="wk-webshop-i18n">(.*?)</script>', html, re.S).group(1)
+	assert html.startswith("<script>") and html.count("<script") == 1 and "type=" not in html
+	body = re.search(r"Object\.assign\(f\._messages \|\| \{\}, (.*)\); \}\)\(window\.frappe\)", html, re.S).group(1)
 	assert json.loads(body) == messages
-	assert "_messages" in html and "wk-webshop-i18n" in html
 	assert stockpage.i18n({}) == ""
 
 
 def test_the_guard_script_is_inline_and_small():
 	html = stockpage.scripts(guard=True, messages={})
 	assert html.startswith("<script>") and html.endswith("</script>") and len(html) < 1200
+	assert stockpage.scripts(guard=False, messages={}) == ""
 
 
 def run_node(body):

@@ -16,6 +16,8 @@ SCRIPT_NAME = "WK Contact"
 SCRIPT_FILE = Path(__file__).with_name("wk_contact.js")
 # Which page of which kind lives in a Builder Page of this name.
 PAGE_NAME = "wk-{key}-{lang}"
+NOTFOUND_NAME = "wk-notfound"
+NOTFOUND_ROUTE = "404"  # Builder renders the published page with this route as the site's not-found page
 COMPONENT_KINDS = tuple(sections.COMPONENTS)
 ROUTES_HOME = ROUTES["home"]["uk"]
 
@@ -84,6 +86,30 @@ def page_specs() -> list[dict]:
 	return specs
 
 
+def notfound_spec() -> dict:
+	"""One page for both languages: its texts and links come from `wk_text` and `wk_url`, in the language of the request."""
+	fields = {
+		"page_title": TEXT["en"]["notfound_title"],
+		"route": NOTFOUND_ROUTE,
+		"language": "",
+		"meta_description": "",
+		"blocks": dump(sections.notfound_tree()),
+		"head_html": call("wk_head", "uk", "notfound"),
+		"published": 1,
+		"disable_indexing": 1,
+		"page_data_script": "",
+		"client_scripts": [],
+	}
+	return {
+		"kind": "Builder Page",
+		"name": NOTFOUND_NAME,
+		"fields": fields,
+		"hash": digest(fields),
+		"key": "notfound",
+		"lang": "",
+	}
+
+
 def all_specs() -> list[dict]:
 	"""Dependencies first: the script and the components, then the pages that use them."""
-	return [script_spec(), *component_specs(), *page_specs()]
+	return [script_spec(), *component_specs(), *page_specs(), notfound_spec()]

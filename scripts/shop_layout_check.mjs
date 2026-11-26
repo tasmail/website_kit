@@ -45,7 +45,7 @@ const PAGES = [
 	["/no-such-page-for-the-check", "page"],
 ];
 
-async function common(page, where, themed) {
+async function common(page, where, themed, builder = false) {
 	const info = await page.evaluate(async () => {
 		const sheets = [...document.querySelectorAll('link[rel="stylesheet"]')].map((l) => l.getAttribute("href"));
 		const served = [];
@@ -66,7 +66,8 @@ async function common(page, where, themed) {
 		};
 	});
 	check(!info.sheets.some((h) => !h || h === "None" || h.endsWith("/None")), `${where}: a stylesheet link points at None`);
-	check(info.sheets.some((h) => /website\.bundle/.test(h || "")), `${where}: Frappe's website.bundle.css is not linked`);
+	// A Builder page (the kit's 404 page) brings its own reset instead of Frappe's website bundle.
+	check(builder || info.sheets.some((h) => /website\.bundle/.test(h || "")), `${where}: Frappe's website.bundle.css is not linked`);
 	if (themed) check(info.sheets.some((h) => /wk-theme/.test(h || "")), `${where}: the kit token file is not linked`);
 	for (const s of info.served) check(s.status === 200 && /text\/css/.test(s.type), `${where}: ${s.href} is ${s.status} ${s.type}`);
 	// The login page replaces Frappe's head block: the kit sheets reach it through the navbar, so it is themed like the rest.
@@ -173,30 +174,49 @@ async function contrastProblems(page) {
 // narrow one; the disclosure works from the keyboard (Enter and Space on the summary).
 async function menuChecks(page, where, wide) {
 	const info = await page.evaluate(() => {
-		const shown = (e) => e && getComputedStyle(e).display !== "none" && e.getBoundingClientRect().width > 0;
-		const burger = document.querySelector(".wk-header__burger");
+		// A closed <details> still reports a box for its content, so it counts as hidden.
+		const shown = (e) => e && getComputedStyle(e).display !== "none" && e.getBoundingClientRect().width > 0 && !e.closest("details:not([open])");
+		const burgerBox = document.querySelector(".wk-header__burger");
+		const burger = burgerBox && getComputedStyle(burgerBox).display !== "none" && burgerBox.getBoundingClientRect().width > 0 ? burgerBox : null;
 		const menu = document.querySelector(".wk-header__menu");
 		const visibleNavs = [...document.querySelectorAll(".wk-header__nav")].filter(shown);
 		return {
-			header: !!document.querySelector(".wk-header"), burger: shown(burger), menu: shown(menu), navs: visibleNavs.length,
+			header: !!document.querySelector(".wk-header"), burger: !!burger, menu: shown(menu), navs: visibleNavs.length,
 			checkbox: !!document.querySelector(".wk-header input[type=checkbox]"),
 		};
 	});
 	check(info.header, `${where}: no kit header`);
+	if (!info.header) return;
 	check(!info.checkbox, `${where}: the header still has a checkbox`);
 	if (wide) {
 		check(info.navs === 1 && !info.burger, `${where}: wide screen: ${info.navs} visible menus, burger ${info.burger} (one open menu, no burger expected)`);
+		return;
+	}
+	if (!info.burger) {
+		check(false, `${where}: narrow screen: no burger`);
 		return;
 	}
 	check(info.burger && info.navs === 0, `${where}: narrow screen: burger ${info.burger}, ${info.navs} visible menus (the menu must be closed behind the burger)`);
 	await page.evaluate(() => window.scrollTo(0, 0));
 	await page.focus(".wk-header__burger");
 	await page.keyboard.press("Enter");
-	const opened = await page.evaluate(() => ({ open: document.querySelector(".wk-header__menu").open, navs: [...document.querySelectorAll(".wk-header__nav")].filter((n) => n.getBoundingClientRect().width > 0).length }));
+	const opened = await page.evaluate(() => ({ open: document.querySelector(".wk-header__menu").open, navs: [...document.querySelectorAll(".wk-header__nav")].filter((n) => n.getBoundingClientRect().width > 0 && !n.closest("details:not([open])")).length }));
 	check(opened.open && opened.navs === 1, `${where}: Enter on the burger does not open exactly one menu (${JSON.stringify(opened)})`);
 	await page.keyboard.press("Space");
 	const closed = await page.evaluate(() => document.querySelector(".wk-header__menu").open);
 	check(!closed, `${where}: Space on the burger does not close the menu`);
+}
+
+// The strings of Webshop's browser scripts: Frappe loads no translations into website pages, so the kit supplies them.
+async function webshopStrings() {
+	const page = await browser.newPage();
+	await page.setExtraHTTPHeaders({ "Accept-Language": "uk" });
+	await page.goto(new URL("/all-products", base).href, { waitUntil: "networkidle0" });
+	const got = await page.evaluate(() => ({ add: frappe._("Add to Cart"), submit: frappe._("Submit"), found: frappe._("{0} items found."), count: Object.keys(frappe._messages || {}).length }));
+	check(got.add === "Додати в кошик", `uk shop page: "Add to Cart" is "${got.add}" in the browser`);
+	check(got.submit === "Надіслати", `uk shop page: "Submit" is "${got.submit}" (the shop wording, not the Desk's "Провести")`);
+	check(got.found.includes("{0}") && got.found !== "{0} items found.", `uk shop page: "{0} items found." is "${got.found}"`);
+	await page.close();
 }
 
 async function scrollBottom(page) {
@@ -205,14 +225,19 @@ async function scrollBottom(page) {
 }
 
 try {
+	await webshopStrings();
 	for (const size of [{ width: 1440, height: 900 }, { width: 390, height: 844 }]) {
 		const wide = size.width > 800;
 		for (const [path, kind] of PAGES) {
 			const page = await browser.newPage();
 			await page.setViewport(size);
-			await page.goto(new URL(path, base).href, { waitUntil: "networkidle0" });
 			const where = `${size.width}px ${path}`;
-			await common(page, where, true);
+			// No uncaught error: Frappe's website bundle used to end in an unhandled rejection on every page (file_uploader.bundle.js).
+			page.on("pageerror", (error) => check(false, `${where}: uncaught error: ${String(error.message).slice(0, 120)}`));
+			await page.goto(new URL(path, base).href, { waitUntil: "networkidle0" });
+			// A Builder page (the kit's 404 page when Builder is installed) brings its own reset instead of Frappe's website bundle.
+			const builder = await page.evaluate(() => [...document.querySelectorAll('link[rel="stylesheet"]')].some((l) => /\/builder\/reset\.css/.test(l.getAttribute("href") || "")));
+			await common(page, where, true, builder);
 			for (const text of await contrastProblems(page)) check(false, `${where}: low contrast ${text}`);
 			await menuChecks(page, where, wide);
 			if (outDir) await page.screenshot({ path: `${outDir}/${label}-${path.replace(/[^a-z]+/g, "_")}-${size.width}.png`, fullPage: kind !== "list" });

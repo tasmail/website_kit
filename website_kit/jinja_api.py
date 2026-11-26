@@ -10,7 +10,7 @@ import frappe
 import frappe.utils
 
 from . import __version__, contact, runtime
-from .pages import header, markup
+from .pages import footer, header, markup
 from .pages.content import ROUTES, TEXT, URLS
 from .safe import never_raises
 from .theme.escape import esc, safe_url
@@ -83,7 +83,9 @@ def wk_head(lang="uk", key="home"):
 	theme = safe_url(settings.theme_file_url) if settings else ""
 	theme_css = f"{theme}?v={settings.theme_hash}" if theme else ""
 	alternates = []
-	if all(frappe.db.exists("Builder Page", {"route": route, "published": 1}) for route in ROUTES[key].values()):
+	if key in ROUTES and all(
+		frappe.db.exists("Builder Page", {"route": route, "published": 1}) for route in ROUTES[key].values()
+	):
 		alternates = [(code, frappe.utils.get_url(URLS[key][code])) for code in URLS[key]]
 		alternates.append(("x-default", frappe.utils.get_url(URLS[key]["uk"])))
 	info = contact.contact_info()
@@ -169,3 +171,24 @@ def wk_header(lang="", hide_login=""):
 		brand_html=esc(_brand_text()),
 		logo_url=frappe.get_website_settings("banner_image") or "",
 	)
+
+
+@never_raises
+def wk_footer(lang=""):
+	"""The content of the footer for pages that are not made of blocks (the not-found page); the language is the request's when empty."""
+	lang = _language(lang)
+	info = contact.contact_info()
+	facts = markup.contact_list(TEXT[lang], info, "footer")
+	return footer.inner(lang=lang, brand_html=esc(_brand_text()), facts_html=facts)
+
+
+@never_raises
+def wk_text(key="", lang=""):
+	"""One text of the standard pages in the language of the request (one page, both languages); an unknown key gives nothing."""
+	return esc(TEXT[_language(lang)].get(key, ""))
+
+
+@never_raises
+def wk_url(key="home", lang=""):
+	"""The URL of a standard page in the language of the request."""
+	return esc(URLS.get(key, {}).get(_language(lang), ""))

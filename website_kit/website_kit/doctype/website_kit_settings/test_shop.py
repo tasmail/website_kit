@@ -205,7 +205,7 @@ class TestShop(TestCase):
 		result = shop.remove_samples()
 		self.assertEqual(result["kept"], [])
 		after = shop.leftovers()
-		self.assertEqual(after["tagged"], {"Item": 0, "Item Group": 0, "Item Price": 0, "Website Item": 0})
+		self.assertEqual(after["tagged"], {"Item": 0, "Item Group": 0, "Item Price": 0, "Website Item": 0, "UOM": 0})
 		self.assertEqual(
 			(after["files"], after["stock_ledger_entries"], after["bins"], after["gl_entries"]), (0, 0, 0, 0)
 		)
@@ -386,6 +386,58 @@ class TestShop(TestCase):
 			self.assertEqual(
 				frappe.db.get_value("Website Item", {"item_code": samples.item_code(mug[0])}, "web_item_name"), name
 			)
+			code = samples.item_code(mug[0])
+			self.assertEqual(frappe.db.get_value("Item", code, "stock_uom"), samples.uom_name(language))
+			self.assertEqual(frappe.db.get_value("Item", code, "item_group"), samples.group_name(language))
+
+	def test_the_unit_and_group_the_kit_made_go_with_the_samples_and_ones_that_existed_stay(self):
+		original = frappe.db.get_single_value("System Settings", "language")
+		self.addCleanup(lambda: frappe.db.set_single_value("System Settings", "language", original))
+		frappe.db.set_single_value("System Settings", "language", "uk")
+		for name in ("шт",):
+			if frappe.db.exists("UOM", name):
+				self.skipTest("the site already has the unit, nothing to check")
+		shop.load_samples()
+		self.assertTrue(frappe.db.exists("UOM", "шт") and frappe.db.exists("Item Group", "Зразки"))
+		self.assertEqual(shop.tagged("UOM"), ["шт"])
+		shop.remove_samples()
+		self.assertFalse(frappe.db.exists("UOM", "шт") or frappe.db.exists("Item Group", "Зразки"))
+		# a unit that exists before the load is used as it is, never tagged, and survives the removal
+		frappe.get_doc({"doctype": "UOM", "uom_name": "шт", "enabled": 1}).insert(ignore_permissions=True)
+		shop.load_samples()
+		self.assertEqual(shop.tagged("UOM"), [])
+		shop.remove_samples()
+		self.assertTrue(frappe.db.exists("UOM", "шт"))
+		frappe.delete_doc("UOM", "шт", ignore_permissions=True, force=True)
+
+	def test_the_navbar_values_carry_the_links_the_guard_and_on_shop_pages_the_strings(self):
+		shop.enable_shop()
+		frappe.clear_document_cache("Webshop Settings", "Webshop Settings")
+		other = runtime.update_website_context(frappe._dict(route="login"))["wk"]
+		self.assertIn("wk.css", other["links"])
+		self.assertNotIn("wk-shop.css", other["links"])
+		self.assertIn("file_uploader.bundle.js", other["scripts"])
+		self.assertNotIn("f._messages", other["scripts"])
+		frappe.local.lang = "uk"
+		try:
+			values = runtime.update_website_context(frappe._dict(route="all-products"))["wk"]
+		finally:
+			frappe.local.lang = "en"
+		self.assertIn("wk-shop.css", values["links"])
+		self.assertIn("f._messages", values["scripts"])
+		self.assertIn("Додати в кошик", values["scripts"])
+		self.assertNotIn("{{", values["links"] + values["scripts"])
+
+	def test_the_header_function_gives_every_page_the_same_menu(self):
+		from website_kit import jinja_api
+
+		shop.enable_shop()
+		shop.load_samples()
+		html = jinja_api.wk_header("")
+		self.assertIn("wk-header__burger", html)
+		self.assertEqual(html.count('href="/all-products"'), 2)  # the wide menu and the one in the disclosure
+		self.assertEqual(jinja_api.wk_header("uk"), jinja_api.wk_header("uk"))
+		self.assertNotIn("/login", jinja_api.wk_header("uk", "x"))
 
 	def test_status_and_methods(self):
 		self.assertEqual(api.shop_status()["samples"], 0)
