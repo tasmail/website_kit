@@ -187,6 +187,12 @@ class TestStandardPages(KitTestCase):
 			self.assertIn("wk-theme", html)
 			self.assertIn("/assets/website_kit/css/wk.css", html)
 
+	def test_a_closed_site_has_exactly_one_robots_meta_tag_on_every_standard_page(self):
+		for path in ("/", "/about", "/contact", "/en", "/en/about"):
+			html = fetch(path)[1]
+			self.assertEqual(len(re.findall(r'<meta[^>]+name="robots"', html)), 1, path)
+			self.assertIn("noindex", html)
+
 	def test_a_pair_of_pages_in_the_two_languages_is_served(self):
 		for path in UK_PAGES[1:]:
 			for prefix, lang in (("", "uk"), ("/en", "en")):

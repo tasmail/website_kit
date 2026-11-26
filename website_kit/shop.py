@@ -253,6 +253,11 @@ def load_samples() -> dict:
 	return {"created": created, "samples": len(tagged("Item"))}
 
 
+def site_language() -> str:
+	"""The language of the site (System Settings), not of the user who presses the button: the samples are shown to visitors."""
+	return (frappe.db.get_single_value("System Settings", "language") or "en")[:2]
+
+
 def tag_fields_exist() -> bool:
 	return all(frappe.get_meta(doctype).has_field(samples.TAG_FIELD) for doctype in TAGGED)
 
@@ -269,7 +274,7 @@ def _create_samples(price_list: str, written: list) -> int:
 				**tag,
 			}
 		).insert(ignore_permissions=True)
-	lang = frappe.local.lang or "en"
+	lang = site_language()
 	created = 0
 	for entry in samples.ITEMS:
 		code = samples.item_code(entry[0])

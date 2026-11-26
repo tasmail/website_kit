@@ -66,6 +66,32 @@ def measure(base: str, host: str, path: str) -> dict:
 	return {"path": path, "total": total, "sizes": sizes, "scripts": scripts, "external": external, "fonts": fonts}
 
 
+STOCK_PAGES = ("/login", "/no-such-page-for-the-check")
+
+
+def stock_page_problems(base: str, host: str, path: str) -> list[str]:
+	"""A stock Frappe page (login, the 404 page) must keep Frappe's own base stylesheet and never link `None`.
+
+	The kit once assigned a Website Theme that had no compiled file: Frappe then printed `href="None"` and dropped website.bundle.css,
+	which left the stock pages (the Webshop list included) without Bootstrap and the Frappe styles.
+	"""
+	import urllib.error
+
+	url = urljoin(base, path)
+	request = urllib.request.Request(url, headers={"Host": host, "Accept-Encoding": "identity"})
+	try:
+		html = urllib.request.urlopen(request, timeout=30).read().decode("utf-8", "replace")
+	except urllib.error.HTTPError as error:  # the 404 page is a page too
+		html = error.read().decode("utf-8", "replace")
+	hrefs = [(HREF.search(tag) or [None, ""])[1] for tag in LINK.findall(html) if "stylesheet" in tag]
+	problems = []
+	if any(href in ("None", "", "/None") or href.endswith("/None") for href in hrefs):
+		problems.append("a stylesheet link points at None")
+	if not any("website.bundle" in href for href in hrefs):
+		problems.append("Frappe's website.bundle.css is not linked")
+	return problems
+
+
 def main() -> int:
 	parser = argparse.ArgumentParser()
 	parser.add_argument("--base", default="http://127.0.0.1:8000")
@@ -101,6 +127,10 @@ def main() -> int:
 				"    web fonts (woff2, not in the sum): "
 				+ ", ".join(f"{name.rsplit('/', 1)[-1]} {size / 1024:.1f} KB" for name, size in result["fonts"].items())
 			)
+		failed = failed or bool(problems)
+	for path in STOCK_PAGES:
+		problems = stock_page_problems(args.base, args.host, path)
+		print(f"{path:14} stock page  " + ("FAIL " + "; ".join(problems) if problems else "ok"))
 		failed = failed or bool(problems)
 	return 1 if failed else 0
 

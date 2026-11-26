@@ -1,42 +1,97 @@
-/* Website Kit shop stylesheet: the Webshop pages (product cards, filters, cart) follow the theme tokens.
- * Scoped by the body class `wk-shop`, which the kit adds only on the shop pages (the catalogue, search, cart, orders, wishlist
- * and product pages) while the shop is on; every selector below also names a Webshop class, so no other page is touched.
- * Plain CSS, no images, no fonts, no build step; every value is a --wk-* custom property (docs/theming.md). */
+/* Website Kit shop stylesheet: the stock Webshop pages (catalogue, search, product, cart, orders, wishlist) follow the tokens.
+ *
+ * Linked, and the body class `wk-shop` added, only on those pages while the shop is on (runtime.is_shop_page); every rule is under
+ * `.wk-shop`, so the login page, the Builder pages and the Desk are never touched. Webshop's own markup is written against Frappe's
+ * design variables (`var(--gray-800)` even in inline styles), so the main job is to point those variables at the kit tokens: a dark
+ * preset then restyles the stock markup without light text on a white card. The few rules after that set radii, borders and fonts.
+ * No images, no fonts, no layout rules: Frappe's website.bundle.css and Webshop's bundle stay in charge of the layout.
+ * Webshop's markup is outside the theming contract (docs/theming.md); a Webshop release can change it. */
 
-.wk-shop .item-card-group-section .card,
-.wk-shop .card.item-card {
+body.wk-shop {
+	--bg-color: var(--wk-color-bg);
+	--fg-color: var(--wk-color-bg);
+	--card-bg: var(--wk-card-bg);
+	--control-bg: var(--wk-color-bg);
+	--white: var(--wk-color-bg);
+	--gray-50: var(--wk-color-surface);
+	--gray-100: var(--wk-color-surface);
+	--fg-hover-color: var(--wk-color-surface);
+	--btn-default-bg: var(--wk-color-surface);
+	--btn-default-hover-bg: var(--wk-color-surface);
+	--blue-50: var(--wk-color-surface);
+	--gray-200: var(--wk-color-border);
+	--gray-300: var(--wk-color-border);
+	--border-color: var(--wk-color-border);
+	--dark-border-color: var(--wk-color-border);
+	--gray-400: var(--wk-color-muted);
+	--gray-500: var(--wk-color-muted);
+	--gray-600: var(--wk-color-muted);
+	--text-muted: var(--wk-color-muted);
+	--text-light: var(--wk-color-muted);
+	--gray-700: var(--wk-color-text);
+	--gray-800: var(--wk-color-text);
+	--gray-900: var(--wk-color-text);
+	--text-color: var(--wk-color-text);
+	--heading-color: var(--wk-color-text);
+	--primary: var(--wk-color-primary);
+	--btn-primary: var(--wk-color-primary);
+	--blue-500: var(--wk-color-link);
+	--blue-600: var(--wk-color-link);
+	--blue-700: var(--wk-color-link);
+	--border-radius: var(--wk-radius-sm);
+	--border-radius-md: var(--wk-radius-md);
+	--border-radius-lg: var(--wk-radius-lg);
+	--card-border-radius: var(--wk-radius-md);
+	--product-bg-color: var(--wk-card-bg);
+	--body-bg-color: var(--wk-color-bg);
+	background: var(--wk-color-bg);
+	color: var(--wk-color-text);
+	font-family: var(--wk-font-body);
+}
+
+.wk-shop h1,
+.wk-shop h2,
+.wk-shop h3,
+.wk-shop h4,
+.wk-shop .card-title {
+	font-family: var(--wk-font-heading);
+}
+
+.wk-shop a:not(.btn) { color: var(--wk-color-link); }
+.wk-shop .product-link,
+.wk-shop .card-title a,
+.wk-shop .list-row a { text-decoration: none; }
+
+/* Cards, list rows and the cart panels take the card variant of the preset (flat, outlined or raised). */
+.wk-shop .list-row,
+.wk-shop .product-container,
+.wk-shop .card,
+.wk-shop .frappe-card,
+.wk-shop .address-card,
+.wk-shop .cart-empty {
 	background: var(--wk-card-bg);
 	border: var(--wk-card-border);
 	border-radius: var(--wk-radius-md);
 	box-shadow: var(--wk-card-shadow);
+	color: var(--wk-color-text);
+}
+
+.wk-shop .list-image,
+.wk-shop .card-img-container {
+	background: var(--wk-color-surface);
+	border-color: var(--wk-color-border);
+	border-radius: var(--wk-radius-sm);
 	overflow: hidden;
 }
 
-.wk-shop .item-card-group-section .card-title,
-.wk-shop .item-card-group-section .card-title a {
-	color: var(--wk-color-text);
-	font-family: var(--wk-font-heading);
-	font-weight: var(--wk-heading-weight);
-}
-
 .wk-shop .card-img-top,
+.wk-shop .website-image,
 .wk-shop .card-img {
 	background: var(--wk-color-surface);
+	max-inline-size: 100%;
 	object-fit: cover;
 }
 
-.wk-shop .product-price,
-.wk-shop .formatted-price {
-	color: var(--wk-color-text);
-	font-weight: 600;
-}
-
-.wk-shop .striked-item-price,
-.wk-shop .striked-price {
-	color: var(--wk-color-muted);
-}
-
-/* Filters */
 .wk-shop .filters-section {
 	background: var(--wk-color-surface);
 	border: 1px solid var(--wk-color-border);
@@ -44,31 +99,61 @@
 	padding: calc(var(--wk-space-unit) * 2);
 }
 
-.wk-shop .filters-title,
-.wk-shop .filter-label {
+.wk-shop .form-control,
+.wk-shop #search-box {
+	background: var(--wk-color-bg);
+	border-radius: var(--wk-radius-sm);
 	color: var(--wk-color-text);
-	font-weight: 600;
 }
 
-.wk-shop .clear-filters a {
-	color: var(--wk-color-link);
-}
+.wk-shop .form-control::placeholder { color: var(--wk-color-muted); opacity: 1; }
 
-/* Cart */
-.wk-shop .cart-table th,
-.wk-shop .cart-table td {
-	border-color: var(--wk-color-border);
-}
+.wk-shop .btn { border-radius: var(--wk-button-radius); }
 
-.wk-shop .cart-btn {
+.wk-shop .btn-primary,
+.wk-shop .cart-btn,
+.wk-shop .btn-primary:hover,
+.wk-shop .btn-primary:focus {
 	background: var(--wk-color-primary);
 	border-color: var(--wk-color-primary);
-	border-radius: var(--wk-button-radius);
 	color: var(--wk-color-primary-contrast);
 }
 
-.wk-shop .btn-light.cart-btn {
-	background: var(--wk-color-surface);
-	border-color: var(--wk-color-border);
+.wk-shop .btn-primary:hover,
+.wk-shop .btn-primary:focus,
+.wk-shop .cart-btn:hover { filter: brightness(0.88); }
+
+.wk-shop .btn-default,
+.wk-shop .btn-light {
+	border: 1px solid var(--wk-color-border);
 	color: var(--wk-color-text);
 }
+
+.wk-shop .table td,
+.wk-shop .table th { border-color: var(--wk-color-border); color: var(--wk-color-text); }
+.wk-shop hr { border-color: var(--wk-color-border); }
+
+/* The list view: every image gets the same 4:3 box whatever the text beside it needs, and on a phone the picture column is wide
+ * enough to be seen (the stock one-sixth column leaves a 27 px sliver and a height that follows the text). */
+.wk-shop .list-image { align-self: flex-start; }
+
+.wk-shop .list-image img {
+	aspect-ratio: 4 / 3;
+	block-size: auto !important;
+	inline-size: 100%;
+	object-fit: cover;
+}
+
+@media (max-width: 48em) {
+	.wk-shop .list-row > .list-image { flex: 0 0 34%; max-inline-size: 34%; }
+	.wk-shop .list-row > .list-image + div { flex: 0 0 66%; max-inline-size: 66%; }
+}
+
+.wk-shop .btn-outline-primary {
+	background: transparent;
+	border-color: var(--wk-color-link);
+	color: var(--wk-color-link);
+}
+
+/* Bootstrap's colour utilities are !important and fixed (#6c757d is 4.1:1 on white), so the muted text takes the token the same way. */
+.wk-shop .text-muted { color: var(--wk-color-muted) !important; }

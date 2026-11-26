@@ -2,6 +2,8 @@
 
 import json
 import re
+import shutil
+import subprocess
 from pathlib import Path
 
 from website_kit import __version__
@@ -40,12 +42,8 @@ def test_templates_never_render_site_data_without_escaping():
 
 
 def test_json_files_are_valid_and_name_the_module():
-	files = [
-		path
-		for folder in ("doctype", "web_template", "website_theme")
-		for path in (PKG / "website_kit" / folder).rglob("*.json")
-	]
-	assert len(files) >= 5
+	files = [path for folder in ("doctype", "web_template") for path in (PKG / "website_kit" / folder).rglob("*.json")]
+	assert len(files) >= 4
 	for path in files:
 		assert json.loads(path.read_text(encoding="utf-8"))["module"] == "Website Kit", path
 
@@ -92,3 +90,26 @@ def test_hooks_register_every_before_request_function_in_one_assignment():
 	assert "website_kit.runtime.before_request" in text and "website_kit.contact.before_request" in text
 	for name in ("after_request", "update_website_context", "after_install", "after_migrate"):
 		assert len(re.findall(rf"^{name}\s*=", text, flags=re.M)) == 1, name
+
+
+def tracked_entries():
+	git = shutil.which("git")
+	if not git or not (ROOT / ".git").exists():
+		return None
+	return subprocess.run(
+		[git, "-C", str(ROOT), "ls-files", "-s"], capture_output=True, text=True, check=True
+	).stdout.splitlines()
+
+
+def test_no_symlink_and_no_node_modules_is_tracked():
+	"""A local `node_modules` (a directory or a symlink to one) must never be committed."""
+	entries = tracked_entries()
+	if entries is None:
+		return
+	assert [line for line in entries if line.startswith("120000")] == [], "a symlink is tracked"
+	assert [line for line in entries if "node_modules" in line] == []
+
+
+def test_gitignore_covers_node_modules_as_a_file_and_as_a_directory():
+	lines = (ROOT / ".gitignore").read_text(encoding="utf-8").split()
+	assert "node_modules" in lines  # the bare name matches a symlink as well as a directory

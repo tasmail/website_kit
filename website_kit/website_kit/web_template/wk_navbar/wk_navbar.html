@@ -10,6 +10,9 @@
 			<span class="wk-header__name">{{ wk.brand_name or _("Home") }}</span>
 			{%- endif -%}
 		</a>
+		{#- Below 48em the menu is collapsed. A checkbox keeps it free of JavaScript and keyboard operable (Space toggles it). -#}
+		<input type="checkbox" class="wk-header__toggle" id="wk-header__toggle" aria-label="{{ _('Menu') }}">
+		<label class="wk-header__burger" for="wk-header__toggle" aria-hidden="true"><span></span></label>
 		<nav class="wk-header__nav" aria-label="{{ _('Main menu') }}">
 			<ul class="wk-menu">
 				{#- One level of children: a top item with children is a details/summary group (no JavaScript, keyboard accessible). -#}

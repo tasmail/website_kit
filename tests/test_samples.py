@@ -80,12 +80,16 @@ def test_the_shop_entry_is_matched_by_path_whatever_the_spelling():
 		assert not shop_menu.is_shop_entry({"url": url}), url
 
 
-def test_the_shop_stylesheet_never_restyles_other_pages():
-	"""Every rule is under .wk-shop and names a Webshop class; generic Bootstrap and Frappe classes are not restyled."""
+def test_the_shop_stylesheet_is_scoped_to_the_shop_pages():
+	"""Every rule is under the body class `wk-shop`, which the kit adds only on the Webshop pages, so no other page is restyled."""
 	css = (ROOT / "website_kit/public/css/wk-shop.css").read_text(encoding="utf-8")
 	body = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
 	selectors = [s.strip() for block in re.findall(r"([^{}]+)\{", body) for s in block.split(",")]
-	assert selectors and all(s.startswith(".wk-shop ") for s in selectors), selectors
-	for generic in (".btn-primary", ".frappe-card", ".in-green"):
-		assert generic not in body
-	assert not any(re.fullmatch(r"\.wk-shop \.(card-title|card|btn[\w-]*)( a)?", s) for s in selectors)
+	assert selectors and all(s.startswith((".wk-shop ", "body.wk-shop", "@media")) for s in selectors), selectors
+	assert re.search(
+		r"\.wk-shop \.text-muted\s*\{\s*color:\s*var\(--wk-color-muted\)\s*!important", body
+	)  # Bootstrap's utility is !important
+	assert "url(" not in body and "@import" not in body and "@font-face" not in body
+	# the main job is to point Frappe's design variables at the kit tokens, so inline `var(--gray-800)` in Webshop's markup follows the preset
+	for variable in ("--text-color", "--gray-800", "--border-color", "--bg-color", "--primary"):
+		assert re.search(rf"{variable}:\s*var\(--wk-", body), variable

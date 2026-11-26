@@ -16,10 +16,13 @@ Anything not listed here (internal classes such as `.wk-header__inner`, Frappe o
    `token_overrides`).
 2. `apply()` compiles them into one plain CSS file, `/files/wk-theme.css` (custom properties and `@font-face` rules, no
    SCSS, no node step). The result is deterministic: the same settings give the same bytes.
-3. Public website pages load three stylesheets: the compiled Website Theme CSS of Frappe (`/files/website_theme/website_kit_style.css`,
-   the Bootstrap and Frappe website styles, compiled once by node when the theme is imported; it is not minimal), the shared
-   `/assets/website_kit/css/wk.css`, and the generated `/files/wk-theme.css`. The two kit files are never linked from the Desk.
-   On the Frappe 15.128.0 CI bench the files measure 453 KB raw / 69 KB gzip (Website Theme CSS), 5.9 KB / 1.5 KB (`wk.css`) and 3.7 KB / 1.0 KB (`wk-theme.css`); CI prints them on every run. A browser measurement has not been made.
+3. The Website Theme stays the stock `Standard` one, so Frappe serves its prebuilt `website.bundle.css` (Bootstrap and the Frappe
+   website styles); the kit never compiles a theme on a site (no node, no sass). On top of it public pages load two kit
+   stylesheets, the shared `/assets/website_kit/css/wk.css` and the generated `/files/wk-theme.css`, and while Webshop is on, on
+   the shop pages, `/assets/website_kit/css/wk-shop.css`. The kit files are never linked from the Desk. Releases before 0.3 assigned
+   a kit-owned Website Theme named `Website Kit`; `apply()` and `bench migrate` move a site that holds exactly that value back to
+   `Standard` (any other theme is the customer's and is left alone). On the Frappe 15.128.0 CI bench `wk.css` measures
+   7.5 KB / 1.8 KB and `wk-theme.css` of the `clear` preset 3.2 KB / 1.0 KB (raw / gzip); CI prints them on every run.
 4. `wk.css` reads only the custom properties below, so a preset change never needs a new stylesheet.
 
 ## Tokens
@@ -166,7 +169,21 @@ Selectors on internal classes (such as the parts of the header) or on Frappe and
 
 ## Shop styling
 
-While Webshop is on, the kit adds the body class `wk-shop` and one more stylesheet, `/assets/website_kit/css/wk-shop.css` (under 1 KB
-gzip), that lets the Webshop product cards, filters and cart follow the tokens. It targets Webshop's own markup under `wk-shop`; that
-markup is outside the contract above, so a Webshop release can change it. Sample products carry the hidden field `website_kit_sample`;
-"Remove sample products" deletes exactly the tagged records and the pictures named `wk-sample-...svg`.
+While Webshop is on, the kit adds the body class `wk-shop` and one more stylesheet, `/assets/website_kit/css/wk-shop.css` (5.4 KB raw, 1.6 KB
+gzip), on the Webshop pages only: the catalogue and its sub-routes, search, cart, orders, wishlist, checkout and the product pages. Webshop's
+markup is written against Frappe's design variables (`var(--gray-800)` even in inline styles), so the stylesheet points those variables
+(`--text-color`, `--gray-*`, `--border-color`, `--bg-color`, `--primary`, ...) at the kit tokens on the `wk-shop` body, plus a few rules for the card
+variant, radii and fonts. A preset, including the dark one, therefore re-skins the stock markup without light text on a white card. It
+adds no layout rules: Frappe's `website.bundle.css` and Webshop's bundle stay in charge of the layout, which is why the kit keeps the stock
+`Standard` Website Theme. That markup is outside the contract above, so a Webshop release can change it; CI renders the pages in Chrome
+under every preset (`scripts/shop_layout_check.mjs`) and fails on a layout change.
+
+The login page is Frappe's own template and does not load the kit head; it keeps the stock Frappe styling (with the stock base stylesheet).
+
+Sample products carry the hidden field `website_kit_sample`; "Remove sample products" deletes exactly the tagged records and the pictures
+named `wk-sample-...svg`. They are created in the site language (System Settings), in Ukrainian or English.
+
+## Header on narrow screens
+
+Below 48 em the header menu is collapsed behind a burger button. It is a checkbox and a label (no JavaScript, keyboard operable with Space,
+a visible focus ring); the screen reader announces it as the checkbox "Menu". At 48 em and wider the menu is always open.

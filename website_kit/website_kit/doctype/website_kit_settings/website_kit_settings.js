@@ -5,6 +5,9 @@
 (function () {
 	const API = "website_kit.api.";
 	const ASSET = "/assets/website_kit/js/";
+	// Wordings that are the kit's own (preset names, "Borders", "Secondary") carry a context, so they never replace Frappe's own
+	// translation of the same word on the Desk or in another release of Frappe.
+	const THEME_CONTEXT = "Website Kit theme";
 	const COLOUR_LABELS = {
 		"color-primary": __("Primary (buttons)"),
 		"color-primary-contrast": __("Text on primary"),
@@ -13,7 +16,7 @@
 		"color-surface": __("Cards and bands"),
 		"color-text": __("Text"),
 		"color-muted": __("Secondary text"),
-		"color-border": __("Borders"),
+		"color-border": __("Borders", null, THEME_CONTEXT),
 		"color-link": __("Links"),
 		"color-danger": __("Errors"),
 		"color-inverse": __("Dark band"),
@@ -48,7 +51,7 @@
 		link: __("link"),
 		secondary_text: __("Secondary text."),
 		call_to_action: __("Call to action"),
-		secondary: __("Secondary"),
+		secondary: __("Secondary", null, THEME_CONTEXT),
 		card: __("Card"),
 		cards_follow_the_card_style: __("Cards follow the card style."),
 		sale: __("Sale"),
@@ -146,7 +149,7 @@
 		return `<button type="button" class="wk-pick${selected ? " is-selected" : ""}" data-preset="${esc(preset.name)}"
 			aria-pressed="${selected ? "true" : "false"}" style="${style}">
 			<span class="wk-mini" aria-hidden="true"><i class="wk-mini-bar"></i><b>Aa</b><u></u><u class="short"></u><s>${__("Button")}</s></span>
-			<strong>${esc(__(preset.label))}</strong>
+			<strong>${esc(__(preset.label, null, THEME_CONTEXT))}</strong>
 			<small>${esc(__(preset.description))}</small>
 		</button>`;
 	}
@@ -155,7 +158,7 @@
 		return `<button type="button" class="wk-pick wk-pick-custom${selected ? " is-selected" : ""}" data-preset="custom"
 			aria-pressed="${selected ? "true" : "false"}">
 			<span class="wk-mini wk-mini-custom" aria-hidden="true"><b>+</b></span>
-			<strong>${__("Custom")}</strong>
+			<strong>${__("Custom", null, THEME_CONTEXT)}</strong>
 			<small>${__("Start from any theme and change its colours, font, corners and spacing.")}</small>
 		</button>`;
 	}
@@ -318,7 +321,7 @@
 			${sel("wk-density", __("Density"), Object.keys(wk.data.density_choices).map((k) => `<option value="${k}"${density_now && density_now[0] === k ? " selected" : ""}>${esc(word(k))}</option>`).join(""))}
 			<h6>${__("Page parts")}</h6>${variants}
 			<h6>${__("Start again from")}</h6>
-			${sel("wk-restart", __("Copy a ready-made theme"), `<option value="">-</option>` + wk.data.presets.map((p) => `<option value="${p.name}">${esc(__(p.label))}</option>`).join(""))}
+			${sel("wk-restart", __("Copy a ready-made theme"), `<option value="">-</option>` + wk.data.presets.map((p) => `<option value="${p.name}">${esc(__(p.label, null, THEME_CONTEXT))}</option>`).join(""))}
 		</div></div>`);
 		bind_editor(frm, wrapper);
 	}

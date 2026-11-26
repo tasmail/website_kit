@@ -368,6 +368,25 @@ class TestShop(TestCase):
 			runtime.update_website_context(frappe._dict(route="x", doctype="Website Item"))["head_include"],
 		)
 
+	def test_samples_are_made_in_the_language_of_the_site_not_of_the_user(self):
+		original = frappe.db.get_single_value("System Settings", "language")
+		self.addCleanup(lambda: frappe.db.set_single_value("System Settings", "language", original))
+		mug = samples.ITEMS[0]
+		for language in ("uk", "en"):
+			shop.remove_samples()
+			frappe.db.set_single_value("System Settings", "language", language)
+			frappe.local.lang = "de"  # the person pressing the button may use any language
+			try:
+				shop.load_samples()
+			finally:
+				frappe.local.lang = "en"
+			self.assertEqual(shop.site_language(), language)
+			name = frappe.db.get_value("Item", samples.item_code(mug[0]), "item_name")
+			self.assertEqual(name, mug[6][language][0])
+			self.assertEqual(
+				frappe.db.get_value("Website Item", {"item_code": samples.item_code(mug[0])}, "web_item_name"), name
+			)
+
 	def test_status_and_methods(self):
 		self.assertEqual(api.shop_status()["samples"], 0)
 		api.load_samples()

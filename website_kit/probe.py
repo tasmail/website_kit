@@ -198,3 +198,68 @@ def contact_demo_off() -> None:
 	settings.recaptcha_secret = ""
 	settings.save(ignore_permissions=True)
 	frappe.db.commit()
+
+
+def shop_demo() -> None:
+	"""CI and local check: switch the shop on and load the ten sample products (needs ERPNext, Webshop and a company)."""
+	from . import shop
+
+	shop.enable_shop()
+	shop.load_samples()
+	frappe.db.commit()
+	print("shop demo ready")
+
+
+def set_preset(name: str = "clear") -> None:
+	"""CI and local check: save a preset the way the settings page does (`custom` is a copy of `market` with two changes)."""
+	import json
+
+	from .theme import editor
+
+	settings = frappe.get_doc(SETTINGS)
+	if name == "custom":
+		values = editor.duplicate_as_custom("market", "", "")
+		overrides = json.loads(values["token_overrides"])
+		overrides["tokens"].update({"color-primary": "#7c3aed", "radius-md": "16px"})
+		settings.update({**values, "token_overrides": json.dumps(overrides)})
+	else:
+		settings.update({"preset": name, "custom_base": "", "token_overrides": ""})
+	settings.save(ignore_permissions=True)
+	frappe.db.commit()
+	print(name, settings.theme_hash)
+
+
+def retire_theme() -> None:
+	"""CI only: put a site in the state of a site that was installed by a release before 0.3: the Website Theme `Website Kit` exists
+	(a copy of it, compiled by node on save) and is the active theme."""
+	if not frappe.db.exists("Website Theme", "Website Kit"):
+		doc = frappe.get_doc(
+			{
+				"doctype": "Website Theme",
+				"theme": "Website Kit",
+				"module": "Website Kit",
+				"custom": 1,
+				"ignored_apps": [],
+			}
+		)
+		doc.flags.ignore_permissions = True
+		doc.insert()
+	frappe.db.set_single_value("Website Settings", "website_theme", "Website Kit")
+	# A fresh install records every listed patch as run; a site installed by an older release has not run this one.
+	frappe.db.delete("Patch Log", {"patch": "website_kit.patches.v0_3.use_stock_website_theme"})
+	frappe.db.commit()
+	print("retired theme in place:", frappe.db.get_single_value("Website Settings", "website_theme"))
+
+
+def assert_stock_theme() -> None:
+	"""CI only: after `bench migrate` the site is on the stock theme, the retired record and its files are gone."""
+	import os
+
+	assert frappe.db.get_single_value("Website Settings", "website_theme") == "Standard", (
+		"the site was not moved to the stock theme"
+	)
+	assert not frappe.db.exists("Website Theme", "Website Kit"), "the retired theme record is still there"
+	folder = frappe.utils.get_files_path("website_theme", is_private=False)
+	left = [name for name in (os.listdir(folder) if os.path.isdir(folder) else []) if name.startswith("website_kit_")]
+	assert not left, f"generated theme files are left: {left}"
+	print("stock theme ok")
