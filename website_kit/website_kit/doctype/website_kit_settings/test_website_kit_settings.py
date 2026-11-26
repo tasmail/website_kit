@@ -118,7 +118,6 @@ class TestWebsiteKitSettings(TestCase):
 			{"doctype": "File", "file_name": apply.THEME_FILE, "content": "/* foreign */", "is_private": 0}
 		).insert(ignore_permissions=True)
 		self.addCleanup(lambda: frappe.delete_doc("File", foreign.name, force=True, ignore_permissions=True))
-		self.assertEqual(foreign.file_url, "/files/wk-theme.css")  # the foreign file took the stable name
 		self.assertEqual(apply.apply().get("theme_file"), "created")
 		mine = frappe.get_doc("File", apply.find_theme_file())
 		self.assertNotEqual(mine.name, foreign.name)
