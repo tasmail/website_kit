@@ -69,7 +69,13 @@ def fallback(text, info) -> str:
 
 
 def privacy_sentence(text, privacy_url) -> str:
-	"""The consent line: `form_privacy` with `{link}` replaced by a link to the privacy page."""
+	"""The consent line: `form_privacy` with `{link}` replaced by a link to the privacy page.
+
+	Empty without a URL: the privacy page is linked only once the customer filled in the data controller (until then it
+	holds placeholders, and a consent to unwritten terms must not be asked for).
+	"""
+	if not privacy_url:
+		return ""
 	before, _, after = text["form_privacy"].partition("{link}")
 	link = f'<a href="{esc(privacy_url)}" style="{UNDERLINE}">{esc(text["form_privacy_link"])}</a>'
 	return f"{esc(before)}{link}{esc(after)}"
@@ -127,9 +133,23 @@ def head_tags(*, base_css, theme_css, robots_closed, alternates, organization, g
 	return "".join(parts)
 
 
+def _protect(value):
+	"""Braces in a string value become placeholders, so that no `{{` survives in the JSON text (see `json_script`)."""
+	if isinstance(value, str):
+		return value.replace("{", "\u0000L").replace("}", "\u0000R")
+	if isinstance(value, dict):
+		return {key: _protect(item) for key, item in value.items()}
+	if isinstance(value, list):
+		return [_protect(item) for item in value]
+	return value
+
+
 def json_script(value) -> str:
-	"""JSON for a `<script>` element: `<`, `>` and `&` are escaped so the text cannot end the element or start a comment."""
-	text = json.dumps(value, ensure_ascii=False, separators=(",", ":"))
+	"""JSON for a `<script>` element: `<`, `>` and `&` are escaped so the text cannot end the element or start a comment, and a
+	brace inside a string value is written as `\\u007b` or `\\u007d` (still the same text for a JSON parser), so no `{{` of a
+	value can ever be read as a template."""
+	text = json.dumps(_protect(value), ensure_ascii=False, separators=(",", ":"))
+	text = text.replace("\\u0000L", "\\u007b").replace("\\u0000R", "\\u007d")
 	return text.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
 
 

@@ -63,7 +63,11 @@ def page_specs() -> list[dict]:
 				"published": 1,
 				# The privacy text holds placeholders until the customer fills them in: never indexed as shipped.
 				"disable_indexing": 1 if key == "privacy" else 0,
-				"page_data_script": {"home": catalogue.DATA_SCRIPT, "contact": catalogue.CONTACT_SCRIPT}.get(key, ""),
+				"page_data_script": {
+					"home": catalogue.DATA_SCRIPT,
+					"contact": catalogue.CONTACT_SCRIPT,
+					"privacy": catalogue.CONTACT_SCRIPT,
+				}.get(key, ""),
 				"client_scripts": [SCRIPT_NAME] if key == "contact" else [],
 			}
 			name = PAGE_NAME.format(key=key, lang=lang)

@@ -161,7 +161,13 @@ def sync() -> dict:
 	merged = policy.merge_notes(frappe.db.get_single_value(SETTINGS, NOTE_FIELD), notes)
 	if _save(NOTE_FIELD, merged):
 		changes["pages_note"] = "updated"
-	changes.update(set_home_page())
+	if "_home" not in state:
+		home = set_home_page()
+		if home is not None:
+			changes.update(home)
+			state["_home"] = "set"
+			if _save(STATE_FIELD, json.dumps(state, sort_keys=True)):
+				changes["pages_state"] = "recorded"
 	if changes:
 		from frappe.website.utils import clear_website_cache
 
@@ -169,11 +175,14 @@ def sync() -> dict:
 	return changes
 
 
-def set_home_page() -> dict:
-	"""Point `/` at the Ukrainian home page where the customer has not chosen a home page."""
+def set_home_page() -> dict | None:
+	"""Point `/` at the Ukrainian home page where the customer has not chosen a home page; `None` while the page is missing.
+
+	It runs once (the caller records it): a customer who clears the field later is not overruled on the next migrate.
+	"""
 	home = specs.ROUTES_HOME
 	if not frappe.db.exists(PAGE, {"route": home, "published": 1}):
-		return {}
+		return None
 	changes = policy.home_page_changes(
 		frappe.db.get_single_value("Website Settings", "home_page"),
 		frappe.db.get_single_value("Builder Settings", "home_page"),

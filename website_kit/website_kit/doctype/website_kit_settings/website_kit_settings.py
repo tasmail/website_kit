@@ -28,6 +28,10 @@ class WebsiteKitSettings(Document):
 			validate_email_address(self.contact_email, throw=True)
 			if guard_keys.is_forbidden_recipient(self.contact_email):
 				frappe.throw(_("Use your own e-mail address: the contact form never sends to this domain."))
+			single = guard_keys.single_recipient(self.contact_email)
+			if not single:
+				frappe.throw(_("Enter one plain e-mail address, without a name or a list."))
+			self.contact_email = single
 		self.contact_phone = (self.contact_phone or "").strip()
 		self.address = (self.address or "").strip()
 		self.controller_name = (self.controller_name or "").strip()
@@ -42,6 +46,12 @@ class WebsiteKitSettings(Document):
 			frappe.throw(_("Enter both reCAPTCHA keys of the pair, or neither."))
 
 	def on_update(self):
+		# The render path cannot read a password, so whether the pair is readable is recorded here.
+		ok = int(bool(self.recaptcha_site_key and self.get_password("recaptcha_secret", raise_exception=False)))
+		if self.recaptcha_keys_ok != ok:
+			frappe.db.set_single_value(self.doctype, "recaptcha_keys_ok", ok)
+			self.recaptcha_keys_ok = ok
+			frappe.clear_document_cache(self.doctype, self.name)
 		previous = self.get_doc_before_save()
 		apply.apply(self, previous_email=previous.contact_email if previous else None)
 		if previous is None or any(previous.get(field) != self.get(field) for field in PUBLIC_FIELDS):

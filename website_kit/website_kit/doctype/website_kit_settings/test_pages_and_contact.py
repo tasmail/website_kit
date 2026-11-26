@@ -2,6 +2,7 @@
 
 import json
 import re
+import unittest
 from unittest import mock
 
 import frappe
@@ -25,6 +26,12 @@ SECRET = "s" * 40
 UK_PAGES = ("/", "/about", "/contact", "/privacy")
 
 
+V15_ONLY = unittest.skipIf(
+	not frappe.__version__.startswith("15."),
+	"these tests change the guard's configuration through site_config.json, which Frappe 16 caches for 60 s (and frappe_guard is v15 only)",
+)
+
+
 def fetch(path, method="GET", headers=None, data=None, host=None):
 	"""One request through the real Frappe application; the connection of the test is rebuilt afterwards (the app destroys it)."""
 	site, sites_path = frappe.local.site, frappe.local.sites_path
@@ -34,7 +41,9 @@ def fetch(path, method="GET", headers=None, data=None, host=None):
 	clear_website_cache()
 	try:
 		client = Client(frappe.app.application, Response)
-		response = client.open(path, method=method, headers={"Host": host or site, **(headers or {})}, data=data)
+		# the site is named by a header, so that the Host header can be any name the test wants to try
+		headers = {"Host": host or site, "X-Frappe-Site-Name": site, **(headers or {})}
+		response = client.open(path, method=method, headers=headers, data=data)
 		return response.status_code, response.get_data(as_text=True), response.headers
 	finally:
 		frappe.init(site=site, sites_path=sites_path, force=True)
@@ -94,6 +103,7 @@ class KitTestCase(TestCase):
 	def tearDown(self):
 		for key in self.config_keys:
 			set_site_config(key, None)
+			frappe.conf.pop(key, None)
 		settings = frappe.get_doc(SETTINGS)
 		settings.update({**self.saved, "recaptcha_site_key": "", "recaptcha_secret": ""})
 		settings.allow_search_engines = 0
@@ -126,10 +136,13 @@ class KitTestCase(TestCase):
 		frappe.db.commit()
 
 	def config(self, key, value):
+		"""A site config value for the requests (the file) and for this process (`frappe.conf`, read by `apply`)."""
 		set_site_config(key, value)
+		frappe.conf[key] = value
 		self.config_keys.append(key)
 
 	def enable_form(self):
+		self.config("guard_mode", "enforce")
 		self.configure(contact_email=EMAIL, recaptcha_site_key=SITE_KEY, recaptcha_secret=SECRET)
 
 	def page_state(self):
@@ -226,6 +239,12 @@ class TestStandardPages(KitTestCase):
 		self.configure(controller_name="ТОВ «Ромашка»")
 		self.assertIn("ТОВ «Ромашка»", visible_text(fetch("/privacy")[1]))
 		self.assertNotIn("[повна назва власника даних]", visible_text(fetch("/privacy")[1]))
+
+	def test_json_ld_never_carries_a_template(self):
+		self.configure(allow_search_engines=1, brand_name="{{ 7*7 }}", contact_email=EMAIL)
+		html = fetch("/")[1]
+		self.assertIn('"name":"\\u007b\\u007b 7*7 \\u007d\\u007d"', html)
+		self.assertNotIn('"name":"{{', html)
 
 	def test_install_twice_changes_nothing(self):
 		before = (self.page_state(), frappe.get_all(PAGE, pluck="modified"))
@@ -336,6 +355,12 @@ class TestUpgradePolicy(KitTestCase):
 		frappe.db.commit()
 		self.assertEqual(sync.sync().get(f"{PAGE}:{self.NAME}"), "create")  # the route is free again
 
+	def test_the_home_route_is_set_once_and_a_cleared_field_stays_cleared(self):
+		frappe.db.set_single_value("Website Settings", "home_page", "")
+		frappe.db.commit()
+		self.assertEqual(sync.sync(), {})  # already done at install: the marker is in the state
+		self.assertEqual(frappe.db.get_single_value("Website Settings", "home_page") or "", "")
+
 	def test_the_home_route_is_not_taken_over_when_the_customer_has_a_home_page(self):
 		frappe.db.set_single_value("Website Settings", "home_page", "my-home")
 		frappe.db.set_single_value("Builder Settings", "home_page", "my-home")
@@ -391,17 +416,66 @@ class TestContactForm(KitTestCase):
 			(contact_us.forward_to_email, contact_us.is_disabled, contact_us.send_acknowledgement_email), (EMAIL, 0, 0)
 		)
 
+	@V15_ONLY
 	def test_platform_keys_need_the_host_in_the_guard_host_list_or_an_erp_crm_name(self):
-		self.configure(contact_email=EMAIL, recaptcha_site_key="", recaptcha_secret="")
+		self.config("guard_mode", "enforce")
 		self.config("guard_recaptcha_site_key", SITE_KEY)
 		self.config("guard_recaptcha_secret", SECRET)
+		self.configure(contact_email=EMAIL, recaptcha_site_key="", recaptcha_secret="")
 		self.assertNotIn("<form", fetch("/contact")[1])  # a host the platform did not list, not an erp-crm.org name
-		self.config("guard_hosts", ["test.localhost"])
+		self.config("guard_hosts", [frappe.local.site])
 		self.assertIn('data-guard-action="contact"', fetch("/contact")[1])
+
+	def test_without_enforce_the_form_is_not_rendered_and_the_page_stays_disabled(self):
+		"""The guard refuses only in enforce; in monitor (its default) a post without a token would be stored."""
+		self.configure(contact_email=EMAIL, recaptcha_site_key=SITE_KEY, recaptcha_secret=SECRET)
+		html = fetch("/contact")[1]
+		self.assertNotIn("<form", html)
+		self.assertIn(f"mailto:{EMAIL}", html)
+		self.assertEqual(frappe.db.get_single_value("Contact Us Settings", "is_disabled"), 1)
+		self.assertIn("enforce", frappe.db.get_single_value(SETTINGS, "contact_form_status"))
+		self.assertNotIn("reCAPTCHA", visible_text(fetch("/privacy")[1]).replace("[", ""))
+
+	def test_the_contact_page_is_enabled_only_while_the_form_is_usable_and_disabled_again(self):
+		self.configure(contact_email=EMAIL)  # no keys, not enforced
+		self.assertEqual(frappe.db.get_single_value("Contact Us Settings", "is_disabled"), 1)
+		self.enable_form()
+		self.assertEqual(frappe.db.get_single_value("Contact Us Settings", "is_disabled"), 0)
+		self.assertIn("available", frappe.db.get_single_value(SETTINGS, "contact_form_status"))
+		frappe.conf["guard_mode"] = "monitor"  # the guard state changes, a migrate or save notices
+		from website_kit import apply
+
+		apply.apply()
+		self.assertEqual(frappe.db.get_single_value("Contact Us Settings", "is_disabled"), 1)
+
+	def test_a_page_already_pointing_at_the_address_is_enabled_when_it_becomes_usable(self):
+		frappe.db.set_value("Contact Us Settings", "Contact Us Settings", {"forward_to_email": EMAIL, "is_disabled": 1})
+		self.enable_form()
+		self.assertEqual(frappe.db.get_single_value("Contact Us Settings", "is_disabled"), 0)
+
+	def test_a_privacy_page_with_placeholders_is_not_linked_from_the_form(self):
+		self.enable_form()
+		self.configure(controller_name="")
+		self.assertNotIn("/privacy", fetch("/contact")[1].split("<footer")[0])
+		self.configure(controller_name="ТОВ «Ромашка»")
+		self.assertIn('href="/privacy"', fetch("/contact")[1].split("<footer")[0])
+
+	def test_unreadable_own_keys_count_as_no_own_keys_everywhere(self):
+		self.enable_form()
+		frappe.db.set_single_value(SETTINGS, "recaptcha_keys_ok", 0)
+		frappe.clear_document_cache(SETTINGS, SETTINGS)
+		self.assertNotIn("<form", fetch("/contact")[1])
 
 	def test_a_foss_ua_address_is_refused(self):
 		settings = frappe.get_doc(SETTINGS)
-		for email in ("someone@foss.ua", "a@mail.foss.ua"):
+		for email in (
+			"someone@foss.ua",
+			"a@mail.foss.ua",
+			"a@foss.ua,b@example.com",
+			"Evil <a@foss.ua>",
+			"a@FOSS.UA.",
+			"b@example.com, c@example.com",
+		):
 			settings.contact_email = email
 			with self.assertRaises(frappe.ValidationError):
 				settings.save(ignore_permissions=True)
@@ -434,17 +508,22 @@ class TestContactForm(KitTestCase):
 		self.assertEqual(frappe.db.get_single_value("Contact Us Settings", "forward_to_email"), "keep@example.org")
 
 
+@V15_ONLY
 class TestSendMessageThroughTheGuard(KitTestCase):
 	"""The form posts to the stock `send_message`; the guard decides, with the keys of the site, before the method runs."""
 
 	def setUp(self):
 		super().setUp()
-		self.config("guard_mode", "enforce")
 		self.enable_form()
 		frappe.db.commit()
 
-	def post(self, token="a-token", host=None, reply_host="test.localhost", success=True):
-		reply = {"success": success, "score": 0.9, "action": "contact", "hostname": reply_host}
+	def post(self, token="a-token", host=None, reply_host=None, success=True):
+		reply = {
+			"success": success,
+			"score": 0.9,
+			"action": "contact",
+			"hostname": reply_host or host or frappe.local.site,
+		}
 		from frappe_guard.providers import recaptcha_v3
 
 		answer = mock.Mock()
@@ -499,16 +578,61 @@ class TestSendMessageThroughTheGuard(KitTestCase):
 		self.assertGreaterEqual(status, 400, body)
 		self.assertEqual(self.communications(), [])
 
-	def test_the_keys_reach_the_guard_without_touching_the_site_config(self):
-		"""The site config holds no guard key: the guard got the site's keys from the request's own copy of the config."""
+	def guard_sees(self, host=None, secret_in_conf=False):
+		"""Post once with the guard's provider replaced by a recorder; returns `(status, [(secret, hosts), ...])`."""
+		seen = []
+
+		class Recorder:
+			def __init__(self, secret, hosts, *args, **kwargs):
+				seen.append((secret, sorted(hosts)))
+
+			def verify(self, token, action, threshold):
+				from frappe_guard.policy import Outcome, Verdict
+
+				return Verdict(Outcome.PASS, 0.9)
+
+		with mock.patch("frappe_guard.check.RecaptchaV3", Recorder):
+			with mock.patch("frappe.sendmail"):
+				status, body, _ = fetch(
+					"/api/method/frappe.www.contact.send_message",
+					method="POST",
+					headers={"Accept": "application/json", "X-Guard-Token": "tok"},
+					data={"sender": "visitor@example.com", "subject": "s", "message": "m"},
+					host=host,
+				)
+		return status, seen
+
+	def test_the_guard_receives_the_own_secret_and_exactly_the_request_host(self):
+		for host, normalised in (
+			("Shop.Example.COM:8000", "shop.example.com"),
+			("shop.example.com.", "shop.example.com"),
+			("shop.example.com", "shop.example.com"),
+		):
+			status, seen = self.guard_sees(host)
+			self.assertEqual(status, 200, host)
+			self.assertEqual(seen, [(SECRET, [normalised])], host)
+
+	def test_the_platform_keys_reach_the_guard_only_for_a_listed_host(self):
+		self.config("guard_recaptcha_site_key", SITE_KEY)
+		self.config("guard_recaptcha_secret", "p" * 40)
+		self.config("guard_hosts", [frappe.local.site])
+		self.configure(recaptcha_site_key="", recaptcha_secret="")
+		status, seen = self.guard_sees()
+		self.assertEqual((status, seen), (200, [("p" * 40, [frappe.local.site])]))
+		# a host the platform did not list, and the erp-crm.org tricks: the kit adds nothing, so the guard keeps the platform's
+		# own host list and a token made on the trick host would not be accepted (the recorder here accepts any token)
+		for host in ("evilerp-crm.org", "x.erp-crm.org.evil.com", "evil.erp-crm.org", frappe.local.site + ".evil.com"):
+			status, seen = self.guard_sees(host)
+			self.assertEqual(seen, [("p" * 40, [frappe.local.site])], host)
+
+	def test_the_site_config_is_never_written_with_a_guard_key(self):
 		with open(frappe.get_site_path("site_config.json"), encoding="utf-8") as handle:
 			config = json.load(handle)
-		self.assertNotIn("guard_recaptcha_secret", config)
-		self.assertNotIn("guard_recaptcha_site_key", config)
-		self.assertNotIn("guard_hosts", config)
-		(status, body, _), _ = self.post()
-		self.assertEqual(status, 200, body)
-		self.assertNotIn("guard_recaptcha_secret", frappe.conf)
+		for key in ("guard_recaptcha_secret", "guard_recaptcha_site_key", "guard_hosts"):
+			self.assertNotIn(key, config)
+		self.assertEqual(self.post()[0][0], 200)
+		with open(frappe.get_site_path("site_config.json"), encoding="utf-8") as handle:
+			self.assertEqual(json.load(handle), config)
 
 
 class TestCatalogueStrip(KitTestCase):

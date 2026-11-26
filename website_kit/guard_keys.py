@@ -18,6 +18,7 @@ Anything else means "no keys": the form is not rendered and a mail-to and phone 
 
 import re
 from dataclasses import dataclass
+from email.utils import getaddresses
 
 SITE_KEY = "guard_recaptcha_site_key"
 SECRET = "guard_recaptcha_secret"
@@ -52,10 +53,47 @@ def valid_key(value) -> bool:
 	return isinstance(value, str) and bool(KEY_PATTERN.match(value.strip()))
 
 
-def is_forbidden_recipient(email) -> bool:
-	"""True for an address at a domain the kit never mails (`foss.ua` and its subdomains)."""
-	domain = (email or "").strip().lower().rpartition("@")[2]
-	return any(domain == blocked or domain.endswith("." + blocked) for blocked in FORBIDDEN_RECIPIENT_DOMAINS)
+def _addresses(text) -> list[tuple[str, str]]:
+	"""`(display name, address)` pairs of a header-like value; the address lower-cased, without a trailing dot."""
+	pairs = getaddresses([text if isinstance(text, str) else ""])
+	return [(name.strip(), address.strip().lower().rstrip(".")) for name, address in pairs if address.strip()]
+
+
+def is_forbidden_recipient(text) -> bool:
+	"""True when ANY address of the value is at a domain the kit never mails (`foss.ua` and its subdomains).
+
+	A list (`a@foss.ua, b@example.com`), a display name (`Name <a@foss.ua>`), upper case and a trailing dot are all looked
+	through, so none of them hides a forbidden address.
+	"""
+	for _name, address in _addresses(text):
+		domain = address.rpartition("@")[2].rstrip(".")
+		if any(domain == blocked or domain.endswith("." + blocked) for blocked in FORBIDDEN_RECIPIENT_DOMAINS):
+			return True
+	return False
+
+
+def single_recipient(text) -> str:
+	"""The one plain address of the value, normalised, or an empty string (a list, a display name or no address is refused)."""
+	pairs = _addresses(text)
+	if len(pairs) != 1 or pairs[0][0] or "," in (text or "") or ";" in (text or ""):
+		return ""
+	address = pairs[0][1]
+	return "" if is_forbidden_recipient(address) or address.count("@") != 1 else address
+
+
+def contact_enforced(conf) -> bool:
+	"""Whether the guard refuses a failed check for the `contact` action. In `monitor` (the guard's default) it only logs.
+
+	Read from the site config the way the guard reads it: `guard_actions.contact.mode`, else `guard_actions["*"].mode`, else
+	`guard_mode`.
+	"""
+	actions = conf.get("guard_actions")
+	actions = actions if isinstance(actions, dict) else {}
+	for key in ("contact", "*"):
+		entry = actions.get(key)
+		if isinstance(entry, dict) and entry.get("mode"):
+			return entry["mode"] == "enforce"
+	return conf.get("guard_mode") == "enforce"
 
 
 def _conf_hosts(conf) -> list[str]:
@@ -90,19 +128,20 @@ class FormState:
 	site_key: str = ""
 
 
-def form_state(keys, guard_installed, contact_disabled, forward_to_email) -> FormState:
+def form_state(keys, guard_installed, contact_disabled, forward_to_email, enforced=True) -> FormState:
 	"""Whether the contact form may be rendered. A form that posts without the guard must not exist."""
 	if not guard_installed:
 		return FormState(False, "guard app not installed")
+	if not enforced:
+		return FormState(False, "the guard is not in enforce mode for the contact action")
 	if keys is None:
 		return FormState(False, "no usable reCAPTCHA keys for this host")
 	if contact_disabled:
 		return FormState(False, "Contact Us Settings is disabled")
-	recipient = (forward_to_email or "").strip()
-	if not recipient:
+	if not (forward_to_email or "").strip():
 		return FormState(False, "no recipient (Contact Us Settings forward_to_email)")
-	if is_forbidden_recipient(recipient):
-		return FormState(False, "recipient is not allowed")
+	if not single_recipient(forward_to_email):
+		return FormState(False, "recipient is not one allowed address")
 	return FormState(True, "ok", keys.site_key)
 
 

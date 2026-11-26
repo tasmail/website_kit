@@ -60,12 +60,22 @@ opened, or when the hidden trap field is filled.
 shows the e-mail and phone from Website Kit Settings instead (and the privacy page leaves out the reCAPTCHA paragraph):
 
 - the `frappe_guard` app is installed;
+- the guard **refuses** a failed check for the `contact` action: `guard_mode` (or `guard_actions.contact.mode`) in the site
+  config is `enforce`. In `monitor`, the guard's default, it only logs and a post without a token would be stored, so the kit
+  shows no form and makes no claim of protection (the privacy page leaves out the reCAPTCHA paragraph);
 - usable reCAPTCHA v3 keys exist for the host the page is served on (below);
-- Contact Us Settings is enabled and has a recipient (`forward_to_email`) that is not a `foss.ua` address.
+- Contact Us Settings is enabled and has one plain recipient address (`forward_to_email`; no list, no display name, never
+  `foss.ua` or a subdomain, in any spelling).
 
 Contact Us Settings follows Website Kit Settings: saving a contact e-mail there sets `forward_to_email` (only while it is empty
-or still the address the kit wrote before) and switches the contact page on (Frappe ships it disabled); the acknowledgement
-e-mail, a mail to a stranger, is always switched off. An address at `foss.ua` or a subdomain of it is refused.
+or still the address the kit wrote before). The stock contact page is reachable by anyone once enabled, so the kit enables it
+only while the form is usable (guard installed, enforce, keys, a valid address) and disables it again on the next save or
+migrate when that stops being true; `Contact form status` in Website Kit Settings says whether the form is shown and why not.
+The acknowledgement e-mail, a mail to a stranger, is switched off when the kit takes the page over. An address at `foss.ua` or a
+subdomain of it, a list of addresses or an address with a display name is refused.
+
+**Platform requirement:** `guard_mode` `enforce` (or `guard_actions.contact.mode`) in the site config, and `guard_trusted_hops`
+(otherwise the guard cannot tell the client address). The kit does not set them.
 
 ### Where the keys come from
 
@@ -95,7 +105,7 @@ the platform's (a new site starts in `monitor`, which logs and never refuses; th
 
 ## Privacy page
 
-A template with placeholders. It names no controller until `Data controller name` is filled in Website Kit Settings, and shows
+A template with placeholders. It names no controller until `Data controller name` is filled in Website Kit Settings, is not linked from the form until then, and shows
 `[full name of the data controller]` and a bracketed line for the retention period, the legal basis and the contact for requests,
 which the customer writes in the Builder editor. It claims only what the site does: the form data goes to the owner's e-mail and
 is kept as an incoming message, and (only while the form is shown) that the form uses Google reCAPTCHA. The page is closed to
@@ -121,7 +131,8 @@ install, on migrate and when Builder is installed after the kit. It remembers pe
 The note is `Website Kit Settings.pages_note`. A page or component is edited as soon as it is saved in Builder, whatever the
 change. Keep the block ids of a component stable across releases: the instances in pages point at them.
 
-The home route is written to `Website Settings.home_page` and `Builder Settings.home_page` only where they are empty.
+The home route is written to `Website Settings.home_page` and `Builder Settings.home_page` once, only where they are empty; a
+customer who clears the field later is not overruled.
 
 ## Measured (Frappe 15.128.0, Builder 1.36.6, preset `clear`)
 

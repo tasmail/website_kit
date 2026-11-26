@@ -46,6 +46,6 @@ data.wk_has_products = len(products) > 0
 """
 DATA_SCRIPT = _TEMPLATE.replace("__LIMIT__", str(LIMIT))
 
-# The contact pages carry a tiny script on purpose: a page with a data script is never page-cached, and the form depends on
-# the host of the request (the keys are valid for one host), so it must be decided on every request.
+# The contact and privacy pages carry a tiny script on purpose: a page with a data script is never page-cached, and what they
+# show (the form, the reCAPTCHA paragraph) depends on the host of the request and the state of the guard.
 CONTACT_SCRIPT = "data.wk_contact_page = 1\n"

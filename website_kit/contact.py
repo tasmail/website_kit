@@ -28,19 +28,26 @@ def guard_installed() -> bool:
 	return "frappe_guard" in frappe.get_installed_apps()
 
 
+def own_keys_ok() -> bool:
+	"""Whether the customer's own key pair is complete and readable (checked when the settings were saved)."""
+	settings = kit_settings()
+	return bool(settings and settings.recaptcha_site_key and settings.recaptcha_keys_ok)
+
+
 def current_keys(with_secret: bool = False):
 	"""The reCAPTCHA keys for this request (own, platform or shared), or None.
 
-	Rendering a page needs only the public key and to know that a secret exists, and a password cannot be read while a page
-	renders (Frappe refuses it inside its script sandbox). So the secret is decrypted only when `with_secret` is set, which the
-	request that posts the form does.
+	Rendering a page cannot read a password (Frappe refuses it inside its script sandbox), so the page relies on the flag
+	`recaptcha_keys_ok` set when the settings were saved, and the request that posts the form decrypts the secret. An own pair
+	that cannot be read counts as no own keys, in both places alike.
 	"""
 	settings = kit_settings()
-	own_key = (settings.recaptcha_site_key if settings else "") or ""
-	if own_key and with_secret:
-		own_secret = settings.get_password("recaptcha_secret", raise_exception=False)
-	else:
-		own_secret = "x" if own_key and settings.recaptcha_secret else ""
+	own_key, own_secret = "", ""
+	if own_keys_ok():
+		own_key = settings.recaptcha_site_key
+		own_secret = (settings.get_password("recaptcha_secret", raise_exception=False) or "") if with_secret else "x"
+		if not own_secret:
+			own_key = ""
 	return guard_keys.resolve(own_key, own_secret, frappe.conf, request_host(), frappe.local.site)
 
 
@@ -49,10 +56,18 @@ def form_state() -> guard_keys.FormState:
 	try:
 		disabled = frappe.db.get_single_value(CONTACT_US, "is_disabled")
 		forward = frappe.db.get_single_value(CONTACT_US, "forward_to_email")
-		return guard_keys.form_state(current_keys(), guard_installed(), disabled, forward)
+		return guard_keys.form_state(
+			current_keys(), guard_installed(), disabled, forward, guard_keys.contact_enforced(frappe.conf)
+		)
 	except Exception:
 		frappe.log_error(title="Website Kit: the state of the contact form could not be read")
 		return guard_keys.FormState(False, "error")
+
+
+def privacy_ready() -> bool:
+	"""Whether the privacy page names its controller, so that the form may link to it."""
+	settings = kit_settings()
+	return bool(settings and (settings.controller_name or "").strip())
 
 
 def contact_info() -> dict:
@@ -86,15 +101,41 @@ def before_request() -> None:
 		frappe.logger("website_kit").error("the guard keys could not be prepared", exc_info=True)
 
 
+def usable_without_host() -> tuple[bool, str]:
+	"""Whether the form can work on this site at all (independent of the request host), and the reason when it cannot."""
+	if not guard_installed():
+		return False, "the frappe_guard app is not installed"
+	if not guard_keys.contact_enforced(frappe.conf):
+		return (
+			False,
+			"the guard is not in enforce mode for the contact action (site config guard_mode or guard_actions)",
+		)
+	settings = kit_settings()
+	platform = frappe.conf.get(guard_keys.SITE_KEY) and frappe.conf.get(guard_keys.SECRET)
+	if not (own_keys_ok() or platform):
+		return False, "there are no reCAPTCHA keys (enter your own keys, or the platform has to provide them)"
+	if not guard_keys.single_recipient(settings.contact_email if settings else ""):
+		return False, "there is no valid contact e-mail"
+	return True, ""
+
+
 def sync_contact_settings(contact_email, previous_email=None) -> dict:
-	"""Make Contact Us Settings follow the customer's address; returns what changed (empty on a repeat)."""
+	"""Make Contact Us Settings follow the customer's address and the state of the guard; returns what changed."""
+	usable, reason = usable_without_host()
 	doc = frappe.get_doc(CONTACT_US)
 	changes = settings_sync.contact_us_changes(
 		{field: doc.get(field) for field in ("forward_to_email", "send_acknowledgement_email", "is_disabled")},
 		contact_email,
 		previous_email,
+		usable,
 	)
 	if changes:
 		doc.update(changes)
 		doc.save(ignore_permissions=True)
-	return {f"contact_us_settings.{field}": "set" for field in changes}
+	result = {f"contact_us_settings.{field}": "set" for field in changes}
+	status = "The contact form is available." if usable else f"The contact form is not shown: {reason}."
+	if (frappe.db.get_single_value(SETTINGS, "contact_form_status") or "") != status:
+		frappe.db.set_single_value(SETTINGS, "contact_form_status", status)
+		frappe.clear_document_cache(SETTINGS, SETTINGS)
+		result["contact_form_status"] = "set"
+	return result

@@ -19,6 +19,17 @@ def test_the_form_is_marked_for_the_guard_and_has_a_trap_and_labels():
 	assert '<a href="/privacy" style="text-decoration:underline">' in html and "reCAPTCHA" in html
 
 
+def test_without_a_ready_privacy_page_the_form_does_not_ask_for_consent_to_it():
+	html = markup.contact_form(UK, "")
+	assert "/privacy" not in html and "політиці" not in html and "reCAPTCHA" in html
+
+
+def test_braces_of_a_value_never_reach_the_json_as_a_template():
+	text = markup.json_script({"name": "{{ 7*7 }} {% x %}", "n": [{"a": "}}"}]})
+	assert "{{" not in text and "}}" not in text.replace('"}]}', "") and "{%" not in text
+	assert json.loads(text) == {"name": "{{ 7*7 }} {% x %}", "n": [{"a": "}}"}]}
+
+
 def test_the_form_has_no_script_and_no_remote_url():
 	html = markup.contact_form(EN, "/en/privacy")
 	assert "<script" not in html and not re.search(r"https?://", html) and 'action="#"' in html

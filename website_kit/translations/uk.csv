@@ -34,7 +34,7 @@ Address,Адреса
 Data controller name,Назва володільця даних
 The full name of the person or company that is responsible for the data collected on the site. It is written on the Privacy page; until you enter it the page shows a placeholder.,"Повна назва особи чи компанії, що відповідає за дані, зібрані на сайті. Вона вказується на сторінці конфіденційності; доки її не введено, сторінка показує заповнювач."
 Contact form,Форма зв'язку
-The form is shown only when the guard app (frappe_guard) is installed and has reCAPTCHA v3 keys for this site's address. Enter the keys of your own domain here (register it at google.com/recaptcha); on a site address that ends in erp-crm.org the keys of the platform are used while these fields are empty. Without keys the Contact page shows your e-mail and phone instead of the form.,"Форма показується, лише коли встановлено застосунок захисту (frappe_guard) і є ключі reCAPTCHA v3 для адреси цього сайту. Введіть тут ключі власного домену (зареєструйте його на google.com/recaptcha); на адресі сайту, що закінчується на erp-crm.org, поки ці поля порожні, діють ключі платформи. Без ключів сторінка «Контакти» показує вашу пошту й телефон замість форми."
+"The form is shown only when the guard app (frappe_guard) is installed and set to enforce for the contact action (site config guard_mode), and has reCAPTCHA v3 keys for this site's address. Enter the keys of your own domain here (register it at google.com/recaptcha); on a site address that ends in erp-crm.org the keys of the platform are used while these fields are empty. Otherwise the Contact page shows your e-mail and phone instead of the form.","Форма показується, лише коли встановлено застосунок захисту (frappe_guard) у режимі enforce для дії contact (guard_mode у конфігурації сайту) і є ключі reCAPTCHA v3 для адреси цього сайту. Введіть тут ключі власного домену (зареєструйте його на google.com/recaptcha); на адресі сайту, що закінчується на erp-crm.org, поки ці поля порожні, діють ключі платформи. Інакше сторінка «Контакти» показує вашу пошту й телефон замість форми."
 reCAPTCHA site key,Публічний ключ reCAPTCHA
 The public key of reCAPTCHA v3 for your domain.,Публічний ключ reCAPTCHA v3 для вашого домену.
 reCAPTCHA secret key,Секретний ключ reCAPTCHA
@@ -47,3 +47,7 @@ Use your own e-mail address: the contact form never sends to this domain.,Вка
 The data controller name is too long (at most 140 characters).,Назва володільця даних задовга (щонайбільше 140 символів).
 "The reCAPTCHA site key looks wrong: it has letters, digits, - and _ only.","Публічний ключ reCAPTCHA має хибний вигляд: допускаються лише літери, цифри, - та _."
 "Enter both reCAPTCHA keys of the pair, or neither.",Введіть обидва ключі reCAPTCHA з пари або жодного.
+reCAPTCHA keys readable,Ключі reCAPTCHA читаються
+Contact form status,Стан форми зв'язку
+"Whether the contact form is shown, and why not.","Чи показується форма зв'язку, а якщо ні, то чому."
+"Enter one plain e-mail address, without a name or a list.","Введіть одну звичайну електронну адресу, без імені чи списку."

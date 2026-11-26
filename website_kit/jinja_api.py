@@ -49,7 +49,8 @@ def wk_contact_form(lang="uk"):
 	"""The form while it may be shown, else the mail-to and phone block. A form that posts without the guard never exists."""
 	text = _text(lang)
 	if contact.form_state().render:
-		return markup.contact_form(text, URLS["privacy"].get(lang, URLS["privacy"]["uk"]))
+		privacy = URLS["privacy"].get(lang, URLS["privacy"]["uk"]) if contact.privacy_ready() else ""
+		return markup.contact_form(text, privacy)
 	return markup.fallback(text, contact.contact_info())
 
 

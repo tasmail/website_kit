@@ -4,7 +4,7 @@ The kit sets its theme, its Navbar and Footer templates and the robots text only
 default or the kit's own value. A choice of the customer is never overwritten (also not on a re-install).
 """
 
-from . import seo
+from . import guard_keys, seo
 
 THEME = "Website Kit"
 NAVBAR = "WK Navbar"
@@ -32,21 +32,27 @@ def website_settings_changes(current: dict, allow_search_engines) -> dict:
 	return changes
 
 
-def contact_us_changes(current: dict, contact_email, previous_email=None) -> dict:
+def contact_us_changes(current: dict, contact_email, previous_email=None, usable=False) -> dict:
 	"""What the kit may write into `Contact Us Settings`.
 
-	`forward_to_email` follows the customer's address while it is empty or still the address the kit wrote last time; an address
-	the customer typed there is kept. Stock Frappe ships Contact Us Settings disabled, so the page is switched on at the moment the
-	kit first writes the customer's address (`is_disabled` is not touched afterwards: switching it off later is the customer's
-	choice). The acknowledgement e-mail (a mail to a stranger, the abuse vector the guard describes) is always off.
+	The stock `send_message` is reachable by anyone once the contact page is enabled, so the kit enables it only while the form
+	is usable (`usable`: the guard app, reCAPTCHA keys and the `enforce` mode are in place) and disables it again when that
+	stops being true. `forward_to_email` follows the customer's single plain address while it is empty or still the address the
+	kit wrote last time; an address the customer typed there is kept. The acknowledgement e-mail (a mail to a stranger, the abuse
+	vector the guard describes) is switched off when the kit takes the page over.
 	"""
 	changes = {}
-	email = (contact_email or "").strip()
+	email = guard_keys.single_recipient(contact_email)
 	forward = (current.get("forward_to_email") or "").strip()
 	if email and forward != email and forward in ("", (previous_email or "").strip()):
 		changes["forward_to_email"] = email
-		if current.get("is_disabled"):
-			changes["is_disabled"] = 0
-	if current.get("send_acknowledgement_email"):
+		forward = email
+	ours = bool(email) and forward == email
+	if ours and usable and current.get("is_disabled"):
+		changes["is_disabled"] = 0
+	if (not usable or not ours) and not current.get("is_disabled") and (ours or not forward):
+		changes["is_disabled"] = 1
+	# Switched off when the kit takes the page over, not on every apply: a later choice of the customer is not overwritten.
+	if current.get("send_acknowledgement_email") and ("forward_to_email" in changes or "is_disabled" in changes):
 		changes["send_acknowledgement_email"] = 0
 	return changes

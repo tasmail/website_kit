@@ -87,6 +87,16 @@ def test_forbidden_recipients():
 KEYS = guard_keys.Keys(KEY, SECRET, ("h",), "own")
 
 
+def test_the_form_needs_enforce():
+	assert not guard_keys.form_state(KEYS, True, 0, "me@example.com", enforced=False).render
+	assert "enforce" in guard_keys.form_state(KEYS, True, 0, "me@example.com", enforced=False).reason
+
+
+def test_a_list_or_named_recipient_never_renders_the_form():
+	for value in ("a@foss.ua,b@example.com", "Evil <a@foss.ua>", "a@FOSS.UA.", "b@example.com, c@example.com"):
+		assert not guard_keys.form_state(KEYS, True, 0, value).render, value
+
+
 def test_the_form_needs_the_guard_keys_a_recipient_and_an_enabled_page():
 	assert guard_keys.form_state(KEYS, True, 0, "me@example.com") == guard_keys.FormState(True, "ok", KEY)
 	assert not guard_keys.form_state(KEYS, False, 0, "me@example.com").render  # no guard app: the form must not exist

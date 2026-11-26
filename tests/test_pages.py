@@ -314,10 +314,11 @@ def test_the_privacy_page_is_closed_to_indexing_and_has_placeholders():
 			assert "[" in content.TEXT[spec["lang"]]["privacy_placeholder_rights"]
 
 
-def test_the_home_and_contact_pages_have_a_data_script_and_the_others_do_not():
+def test_the_pages_that_depend_on_the_request_have_a_data_script():
 	by_key = {spec["key"]: spec["fields"]["page_data_script"] for spec in specs.page_specs()}
 	assert by_key["home"] == catalogue.DATA_SCRIPT and by_key["contact"] == catalogue.CONTACT_SCRIPT
-	assert by_key["about"] == "" and by_key["privacy"] == ""
+	assert by_key["about"] == ""
+	assert by_key["privacy"] == catalogue.CONTACT_SCRIPT  # uncached: its reCAPTCHA paragraph follows the guard state
 
 
 def test_a_page_stays_small():
