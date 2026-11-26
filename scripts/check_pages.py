@@ -87,8 +87,18 @@ def stock_page_problems(base: str, host: str, path: str) -> list[str]:
 	problems = []
 	if any(href in ("None", "", "/None") or href.endswith("/None") for href in hrefs):
 		problems.append("a stylesheet link points at None")
-	if not any("website.bundle" in href for href in hrefs):
+	# With Builder installed the 404 page is the kit's Builder page, which has Builder's reset instead of the website bundle.
+	if not any("website.bundle" in href or "/builder/reset.css" in href for href in hrefs):
 		problems.append("Frappe's website.bundle.css is not linked")
+	# The kit reaches Frappe's own pages through the navbar (login replaces the head block): sheets, header, and on the 404 a footer.
+	if not any("/website_kit/css/wk.css" in href for href in hrefs):
+		problems.append("the kit stylesheet wk.css is not linked")
+	if 'class="wk-header"' not in html:
+		problems.append("the kit header is missing")
+	if path == "/no-such-page-for-the-check" and 'class="wk-footer"' not in html:
+		problems.append("the kit footer is missing on the 404 page")
+	if path == "/login" and "file_uploader.bundle.js" not in html:  # Builder pages do not load Frappe's website bundle
+		problems.append("the file-uploader guard is missing")
 	return problems
 
 

@@ -231,6 +231,11 @@ products*, then *Load sample products* to get the translated ones.
 
 - Webshop's search is a JavaScript call and a POST. A link such as `/all-products?search=mug` is ignored by Webshop; the kit does not
   add that behaviour.
+- A visitor sees no "Add to Cart" or "Add to Quote" button on a sample product. That is Webshop's rule: the button needs a price and
+  either stock or the Webshop Settings option "Allow items not in stock", and the samples are non-stock items on purpose (they leave
+  no stock or accounting entries). The kit does not switch that option on; enable it in Webshop Settings to let visitors add the
+  samples to the cart.
 - The catalogue opens in the grid or list view Webshop chooses (its setting, not the kit's).
-- Page weight on a shop page is the sum of Frappe's and Webshop's own bundles and the kit's files; the kit's part is `wk.css`,
-  `wk-theme.css` and `wk-shop.css` (sizes in the README).
+- Page weight on a shop page is the sum of Frappe's and Webshop's own bundles and the kit's files; the kit's part (three stylesheets
+  and the inline scripts) is listed in the README.
+- Escape does not close the narrow-screen menu (see above).

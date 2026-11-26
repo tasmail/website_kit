@@ -41,6 +41,15 @@ body.wk-shop {
 	color: var(--wk-color-text);
 }
 
+/* Webshop prints a second, empty `.product-container` under the product when it has no specification table, custom content or
+ * reviews; the card look above made it a bordered empty box. A container whose content area has no element is left plain. */
+.wk-shop .product-container:not(:has(.product-page-content > *)) {
+	background: none;
+	border: 0;
+	box-shadow: none;
+	padding: 0;
+}
+
 .wk-shop .list-image,
 .wk-shop .card-img-container {
 	background: var(--wk-color-surface);

@@ -39,6 +39,17 @@ const menuLinks = (page) =>
 		return nav ? [...nav.querySelectorAll("a")].map((a) => [a.getAttribute("href"), a.textContent.trim()]) : null;
 	});
 
+// Focus the burger and press Enter; false (and a recorded problem) when the page has none.
+async function openMenu(page, where) {
+	if (!(await page.$(".wk-header__burger"))) {
+		check(false, `${where}: no burger on a phone`);
+		return false;
+	}
+	await page.focus(".wk-header__burger");
+	await page.keyboard.press("Enter");
+	return true;
+}
+
 async function open(size, lang, path) {
 	const page = await browser.newPage();
 	await page.setViewport(size);
@@ -55,13 +66,12 @@ try {
 			let expected;
 			if (phone) {
 				check(await menuLinks(reference) === null, `${size.width}px ${builder}: the menu is not collapsed on a phone`);
-				await reference.focus(".wk-header__burger");
-				await reference.keyboard.press("Enter");
+				await openMenu(reference, `${size.width}px ${builder}`);
 			}
 			expected = await menuLinks(reference);
 			check(expected && expected.length >= 4, `${size.width}px ${builder}: the menu has ${expected ? expected.length : 0} links (home, about, contact, language, login expected)`);
 			check(expected && expected.some(([href]) => href === "/login"), `${size.width}px ${builder}: no login link`);
-			if (phone && expected) {
+			if (phone && expected && (await reference.$(".wk-header__burger"))) {
 				// Keyboard: Tab from the burger visits every link of the open menu, in order.
 				await reference.focus(".wk-header__burger");
 				const visited = [];
@@ -75,10 +85,7 @@ try {
 			await reference.close();
 			for (const path of stock) {
 				const page = await open(size, lang, path);
-				if (phone) {
-					await page.focus(".wk-header__burger");
-					await page.keyboard.press("Enter");
-				}
+				if (phone) await openMenu(page, `${size.width}px ${path} (${lang})`);
 				const got = await menuLinks(page);
 				// Same links, same labels, same order as the Builder page, in the same language.
 				// The login page itself has no login link (Frappe's `hide_login`); everything else must match.

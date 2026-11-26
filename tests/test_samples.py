@@ -114,3 +114,12 @@ def test_the_shop_link_colour_does_not_reach_the_header_and_footer():
 	assert re.search(
 		r"(?m)^\.wk-shop \.page-content-wrapper a:not\(\.btn\)\s*\{\s*color:\s*var\(--wk-color-link\)", css
 	)
+
+
+def test_an_empty_product_container_does_not_get_the_card_look():
+	"""Webshop prints an empty `.product-container` below a product without specifications, custom content or reviews."""
+	css = (ROOT / "website_kit/public/css/wk-shop.css").read_text(encoding="utf-8")
+	rule = re.search(r"\.wk-shop \.product-container:not\(:has\(\.product-page-content > \*\)\)\s*\{([^}]*)\}", css)
+	assert rule and "border: 0" in rule.group(1) and "box-shadow: none" in rule.group(1)
+	card = css.index(".wk-shop .list-row,\n.wk-shop .product-container")
+	assert card < css.index(rule.group(0)), "the plain rule must come after the card rule to win"

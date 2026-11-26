@@ -73,6 +73,16 @@ async function common(page, where, themed, builder = false) {
 	// The login page replaces Frappe's head block: the kit sheets reach it through the navbar, so it is themed like the rest.
 	check(!themed || (info.tokenBg !== "" && info.bodyBg === info.tokenBg), `${where}: body background ${info.bodyBg} is not the token --wk-color-bg ${info.tokenBg}`);
 	check(!info.hscroll, `${where}: horizontal scroll (${info.scrollW}px)`);
+	// A bordered card without text or picture is an empty box (Webshop prints an empty product container under a plain product).
+	const empty = await page.evaluate(() =>
+		[...document.querySelectorAll(".product-container, .list-row, .card, .frappe-card, .address-card")]
+			.filter((e) => {
+				const cs = getComputedStyle(e);
+				const b = e.getBoundingClientRect();
+				return b.height > 0 && b.height < 80 && parseFloat(cs.borderTopWidth) > 0 && !e.innerText.trim() && !e.querySelector("img, svg, input, button, iframe");
+			})
+			.map((e) => `${e.tagName.toLowerCase()}.${String(e.className).slice(0, 40)}`));
+	for (const e of empty) check(false, `${where}: empty bordered box ${e}`);
 }
 
 async function listFacts(page, mode) {
