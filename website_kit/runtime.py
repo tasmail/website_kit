@@ -122,6 +122,8 @@ def after_request(response, request):
 
 	Also keeps the safe-mode cookie: `?wk_safe=1` sets it for a manager, `?wk_safe=0` clears it.
 	"""
+	if response is None:  # an error page that could not be built
+		return
 	settings = _settings()
 	mode = render_mode(settings)
 	allow = bool(settings and settings.allow_search_engines) and mode == "normal"

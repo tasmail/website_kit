@@ -214,3 +214,29 @@ Your name,Ваше ім'я
 An error looks like this.,Так виглядає помилка.
 "Brackets, parentheses and functions are nested deeper than {0} levels.",Дужки та функції вкладені глибше ніж на {0} рівнів.
 "var() is not allowed in '{0}', because a custom property could carry an external address.","var() заборонений у '{0}', бо власна властивість може містити зовнішню адресу."
+Contact e-mail,Контактна пошта
+Shown on the Contact page and in the footer. The contact form sends its messages to this address (Contact Us Settings). An address at foss.ua is refused.,Показується на сторінці «Контакти» та в підвалі. Форма зв'язку надсилає повідомлення на цю адресу (Contact Us Settings). Адреса в домені foss.ua не приймається.
+Contact phone,Контактний телефон
+Shown on the Contact page and in the footer.,Показується на сторінці «Контакти» та в підвалі.
+Address,Адреса
+"Shown on the Contact page and in the footer, one line per row.","Показується на сторінці «Контакти» та в підвалі, кожен рядок окремо."
+Data controller name,Назва володільця даних
+The full name of the person or company that is responsible for the data collected on the site. It is written on the Privacy page; until you enter it the page shows a placeholder.,"Повна назва особи чи компанії, що відповідає за дані, зібрані на сайті. Вона вказується на сторінці конфіденційності; доки її не введено, сторінка показує заповнювач."
+Contact form,Форма зв'язку
+"The form is shown only when the guard app (frappe_guard) is installed and set to enforce for the contact action (site config guard_mode), and has reCAPTCHA v3 keys for this site's address. Enter the keys of your own domain here (register it at google.com/recaptcha); on a site address that ends in erp-crm.org the keys of the platform are used while these fields are empty. Otherwise the Contact page shows your e-mail and phone instead of the form.","Форма показується, лише коли встановлено застосунок захисту (frappe_guard) у режимі enforce для дії contact (guard_mode у конфігурації сайту) і є ключі reCAPTCHA v3 для адреси цього сайту. Введіть тут ключі власного домену (зареєструйте його на google.com/recaptcha); на адресі сайту, що закінчується на erp-crm.org, поки ці поля порожні, діють ключі платформи. Інакше сторінка «Контакти» показує вашу пошту й телефон замість форми."
+reCAPTCHA site key,Публічний ключ reCAPTCHA
+The public key of reCAPTCHA v3 for your domain.,Публічний ключ reCAPTCHA v3 для вашого домену.
+reCAPTCHA secret key,Секретний ключ reCAPTCHA
+The secret key of the same pair. It is stored encrypted and never shown.,Секретний ключ тієї ж пари. Він зберігається в зашифрованому вигляді й ніколи не показується.
+Notes on the standard pages,Примітки щодо стандартних сторінок
+Written when a new kit version could not replace a page or component that you edited.,"Записується, коли нова версія набору не могла замінити сторінку чи компонент, які ви редагували."
+Standard pages state,Стан стандартних сторінок
+"What the kit last wrote into each standard page, component and script. Used to tell your edits from the kit's version.","Що набір востаннє записав у кожну стандартну сторінку, компонент і скрипт. За цим відрізняють ваші правки від версії набору."
+Use your own e-mail address: the contact form never sends to this domain.,Вкажіть власну електронну адресу: форма зв'язку ніколи не надсилає на цей домен.
+The data controller name is too long (at most 140 characters).,Назва володільця даних задовга (щонайбільше 140 символів).
+"The reCAPTCHA site key looks wrong: it has letters, digits, - and _ only.","Публічний ключ reCAPTCHA має хибний вигляд: допускаються лише літери, цифри, - та _."
+"Enter both reCAPTCHA keys of the pair, or neither.",Введіть обидва ключі reCAPTCHA з пари або жодного.
+reCAPTCHA keys readable,Ключі reCAPTCHA читаються
+Contact form status,Стан форми зв'язку
+"Whether the contact form is shown, and why not.","Чи показується форма зв'язку, а якщо ні, то чому."
+"Enter one plain e-mail address, without a name or a list.","Введіть одну звичайну електронну адресу, без імені чи списку."

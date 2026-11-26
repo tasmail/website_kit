@@ -3,6 +3,7 @@
 import frappe
 
 from . import apply as kit_apply
+from .pages import sync as pages_sync
 from .theme import presets
 
 SETTINGS = kit_apply.SETTINGS
@@ -18,14 +19,31 @@ def after_install() -> dict:
 	try:
 		settings = frappe.get_doc(SETTINGS)
 		if settings.kit_version:
-			return kit_apply.apply(settings)
-		settings.preset = presets.DEFAULT_PRESET
-		settings.allow_search_engines = 0
-		settings.save(ignore_permissions=True)  # on_update applies the settings
-		return {"seeded": presets.DEFAULT_PRESET}
+			changes = kit_apply.apply(settings)
+		else:
+			settings.preset = presets.DEFAULT_PRESET
+			settings.allow_search_engines = 0
+			settings.save(ignore_permissions=True)  # on_update applies the settings
+			changes = {"seeded": presets.DEFAULT_PRESET}
 	except Exception:
 		frappe.log_error(title="Website Kit: the theme could not be applied at install")
 		return {"error": "apply failed, see the Error Log"}
+	return {**changes, **write_pages()}
+
+
+def write_pages() -> dict:
+	"""Write the standard pages (needs Builder; a failure is logged and never stops the install, migrate or app install)."""
+	try:
+		return pages_sync.sync()
+	except Exception:
+		frappe.log_error(title="Website Kit: the standard pages could not be written")
+		return {"pages": "failed, see the Error Log"}
+
+
+def after_app_install(app_name=None) -> None:
+	"""Hook `after_app_install`: Builder installed after the kit brings the pages in."""
+	if app_name == "builder":
+		write_pages()
 
 
 def after_migrate() -> None:
@@ -39,3 +57,4 @@ def after_migrate() -> None:
 		kit_apply.apply()
 	except Exception:
 		frappe.log_error(title="Website Kit: the theme could not be applied after migrate, the previous file is kept")
+	write_pages()
