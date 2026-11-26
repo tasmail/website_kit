@@ -83,3 +83,12 @@ def test_hooks_name_existing_functions():
 		source = (ROOT / (module.replace(".", "/") + ".py")).read_text(encoding="utf-8")
 		assert f"def {function}(" in source, dotted
 	assert 'app_license = "mit"' in text
+
+
+def test_hooks_register_every_before_request_function_in_one_assignment():
+	"""A second `before_request = [...]` line in hooks.py would silently replace the first (the contact guard hook and the kit's cache hook)."""
+	text = (PKG / "hooks.py").read_text(encoding="utf-8")
+	assert len(re.findall(r"^before_request\s*=", text, flags=re.M)) == 1
+	assert "website_kit.runtime.before_request" in text and "website_kit.contact.before_request" in text
+	for name in ("after_request", "update_website_context", "after_install", "after_migrate"):
+		assert len(re.findall(rf"^{name}\s*=", text, flags=re.M)) == 1, name

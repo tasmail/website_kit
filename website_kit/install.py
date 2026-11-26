@@ -55,6 +55,7 @@ def after_migrate() -> None:
 	"""
 	try:
 		kit_apply.apply()
+		kit_apply.discard_draft()  # a draft was compiled by the rules of the release before the migrate
 	except Exception:
 		frappe.log_error(title="Website Kit: the theme could not be applied after migrate, the previous file is kept")
 	write_pages()

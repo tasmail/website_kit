@@ -66,6 +66,8 @@ def apply(settings=None, previous_email=None) -> dict:
 			"kit_version": f"{__version__}+api{WK_THEME_API}",
 		}
 		changes.update(record(settings, recorded))
+		if "kit_version" in changes and discard_draft():
+			changes["draft"] = "discarded"  # a draft written by an older release was checked by older rules
 		changes.update(sync_website_settings(bool(settings.allow_search_engines)))
 		changes.update(contact.sync_contact_settings(settings.contact_email, previous_email))
 		if {"theme_file", "safe_file", "theme_hash"} & set(changes):

@@ -136,7 +136,7 @@ trusts the twin. Both are tested against one corpus of known-bad and known-good 
 
 | Rule | Limit or list |
 | --- | --- |
-| Size and shape | at most 32 KB, 1500 rules, block depth 3, brackets and functions nested at most 32 deep; no control or invisible characters; no `<` and no `-->` anywhere |
+| Size and shape | at most 32 KB, 1500 rules, block depth 3, brackets, functions and the braces of the rules together nested at most 32 levels deep; no control or invisible characters; no `<` and no `-->` anywhere |
 | At-rules | `@media` (width, height, orientation, `prefers-color-scheme`, `prefers-reduced-motion`, `screen`, `print`), `@supports`, `@font-face` (local sources only; a missing `font-display` is a warning, not changed for you), `@keyframes` named `cx-...`; everything else, `@import` included, is rejected |
 | Properties | layout, box, type, colour, background, border, shadow, flex, grid, transform, transition and animation properties; custom properties only as `--wk-...` or `--cx-...` |
 | Values | no `expression()`, no script URLs, no `src()` or `attr()`; `url()` and `image-set()` only to `/files/` or `/assets/` on the same site, or to a `data:image/` of at most 4 KB; `url()` only in background, list-style and border-image properties; `var()` is not allowed in any property that can load an address (background, list-style, border-image, cursor, content, filter, clip-path), because a custom property could carry a string that an image function turns into an external request |
@@ -159,7 +159,7 @@ Valid CSS can still make a page unusable; the backstops below exist for that.
   outside the Custom CSS, so these buttons always work.
 - After an upgrade the stored Custom CSS is checked again. If the new rules reject it, the site fails closed: the theme file is
   rebuilt from the preset and tokens without any Custom CSS, so the rejected CSS stops being served, and the notes of the settings page say
-  why. The stored text is never edited or deleted; fix it and save.
+  why. The stored text is never edited or deleted; fix it and save. A failure of the apply step for another reason (a busy lock, a full disk) is logged and the previous theme file stays, so in that case an older file is served until the next successful apply. A draft file is dropped on every migrate and whenever the kit version changes.
 - The methods that change something (draft, discard, restore, resets) accept POST only.
 
 Selectors on internal classes (such as the parts of the header) or on Frappe and Webshop markup are outside the contract above.

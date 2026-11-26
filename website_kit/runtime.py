@@ -106,7 +106,10 @@ NOT_PUBLIC_PREFIXES = ("/app", "/api", "/assets", "/files", "/private", "/socket
 def is_public_html(response, request) -> bool:
 	"""True for an HTML page of the public website: not the Desk, the API, assets or file downloads."""
 	path = getattr(request, "path", "") or ""
-	return response.mimetype == "text/html" and not path.startswith(NOT_PUBLIC_PREFIXES)
+	not_public = any(
+		path == prefix or path.startswith(prefix + "/") for prefix in NOT_PUBLIC_PREFIXES
+	)  # whole segments
+	return response.mimetype == "text/html" and not not_public
 
 
 def is_https(request) -> bool:

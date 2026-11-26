@@ -262,6 +262,36 @@ class TestThemeSettings(TestCase):
 			runtime.after_request(response=response, request=request)
 			self.assertNotIn("Cache-Control", response.headers, path)
 
+	def test_no_store_matches_whole_path_segments(self):
+		save(custom_css=CSS)
+		frappe.form_dict["wk_safe"] = "1"
+		for path, expected in (
+			("/apple", True),
+			("/apiary/x", True),
+			("/application-form", True),
+			("/app", False),
+			("/app/x", False),
+			("/api/method/ping", False),
+			("/api", False),
+			("/files", False),
+		):
+			response, request = self.page(path)
+			runtime.after_request(response=response, request=request)
+			self.assertEqual("Cache-Control" in response.headers, expected, path)
+
+	def test_a_stale_draft_does_not_survive_a_migrate_or_a_new_kit_version(self):
+		api.save_draft("market", "", CSS, "")
+		self.assertTrue(apply.find_theme_file(apply.DRAFT_FILE, True))
+		install.after_migrate()
+		self.assertIsNone(apply.find_theme_file(apply.DRAFT_FILE, True))
+		self.assertFalse(settings().draft_file_url)
+		api.save_draft("market", "", CSS, "")
+		frappe.db.set_single_value(SETTINGS, "kit_version", "0.0.0+api1")  # what an older release recorded
+		frappe.clear_document_cache(SETTINGS, SETTINGS)
+		self.assertEqual(apply.apply().get("draft"), "discarded")
+		self.assertIsNone(apply.find_theme_file(apply.DRAFT_FILE, True))
+		self.assertEqual(apply.apply(), {})
+
 	def test_safe_mode_cookie_and_cache_bypass(self):
 		save(custom_css=CSS)
 		frappe.form_dict["wk_safe"] = "1"
