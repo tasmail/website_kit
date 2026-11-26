@@ -169,7 +169,7 @@ Selectors on internal classes (such as the parts of the header) or on Frappe and
 
 ## Shop styling
 
-While Webshop is on, the kit adds the body class `wk-shop` and one more stylesheet, `/assets/website_kit/css/wk-shop.css` (about 1 KB
+While Webshop is on, the kit adds the body class `wk-shop` and one more stylesheet, `/assets/website_kit/css/wk-shop.css` (about 1.6 KB
 gzip), on the Webshop pages only: the catalogue and its sub-routes, search, cart, orders, wishlist, checkout and the product pages. Webshop's
 markup is written against Frappe's design variables (`var(--gray-800)` even in inline styles), so the stylesheet points those variables
 (`--text-color`, `--gray-*`, `--border-color`, `--bg-color`, `--primary`, ...) at the kit tokens on the `wk-shop` body, plus a few rules for the card
