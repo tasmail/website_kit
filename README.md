@@ -32,7 +32,7 @@ validator, the shop (Webshop) styling and sample products, the guard integration
 switch, and any deployment. These are planned in the analysis `docs/site-default-theme-analysis.md` of `tasmail/erpnext-infra`.
 
 Public pages load three stylesheets: the Website Theme CSS that Frappe compiles (full Bootstrap and website styles, not minimal), `wk.css`
-and the generated `wk-theme.css`. The CI job prints their sizes; nothing was measured in a browser.
+and the generated `wk-theme.css`. Measured on the Frappe 15.128.0 CI bench (files, not a browser): the Website Theme CSS is 453 KB raw / 69 KB gzip, `wk.css` 5.9 KB / 1.5 KB, `wk-theme.css` 3.7 KB / 1.0 KB. The Website Theme bundle is the heavy part and is Frappe's, not the kit's; the CI job prints the sizes on every run.
 
 Not verified: how the pages look (no screenshots), behaviour with Webshop and Builder installed, Frappe 16.
 

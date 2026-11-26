@@ -19,7 +19,7 @@ Anything not listed here (internal classes such as `.wk-header__inner`, Frappe o
 3. Public website pages load three stylesheets: the compiled Website Theme CSS of Frappe (`/files/website_theme/website_kit_style.css`,
    the Bootstrap and Frappe website styles, compiled once by node when the theme is imported; it is not minimal), the shared
    `/assets/website_kit/css/wk.css`, and the generated `/files/wk-theme.css`. The two kit files are never linked from the Desk.
-   The CI bench prints the raw and gzip size of all three; a browser measurement has not been made.
+   On the Frappe 15.128.0 CI bench the files measure 453 KB raw / 69 KB gzip (Website Theme CSS), 5.9 KB / 1.5 KB (`wk.css`) and 3.7 KB / 1.0 KB (`wk-theme.css`); CI prints them on every run. A browser measurement has not been made.
 4. `wk.css` reads only the custom properties below, so a preset change never needs a new stylesheet.
 
 ## Tokens
