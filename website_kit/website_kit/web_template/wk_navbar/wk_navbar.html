@@ -1,0 +1,49 @@
+{#- Standard navbar of Website Kit. Site data is output with `| wk_esc` (HTML escape plus brace encoding); `wk.brand_name` is already escaped and brace-encoded
+    (website_kit.theme.escape.esc). Nothing from the site is ever put into this template's source. -#}
+<a class="wk-skip-link" href="#wk-main">{{ _("Skip to content") }}</a>
+<header class="wk-header">
+	<div class="wk-container wk-header__inner">
+		<a class="wk-header__brand" href="{{ url_prefix | wk_esc }}{{ (home_page or '/') | wk_esc }}">
+			{%- if banner_image -%}
+			<img class="wk-header__logo" src="{{ banner_image | wk_esc }}" alt="{{ wk.brand_name }}">
+			{%- else -%}
+			<span class="wk-header__name">{{ wk.brand_name or _("Home") }}</span>
+			{%- endif -%}
+		</a>
+		<nav class="wk-header__nav" aria-label="{{ _('Main menu') }}">
+			<ul class="wk-menu">
+				{#- One level of children: a top item with children is a details/summary group (no JavaScript, keyboard accessible). -#}
+				{%- for item in top_bar_items or [] -%}
+				{%- if not item.parent_label -%}
+				{%- if item.child_items -%}
+				<li class="wk-menu__item">
+					<details class="wk-menu__group">
+						<summary class="wk-menu__link">{{ _(item.label) | wk_esc }}</summary>
+						<ul class="wk-menu__sub">
+							{%- for child in item.child_items -%}
+							{%- set url = child.url or '' -%}
+							{%- set url = url if url.startswith('#') else url | abs_url -%}
+							<li><a class="wk-menu__link" href="{{ url | wk_esc }}"{% if child.open_in_new_tab %} target="_blank" rel="noopener"{% endif %}>{{ _(child.label) | wk_esc }}</a></li>
+							{%- endfor -%}
+						</ul>
+					</details>
+				</li>
+				{%- else -%}
+				{%- set url = item.url or '' -%}
+				{%- set url = url if url.startswith('#') else url | abs_url -%}
+				<li class="wk-menu__item"><a class="wk-menu__link" href="{{ url | wk_esc }}"{% if item.open_in_new_tab %} target="_blank" rel="noopener"{% endif %}>{{ _(item.label) | wk_esc }}</a></li>
+				{%- endif -%}
+				{%- endif -%}
+				{%- endfor -%}
+			</ul>
+			{%- if not hide_login -%}
+			{%- if frappe.session.user == 'Guest' -%}
+			<a class="wk-button wk-button--secondary" href="/login" rel="nofollow">{{ _("Login") }}</a>
+			{%- else -%}
+			<a class="wk-button wk-button--secondary" href="/me" rel="nofollow">{{ _("My Account") }}</a>
+			{%- endif -%}
+			{%- endif -%}
+		</nav>
+	</div>
+</header>
+<a id="wk-main" tabindex="-1"></a>

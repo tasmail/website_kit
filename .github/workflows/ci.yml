@@ -1,0 +1,146 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+# Hosted runners on purpose: the repository is public, so a pull request from a fork must never run on our own runner.
+jobs:
+  unit:
+    name: lint and unit tests (python ${{ matrix.python-version }})
+    runs-on: ubuntu-24.04
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - run: pip install ruff==0.17.0 pytest==9.2.0 pytest-cov==7.1.0 jinja2 fonttools brotli
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: pytest --cov --cov-report=term-missing
+
+  bench:
+    name: clean Frappe ${{ matrix.frappe }} bench
+    runs-on: ubuntu-24.04
+    timeout-minutes: 40
+    # Frappe 15 is pinned to a release tag, so an upstream change cannot turn this job red by itself (bump the tag on purpose).
+    # Frappe 16 floats on its branch and is best effort: its failure does not fail the workflow.
+    continue-on-error: ${{ matrix.experimental }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - frappe: "15"
+            branch: v15.128.0
+            python: "3.11"
+            node: "20"
+            mariadb: "10.6"
+            experimental: false
+          - frappe: "16"
+            branch: version-16
+            python: "3.14"
+            node: "24"
+            mariadb: "11.8"
+            experimental: true
+    services:
+      mariadb:
+        image: mariadb:${{ matrix.mariadb }}
+        env:
+          MARIADB_ROOT_PASSWORD: ci-root
+        ports:
+          - 3306:3306
+        options: --health-cmd="healthcheck.sh --connect --innodb_initialized" --health-interval=5s --health-timeout=5s --health-retries=12
+    env:
+      SITE: test.localhost
+      BENCH: /home/runner/frappe-bench
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+      - name: System packages
+        run: sudo apt-get update -qq && sudo apt-get install -y -qq libcups2-dev redis-server mariadb-client pkg-config libmariadb-dev
+      - name: Database settings
+        run: |
+          mariadb -h 127.0.0.1 -uroot -pci-root -e "SET GLOBAL character_set_server = 'utf8mb4'; SET GLOBAL collation_server = 'utf8mb4_unicode_ci';"
+          mariadb -h 127.0.0.1 -uroot -pci-root -N -e "SELECT @@version, @@global.character_set_server"
+      - name: Install bench and Frappe from source
+        run: |
+          pip install frappe-bench
+          bench init "$BENCH" --skip-assets --python "$(which python)" --frappe-branch "${{ matrix.branch }}"
+          cd "$BENCH"
+          git -C apps/frappe log -1 --format='frappe %h %s'
+          bench setup requirements --node
+          bench set-config -g db_host 127.0.0.1
+      - name: Start Redis
+        run: |
+          cd "$BENCH"
+          nohup redis-server config/redis_cache.conf > redis_cache.log 2>&1 &
+          nohup redis-server config/redis_queue.conf > redis_queue.log 2>&1 &
+          for url in $(python -c "import json;c=json.load(open('sites/common_site_config.json'));print(c['redis_cache'],c['redis_queue'])"); do
+            port="${url##*:}"
+            for _ in $(seq 1 30); do redis-cli -p "$port" ping 2>/dev/null | grep -q PONG && break; sleep 1; done
+            redis-cli -p "$port" ping
+          done
+      - name: Get the app
+        run: |
+          cd "$BENCH"
+          bench get-app website_kit "$GITHUB_WORKSPACE" --skip-assets
+      - name: New site
+        run: |
+          cd "$BENCH"
+          bench new-site "$SITE" --db-root-password ci-root --admin-password admin --mariadb-user-host-login-scope='%'
+          bench --site "$SITE" set-config allow_tests true
+      - name: Install the app
+        run: |
+          cd "$BENCH"
+          bench --site "$SITE" install-app website_kit
+          bench build --app website_kit
+          test -f sites/assets/website_kit/css/wk.css
+          test -f sites/assets/website_kit/fonts/inter/inter-latin-wght-normal.woff2
+          bench --site "$SITE" execute website_kit.probe.state | tail -1 > "$RUNNER_TEMP/state1.json"
+          cat "$RUNNER_TEMP/state1.json"
+      - name: Run it again (idempotence)
+        run: |
+          cd "$BENCH"
+          bench --site "$SITE" migrate
+          bench --site "$SITE" execute website_kit.probe.reapply | tail -1 | tee "$RUNNER_TEMP/reapply.json"
+          test "$(cat "$RUNNER_TEMP/reapply.json")" = '{"after_install": {}, "apply": {}}'
+          bench --site "$SITE" execute website_kit.probe.state | tail -1 > "$RUNNER_TEMP/state2.json"
+          diff "$RUNNER_TEMP/state1.json" "$RUNNER_TEMP/state2.json"
+      - name: Sizes of the stylesheets a public page loads
+        run: |
+          cd "$BENCH/sites"
+          ls -l "$SITE"/public/files/website_theme/*.css "$SITE"/public/files/wk-theme*.css assets/website_kit/css/wk.css
+          for f in "$SITE"/public/files/website_theme/*.css "$SITE"/public/files/wk-theme*.css assets/website_kit/css/wk.css; do
+            printf '%s raw=%s gzip=%s\n' "$f" "$(wc -c < "$f")" "$(gzip -9c "$f" | wc -c)"
+          done
+      - name: Frappe integration tests
+        run: |
+          cd "$BENCH"
+          bench --site "$SITE" run-tests --app website_kit
+      # Last: it leaves customer data (preset market) on the site, and the integration tests expect the install defaults.
+      - name: Migrate keeps customer data
+        run: |
+          cd "$BENCH"
+          bench --site "$SITE" execute website_kit.probe.customize
+          bench --site "$SITE" execute website_kit.probe.state | tail -1 > "$RUNNER_TEMP/state3.json"
+          bench --site "$SITE" migrate
+          bench --site "$SITE" execute website_kit.probe.reapply | tail -1 | tee "$RUNNER_TEMP/reapply2.json"
+          test "$(cat "$RUNNER_TEMP/reapply2.json")" = '{"after_install": {}, "apply": {}}'
+          bench --site "$SITE" execute website_kit.probe.assert_customized
+          bench --site "$SITE" execute website_kit.probe.state | tail -1 > "$RUNNER_TEMP/state4.json"
+          diff "$RUNNER_TEMP/state3.json" "$RUNNER_TEMP/state4.json"

@@ -1,0 +1,30 @@
+{#- Standard footer of Website Kit. Same rules as the navbar: `| wk_esc` for site data, no site data in the source. -#}
+<footer class="wk-footer">
+	<div class="wk-container wk-footer__inner">
+		{%- if footer_items -%}
+		<ul class="wk-footer__links">
+			{%- for item in footer_items -%}
+			{%- if not item.parent_label -%}
+			{%- set url = item.url or '' -%}
+			{%- set url = url if url.startswith('#') else url | abs_url -%}
+			<li><a href="{{ url | wk_esc }}"{% if item.open_in_new_tab %} target="_blank" rel="noopener"{% endif %}>{{ _(item.label) | wk_esc }}</a>
+				{%- if item.child_items -%}
+				<ul class="wk-footer__sub">
+					{%- for child in item.child_items -%}
+					{%- set url = child.url or '' -%}
+					{%- set url = url if url.startswith('#') else url | abs_url -%}
+					<li><a href="{{ url | wk_esc }}"{% if child.open_in_new_tab %} target="_blank" rel="noopener"{% endif %}>{{ _(child.label) | wk_esc }}</a></li>
+					{%- endfor -%}
+				</ul>
+				{%- endif -%}
+			</li>
+			{%- endif -%}
+			{%- endfor -%}
+		</ul>
+		{%- endif -%}
+		<p class="wk-footer__copy">&copy; {{ (copyright | wk_esc) if copyright else wk.brand_name }}</p>
+		{%- if footer_address %}
+		<p class="wk-footer__address">{{ footer_address | wk_esc }}</p>
+		{%- endif %}
+	</div>
+</footer>

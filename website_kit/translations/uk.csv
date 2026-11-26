@@ -1,0 +1,26 @@
+Website Kit,Website Kit
+Website Kit Settings,Налаштування Website Kit
+Theme,Тема
+Preset,Готова тема
+The ready-made look of the public website.,Готовий вигляд публічного сайту.
+Brand name,Назва бренду
+Shown in the header. Empty: the app name of Website Settings.,Показується в шапці. Порожньо: назва застосунку з налаштувань вебсайту.
+Search engines,Пошукові системи
+Allow search engines,Дозволити пошукові системи
+Off: the site sends X-Robots-Tag noindex and robots.txt disallows everything.,"Вимкнено: сайт надсилає X-Robots-Tag noindex, а robots.txt забороняє все."
+Advanced,Додатково
+Token overrides,Зміни токенів
+"JSON with the values that differ from the preset: {""tokens"": {""color-primary"": ""#1d4ed8""}, ""variants"": {""card"": ""raised""}}.","JSON зі значеннями, що відрізняються від готової теми: {""tokens"": {""color-primary"": ""#1d4ed8""}, ""variants"": {""card"": ""raised""}}."
+Custom CSS,Власний CSS
+Not applied yet: the validated Custom CSS editor comes in a later release.,Поки не застосовується: редактор власного CSS із перевіркою з'явиться в наступному випуску.
+Status,Стан
+Applied kit version,Застосована версія набору
+Theme file hash,Хеш файлу теми
+Theme file,Файл теми
+The brand name is too long (at most 140 characters).,Назва бренду задовга (щонайбільше 140 символів).
+Invalid theme settings: {0},Некоректні налаштування теми: {0}
+Skip to content,Перейти до вмісту
+Home,Головна
+Main menu,Головне меню
+Login,Увійти
+My Account,Мій обліковий запис
