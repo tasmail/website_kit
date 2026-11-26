@@ -131,21 +131,26 @@ jobs:
           for f in "$SITE"/public/files/website_theme/*.css "$SITE"/public/files/wk-theme*.css assets/website_kit/css/wk.css; do
             printf '%s raw=%s gzip=%s\n' "$f" "$(wc -c < "$f")" "$(gzip -9c "$f" | wc -c)"
           done
-      # ERPNext, Webshop and Payments are needed only by the shop tests (sample products and their removal, the menu rule);
-      # they run on the pinned Frappe 15 job, where the apps' version-15 branches match.
-      - name: Add ERPNext and Webshop, finish the setup wizard
+      - name: Frappe integration tests
+        run: |
+          cd "$BENCH"
+          bench --site "$SITE" run-tests --app website_kit
+      # ERPNext, Webshop and Payments are needed only by the shop tests (sample products and their removal, the menu rule), so
+      # they get a second site, built in the order a real site is: the shop apps first, then the kit, then the setup wizard.
+      # Pinned Frappe 15 only, where the apps' version-15 branches match.
+      - name: Shop tests on a site with ERPNext and Webshop
         if: matrix.frappe == '15'
         run: |
           cd "$BENCH"
           bench get-app payments --branch version-15 --skip-assets https://github.com/frappe/payments
           bench get-app erpnext --branch version-15 --skip-assets https://github.com/frappe/erpnext
           bench get-app webshop --branch version-15 --skip-assets https://github.com/frappe/webshop
-          for app in payments erpnext webshop; do bench --site "$SITE" install-app "$app"; done
-          bench --site "$SITE" execute website_kit.probe.complete_setup
-      - name: Frappe integration tests
-        run: |
-          cd "$BENCH"
-          bench --site "$SITE" run-tests --app website_kit
+          bench new-site shop.localhost --db-root-password ci-root --admin-password admin --mariadb-user-host-login-scope='%' \
+            --install-app payments --install-app erpnext --install-app webshop
+          bench --site shop.localhost set-config allow_tests true
+          bench --site shop.localhost install-app website_kit
+          bench --site shop.localhost execute website_kit.probe.complete_setup
+          bench --site shop.localhost run-tests --app website_kit
       # Last: it leaves customer data (preset market) on the site, and the integration tests expect the install defaults.
       - name: Migrate keeps customer data
         run: |
