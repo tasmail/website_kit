@@ -4,9 +4,10 @@
 
 (function () {
 	const API = "website_kit.api.";
-	// Preset names are product names: scoped by a context, so they never replace Frappe's own "Clear" or "Custom" on the Desk.
-	const THEME_CONTEXT = "Website Kit theme";
 	const ASSET = "/assets/website_kit/js/";
+	// Wordings that are the kit's own (preset names, "Borders", "Secondary") carry a context, so they never replace Frappe's own
+	// translation of the same word on the Desk or in another release of Frappe.
+	const THEME_CONTEXT = "Website Kit theme";
 	const COLOUR_LABELS = {
 		"color-primary": __("Primary (buttons)"),
 		"color-primary-contrast": __("Text on primary"),
@@ -15,7 +16,7 @@
 		"color-surface": __("Cards and bands"),
 		"color-text": __("Text"),
 		"color-muted": __("Secondary text"),
-		"color-border": __("Borders"),
+		"color-border": __("Borders", null, THEME_CONTEXT),
 		"color-link": __("Links"),
 		"color-danger": __("Errors"),
 		"color-inverse": __("Dark band"),
@@ -50,7 +51,7 @@
 		link: __("link"),
 		secondary_text: __("Secondary text."),
 		call_to_action: __("Call to action"),
-		secondary: __("Secondary"),
+		secondary: __("Secondary", null, THEME_CONTEXT),
 		card: __("Card"),
 		cards_follow_the_card_style: __("Cards follow the card style."),
 		sale: __("Sale"),

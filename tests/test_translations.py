@@ -102,8 +102,14 @@ def test_no_row_overrides_an_existing_translation_site_wide():
 	assert overrides == []
 
 
-def test_context_rows_are_the_preset_names_only():
-	assert sorted(row[0] for row in ROWS if len(row) > 2 and row[2]) == ["Clear", "Custom", "Ledger"]
+def test_context_rows_are_the_kits_own_wordings_only():
+	assert sorted(row[0] for row in ROWS if len(row) > 2 and row[2]) == [
+		"Borders",
+		"Clear",
+		"Custom",
+		"Ledger",
+		"Secondary",
+	]
 	assert {row[2] for row in ROWS if len(row) > 2 and row[2]} == {"Website Kit theme"}
 
 

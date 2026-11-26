@@ -36,7 +36,7 @@ At most {0} KB.,Не більше {0} КБ.
 "B2B, accounting and consulting: neutral greys, one dark accent, Source Sans 3, flat cards, dense tables.","B2B, облік і консалтинг: нейтральні сірі тони, один темний акцент, Source Sans 3, пласкі картки, щільні таблиці."
 Base text size,Базовий розмір тексту
 Body font,Шрифт тексту
-Borders,Рамки
+Borders,Рамки,Website Kit theme
 Button,Кнопка
 Buttons,Кнопки
 Cards,Картки
@@ -193,7 +193,7 @@ What we do,Чим ми займаємося
 "A short text of the page, with a",Короткий текст сторінки з
 Secondary text.,Другорядний текст.
 Call to action,Закликати до дії
-Secondary,Другорядна
+Secondary,Другорядна,Website Kit theme
 Card,Картка
 Cards follow the card style.,Картки слідують стилю карток.
 Sale,Акція
