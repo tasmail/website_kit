@@ -131,6 +131,17 @@ jobs:
           for f in "$SITE"/public/files/website_theme/*.css "$SITE"/public/files/wk-theme*.css assets/website_kit/css/wk.css; do
             printf '%s raw=%s gzip=%s\n' "$f" "$(wc -c < "$f")" "$(gzip -9c "$f" | wc -c)"
           done
+      # ERPNext, Webshop and Payments are needed only by the shop tests (sample products and their removal, the menu rule);
+      # they run on the pinned Frappe 15 job, where the apps' version-15 branches match.
+      - name: Add ERPNext and Webshop, finish the setup wizard
+        if: matrix.frappe == '15'
+        run: |
+          cd "$BENCH"
+          bench get-app payments --branch version-15 --skip-assets https://github.com/frappe/payments
+          bench get-app erpnext --branch version-15 --skip-assets https://github.com/frappe/erpnext
+          bench get-app webshop --branch version-15 --skip-assets https://github.com/frappe/webshop
+          bench --site "$SITE" install-app payments erpnext webshop
+          bench --site "$SITE" execute website_kit.probe.complete_setup
       - name: Frappe integration tests
         run: |
           cd "$BENCH"

@@ -9,6 +9,7 @@ from .theme.escape import esc, safe_url
 
 SETTINGS = "Website Kit Settings"
 BASE_CSS = "/assets/website_kit/css/wk.css"
+SHOP_CSS = "/assets/website_kit/css/wk-shop.css"
 MANAGER_ROLES = frozenset({"System Manager", "Website Manager"})
 SAFE_COOKIE = "wk_safe"
 SAFE_COOKIE_SECONDS = 8 * 3600
@@ -20,6 +21,16 @@ def _settings():
 		return frappe.get_cached_doc(SETTINGS)
 	except Exception:
 		return None
+
+
+def _shop_enabled() -> bool:
+	"""True while Webshop is installed and switched on (cached document)."""
+	if "webshop" not in frappe.get_installed_apps():
+		return False
+	try:
+		return bool(frappe.get_cached_doc("Webshop Settings").enabled)
+	except Exception:
+		return False
 
 
 def is_manager() -> bool:
@@ -90,6 +101,9 @@ def update_website_context(context):
 	link = theme_link(settings, mode) if settings else ""
 	if link:
 		links += f'<link rel="stylesheet" href="{esc(link)}">'
+	shop_on = _shop_enabled()
+	if shop_on:
+		links += f'<link rel="stylesheet" href="{SHOP_CSS}?v={__version__}">'
 	brand = (settings.brand_name if settings else "") or frappe.get_website_settings("app_name") or ""
 	values = {
 		"head_include": (context.get("head_include") or "") + links,
@@ -97,6 +111,12 @@ def update_website_context(context):
 		# Strings for the standard templates: already escaped, braces encoded, so they are inert even in a second Jinja pass.
 		"wk": {"brand_name": esc(brand), "theme_api": WK_THEME_API, "mode": mode},
 	}
+	if shop_on:
+		values["body_class"] = f"{context.get('body_class') or ''} wk-shop".strip()
+	if context.get("top_bar_items"):
+		from . import shop
+
+		values["top_bar_items"] = shop.visible_menu(context.get("top_bar_items"))
 	if mode != "normal":
 		values["no_cache"] = 1  # a page that only a manager sees must never be stored for the public
 	return values

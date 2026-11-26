@@ -161,3 +161,10 @@ Valid CSS can still make a page unusable; the backstops below exist for that.
   in the notes of the settings page; the CSS is never edited or deleted by a patch.
 
 Selectors on internal classes (such as the parts of the header) or on Frappe and Webshop markup are outside the contract above.
+
+## Shop styling
+
+While Webshop is on, the kit adds the body class `wk-shop` and one more stylesheet, `/assets/website_kit/css/wk-shop.css` (under 1 KB
+gzip), that lets the Webshop product cards, filters and cart follow the tokens. It targets Webshop's own markup under `wk-shop`; that
+markup is outside the contract above, so a Webshop release can change it. Sample products carry the hidden field `website_kit_sample`;
+"Remove sample products" deletes exactly the tagged records and the pictures named `wk-sample-...svg`.

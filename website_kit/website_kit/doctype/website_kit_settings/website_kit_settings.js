@@ -496,6 +496,38 @@
 		dialog.show();
 	}
 
+	// ---------------------------------------------------------------- shop and existing sites
+	async function render_shop(frm) {
+		const wrapper = frm.fields_dict.shop_html.$wrapper;
+		const status = await frappe.xcall(API + "shop_status");
+		const lines = [];
+		if (!status.installed) {
+			lines.push(`<p class="text-muted">${__("The shop needs the ERPNext and Webshop apps on this site.")}</p>`);
+		} else {
+			lines.push(`<p>${status.enabled ? `<span class="indicator-pill green">${__("The shop is on")}</span>` : `<span class="indicator-pill gray">${__("The shop is off")}</span>`}
+				${__("Published products")}: <b>${status.published}</b>; ${__("sample products")}: <b>${status.samples}</b>.
+				${status.published ? "" : __("The Shop link stays out of the menu while there are no published products.")}</p>
+				<p class="text-muted small">${__("Sample products are non-stock items with pictures drawn by the kit. Removing them deletes exactly those records and leaves no stock or accounting entries.")}</p>
+				<div class="wk-shop-buttons" style="display:flex;gap:8px;flex-wrap:wrap">
+				<button type="button" class="btn btn-default btn-sm" data-act="enable_shop">${__("Enable shop")}</button>
+				<button type="button" class="btn btn-default btn-sm" data-act="load_samples">${__("Load sample products")}</button>
+				<button type="button" class="btn btn-default btn-sm" data-act="remove_samples"${status.samples ? "" : " disabled"}>${__("Remove sample products")}</button></div>`);
+		}
+		lines.push(`<hr><p class="text-muted small">${__("For a site that existed before the kit: copy the company name and contact data into the settings. Nothing is changed unless you press the button.")}</p>
+			<button type="button" class="btn btn-default btn-sm" data-act="personalize">${__("Personalize this site")}</button>`);
+		wrapper.html(lines.join(""));
+		wrapper.find("[data-act]").on("click", async function () {
+			const act = $(this).data("act");
+			const run = async () => {
+				const result = await frappe.xcall(API + act);
+				frappe.msgprint({ title: __("Done"), message: `<pre style="white-space:pre-wrap">${esc(JSON.stringify(result, null, 1))}</pre>`, indicator: "green" });
+				frm.reload_doc();
+			};
+			if (act === "remove_samples") frappe.confirm(__("Delete all sample products?"), run);
+			else await run();
+		});
+	}
+
 	// ---------------------------------------------------------------- the form
 	frappe.ui.form.on("Website Kit Settings", {
 		async refresh(frm) {
@@ -505,6 +537,7 @@
 			render_preview_shell(frm);
 			render_editor(frm);
 			render_css_help(frm);
+			render_shop(frm);
 			add_buttons(frm);
 			check_css(frm);
 			schedule_preview(frm);

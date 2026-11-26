@@ -1,0 +1,85 @@
+/* Website Kit shop stylesheet: the Webshop pages (product cards, filters, cart) follow the theme tokens.
+ * Scoped by the body class `wk-shop`, which the kit adds only while the shop is on, so nothing else is touched.
+ * Plain CSS, no images, no fonts, no build step; every value is a --wk-* custom property (docs/theming.md). */
+
+.wk-shop .item-card-group-section .card,
+.wk-shop .card.item-card {
+	background: var(--wk-card-bg);
+	border: var(--wk-card-border);
+	border-radius: var(--wk-radius-md);
+	box-shadow: var(--wk-card-shadow);
+	overflow: hidden;
+}
+
+.wk-shop .card-title,
+.wk-shop .card-title a {
+	color: var(--wk-color-text);
+	font-family: var(--wk-font-heading);
+	font-weight: var(--wk-heading-weight);
+}
+
+.wk-shop .card-img-top,
+.wk-shop .card-img {
+	background: var(--wk-color-surface);
+	object-fit: cover;
+}
+
+.wk-shop .product-price,
+.wk-shop .formatted-price {
+	color: var(--wk-color-text);
+	font-weight: 600;
+}
+
+.wk-shop .striked-item-price,
+.wk-shop .striked-price {
+	color: var(--wk-color-muted);
+}
+
+/* Filters */
+.wk-shop .filters-section {
+	background: var(--wk-color-surface);
+	border: 1px solid var(--wk-color-border);
+	border-radius: var(--wk-radius-md);
+	padding: calc(var(--wk-space-unit) * 2);
+}
+
+.wk-shop .filters-title,
+.wk-shop .filter-label {
+	color: var(--wk-color-text);
+	font-weight: 600;
+}
+
+.wk-shop .clear-filters a {
+	color: var(--wk-color-link);
+}
+
+/* Cart */
+.wk-shop .frappe-card,
+.wk-shop .cart-empty.frappe-card {
+	background: var(--wk-color-bg);
+	border: 1px solid var(--wk-color-border);
+	border-radius: var(--wk-radius-md);
+}
+
+.wk-shop .cart-table th,
+.wk-shop .cart-table td {
+	border-color: var(--wk-color-border);
+}
+
+.wk-shop .cart-btn,
+.wk-shop .btn-primary {
+	background: var(--wk-color-primary);
+	border-color: var(--wk-color-primary);
+	border-radius: var(--wk-button-radius);
+	color: var(--wk-color-primary-contrast);
+}
+
+.wk-shop .btn-light.cart-btn {
+	background: var(--wk-color-surface);
+	border-color: var(--wk-color-border);
+	color: var(--wk-color-text);
+}
+
+.wk-shop .in-green {
+	color: var(--wk-color-link);
+}

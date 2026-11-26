@@ -212,3 +212,24 @@ Product,Товар
 Name,Ім'я
 Your name,Ваше ім'я
 An error looks like this.,Так виглядає помилка.
+Delete all sample products?,Видалити всі зразкові товари?
+Done,Готово
+Enable shop,Увімкнути магазин
+Failed to set up the website,Не вдалося налаштувати вебсайт
+For a site that existed before the kit: copy the company name and contact data into the settings. Nothing is changed unless you press the button.,"Для сайту, що існував до набору: скопіювати назву компанії та контактні дані в налаштування. Нічого не змінюється, доки ви не натиснете кнопку."
+Load sample products,Завантажити зразкові товари
+Personalize this site,Персоналізувати цей сайт
+Published products,Опубліковані товари
+Remove sample products,Видалити зразкові товари
+Sample products are non-stock items with pictures drawn by the kit. Removing them deletes exactly those records and leaves no stock or accounting entries.,"Зразкові товари є нескладськими позиціями з малюнками, які створює набір. Видалення прибирає саме ці записи і не залишає складських чи бухгалтерських проводок."
+Setting up the website,Налаштування вебсайту
+Shop actions,Дії магазину
+Shop and existing sites,Магазин та наявні сайти
+The Shop link stays out of the menu while there are no published products.,"Посилання на магазин не показується в меню, доки немає опублікованих товарів."
+The shop is off,Магазин вимкнено
+The shop is on,Магазин увімкнено
+The shop needs the ERPNext and Webshop apps on this site.,Для магазину на сайті потрібні застосунки ERPNext і Webshop.
+"There is no company yet. Finish the setup wizard, then enable the shop.","Компанії ще немає. Завершіть майстер налаштування, потім увімкніть магазин."
+There is no enabled selling price list in {0}.,Немає увімкненого прайс-листа продажу у валюті {0}.
+sample products,зразкові товари
+Shop,Магазин

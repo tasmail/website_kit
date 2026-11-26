@@ -135,3 +135,47 @@ def reset_to_preset() -> dict:
 	preset = settings.custom_base or presets.DEFAULT_PRESET if settings.preset == presets.CUSTOM else settings.preset
 	_save({"preset": preset, "custom_base": "", "token_overrides": "", "custom_css": ""}, _("Reset to the preset"))
 	return {"theme_hash": frappe.db.get_single_value(SETTINGS, "theme_hash")}
+
+
+# ---------------------------------------------------------------- the shop and the existing sites
+
+
+@frappe.whitelist()
+def shop_status() -> dict:
+	_guard()
+	from . import shop
+
+	return shop.status()
+
+
+@frappe.whitelist()
+def enable_shop() -> dict:
+	_guard()
+	from . import shop
+
+	return shop.enable_shop()
+
+
+@frappe.whitelist()
+def load_samples() -> dict:
+	_guard()
+	from . import shop
+
+	return shop.load_samples()
+
+
+@frappe.whitelist()
+def remove_samples() -> dict:
+	_guard()
+	from . import shop
+
+	return shop.remove_samples()
+
+
+@frappe.whitelist()
+def personalize() -> dict:
+	"""Opt-in: copy the company name and contact data into the kit settings on a site that never ran the wizard stage."""
+	_guard()
+	from . import setup
+
+	return setup.personalize()

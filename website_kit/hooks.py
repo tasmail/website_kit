@@ -17,3 +17,13 @@ after_request = ["website_kit.runtime.after_request"]
 
 # The filter `wk_esc` of the standard templates: HTML escape plus brace encoding.
 jinja = {"filters": ["website_kit.theme.escape.wk_esc"]}
+
+# The setup wizard fills the brand name and the contact data once; the cache of the shop menu rule follows the Website Items.
+setup_wizard_stages = "website_kit.setup.stages"
+doc_events = {
+	"Website Item": {
+		"on_update": "website_kit.shop.clear_cache",
+		"after_insert": "website_kit.shop.clear_cache",
+		"on_trash": "website_kit.shop.clear_cache",
+	}
+}

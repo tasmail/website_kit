@@ -19,6 +19,8 @@
   "css_messages",
   "versions_section",
   "versions",
+  "shop_section",
+  "shop_html",
   "visibility_section",
   "allow_search_engines",
   "advanced_section",
@@ -124,6 +126,17 @@
    "options": "Website Kit Theme Version",
    "read_only": 1,
    "description": "The last 20 saved looks. Restoring one saves it as a new version."
+  },
+  {
+   "fieldname": "shop_section",
+   "fieldtype": "Section Break",
+   "label": "Shop and existing sites",
+   "collapsible": 1
+  },
+  {
+   "fieldname": "shop_html",
+   "fieldtype": "HTML",
+   "label": "Shop actions"
   },
   {
    "fieldname": "visibility_section",
