@@ -1,0 +1,40 @@
+{
+	"name": "market",
+	"label": "Market",
+	"description": "Retail, shops and food: warm off-white, one warm accent, Lora headings with Source Sans 3, raised cards, pill buttons.",
+	"tokens": {
+		"color-primary": "#b45309",
+		"color-primary-contrast": "#ffffff",
+		"color-accent": "#c2410c",
+		"color-bg": "#fffaf3",
+		"color-surface": "#fff1dc",
+		"color-text": "#2b2118",
+		"color-muted": "#6b5a4a",
+		"color-border": "#ead9c3",
+		"color-link": "#9a3412",
+		"color-danger": "#b91c1c",
+		"color-inverse": "#2b2118",
+		"color-inverse-contrast": "#fff1dc",
+		"font-body": "source-sans-3",
+		"font-heading": "lora",
+		"font-size-base": "17px",
+		"line-height": "1.6",
+		"heading-weight": "700",
+		"heading-scale": "1.3",
+		"radius-sm": "8px",
+		"radius-md": "12px",
+		"radius-lg": "20px",
+		"shadow-1": "0 1px 3px rgba(43,33,24,.10)",
+		"shadow-2": "0 8px 20px rgba(43,33,24,.12)",
+		"border-width": "1px",
+		"space-unit": "8px",
+		"container-width": "1160px",
+		"section-gap": "72px"
+	},
+	"variants": {
+		"header": "tinted",
+		"footer": "dark",
+		"card": "raised",
+		"button": "pill"
+	}
+}

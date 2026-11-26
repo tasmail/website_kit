@@ -1,0 +1,40 @@
+{
+	"name": "night",
+	"label": "Night",
+	"description": "Technology and agencies: dark surfaces, light text, one bright accent, Manrope, dark header.",
+	"tokens": {
+		"color-primary": "#7cb0ff",
+		"color-primary-contrast": "#0b1020",
+		"color-accent": "#38e1c9",
+		"color-bg": "#0b1020",
+		"color-surface": "#131a2e",
+		"color-text": "#e6e9f2",
+		"color-muted": "#a8b0c6",
+		"color-border": "#2a3454",
+		"color-link": "#8ab8ff",
+		"color-danger": "#ff8a8a",
+		"color-inverse": "#060914",
+		"color-inverse-contrast": "#e6e9f2",
+		"font-body": "manrope",
+		"font-heading": "manrope",
+		"font-size-base": "16px",
+		"line-height": "1.65",
+		"heading-weight": "700",
+		"heading-scale": "1.3",
+		"radius-sm": "6px",
+		"radius-md": "12px",
+		"radius-lg": "18px",
+		"shadow-1": "0 1px 2px rgba(0,0,0,.40)",
+		"shadow-2": "0 8px 24px rgba(0,0,0,.45)",
+		"border-width": "1px",
+		"space-unit": "8px",
+		"container-width": "1160px",
+		"section-gap": "72px"
+	},
+	"variants": {
+		"header": "dark",
+		"footer": "dark",
+		"card": "raised",
+		"button": "solid"
+	}
+}

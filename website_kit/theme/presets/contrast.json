@@ -1,0 +1,40 @@
+{
+	"name": "contrast",
+	"label": "Contrast",
+	"description": "Accessible and public-sector sites: text and interface contrast of at least 7:1, 18 px text, strong borders, square buttons.",
+	"tokens": {
+		"color-primary": "#14338a",
+		"color-primary-contrast": "#ffffff",
+		"color-accent": "#7a2e00",
+		"color-bg": "#ffffff",
+		"color-surface": "#f2f2f2",
+		"color-text": "#111111",
+		"color-muted": "#404040",
+		"color-border": "#111111",
+		"color-link": "#0b2c9e",
+		"color-danger": "#8a0f0f",
+		"color-inverse": "#111111",
+		"color-inverse-contrast": "#ffffff",
+		"font-body": "roboto",
+		"font-heading": "roboto",
+		"font-size-base": "18px",
+		"line-height": "1.7",
+		"heading-weight": "700",
+		"heading-scale": "1.25",
+		"radius-sm": "0",
+		"radius-md": "0",
+		"radius-lg": "0",
+		"shadow-1": "none",
+		"shadow-2": "none",
+		"border-width": "2px",
+		"space-unit": "8px",
+		"container-width": "1080px",
+		"section-gap": "64px"
+	},
+	"variants": {
+		"header": "light",
+		"footer": "dark",
+		"card": "outlined",
+		"button": "square"
+	}
+}
