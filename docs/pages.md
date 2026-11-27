@@ -38,7 +38,7 @@ defined in `website_kit/jinja_api.py`); each escapes what it returns, never rais
 | Call | Returns |
 | --- | --- |
 | `wk_head(lang, page)` | stylesheet links, `noindex` while the site is closed, hreflang pairs, Organization JSON-LD when the site is open, the guard client on the Contact page when the form is shown |
-| `wk_header(lang)` | the content of the header: brand, the menu (the kit pages that exist, the Website Settings top bar items, the other language) and one account link (`/me`, which sends a guest to the login page: the same for every visitor, because Frappe caches pages by path and language only); the stock navbar calls the same function, so every page shows the same menu (see `docs/theming.md`) |
+| `wk_header(lang)` | the content of the header: brand, the menu (the kit pages that exist, the Website Settings top bar items, the other language) and one account link (`/login?redirect-to=/me`: a guest gets the login form, a signed-in user is sent on to `/me`; the same for every visitor, because Frappe caches pages by path and language only); the stock navbar calls the same function, so every page shows the same menu (see `docs/theming.md`) |
 | `wk_footer(lang)`, `wk_text(key)`, `wk_url(key)` | for the not-found page only: the footer content, one text and one page URL in the language of the request |
 | `wk_brand(lang)` | the brand name (Settings, else the app name of Website Settings, else the site name) |
 | `wk_contact_list(lang, variant)` | the e-mail, phone and address entered in Website Kit Settings, as a list |

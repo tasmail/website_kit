@@ -160,16 +160,16 @@ jobs:
           cd "$BENCH"
           (bench --site "$SITE" serve --port 8000 > "$RUNNER_TEMP/serve.log" 2>&1 &)
           for _ in $(seq 1 60); do curl -fs -o /dev/null -H "Host: $SITE" http://127.0.0.1:8000/ && break; sleep 1; done
-          python "$GITHUB_WORKSPACE/scripts/check_pages.py" --base http://127.0.0.1:8000 --host "$SITE"
+          python "$GITHUB_WORKSPACE/scripts/check_pages.py" --base http://127.0.0.1:8000 --host "$SITE" ${{ matrix.frappe == '16' && '--no-login-navbar' || '' }}
           cd "$GITHUB_WORKSPACE"
           npm install --no-save --no-audit --no-fund puppeteer-core@23.11.1 axe-core@4.10.2
           export CHROME="$(which google-chrome)"
           node scripts/axe_check.mjs "http://$SITE:8000"
-          node scripts/header_check.mjs "http://$SITE:8000"  # one header on the Builder pages and on login / the 404 page
+          LOGIN_NAVBAR=${{ matrix.frappe == '16' && '0' || '1' }} node scripts/header_check.mjs "http://$SITE:8000"  # one header on the Builder pages and on login / the 404 page
           cd "$BENCH"
           bench --site "$SITE" set-config guard_mode enforce
           bench --site "$SITE" execute website_kit.probe.contact_demo
-          python "$GITHUB_WORKSPACE/scripts/check_pages.py" --base http://127.0.0.1:8000 --host "$SITE"
+          python "$GITHUB_WORKSPACE/scripts/check_pages.py" --base http://127.0.0.1:8000 --host "$SITE" ${{ matrix.frappe == '16' && '--no-login-navbar' || '' }}
           (cd "$GITHUB_WORKSPACE" && node scripts/axe_check.mjs "http://$SITE:8000" && node scripts/form_check.mjs "http://$SITE:8000")
           bench --site "$SITE" execute website_kit.probe.contact_demo_off
           bench --site "$SITE" set-config guard_mode monitor
@@ -221,7 +221,7 @@ jobs:
           bench --site "$SITE" execute website_kit.probe.assert_stock_theme
           (bench --site "$SITE" serve --port 8002 > "$RUNNER_TEMP/serve-migrate.log" 2>&1 &)
           for _ in $(seq 1 60); do curl -fs -o /dev/null -H "Host: $SITE" http://127.0.0.1:8002/ && break; sleep 1; done
-          python "$GITHUB_WORKSPACE/scripts/check_pages.py" --base http://127.0.0.1:8002 --host "$SITE"
+          python "$GITHUB_WORKSPACE/scripts/check_pages.py" --base http://127.0.0.1:8002 --host "$SITE" ${{ matrix.frappe == '16' && '--no-login-navbar' || '' }}
           pkill -f "serve --port 8002" || true
       # Last: it leaves customer data (preset market) on the site, and the integration tests expect the install defaults.
       - name: Migrate keeps customer data

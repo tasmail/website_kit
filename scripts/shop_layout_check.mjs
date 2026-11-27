@@ -65,6 +65,7 @@ async function common(page, where, themed, builder = false) {
 			hscroll: document.documentElement.scrollWidth > innerWidth + 1, scrollW: document.documentElement.scrollWidth,
 		};
 	});
+	check(new Set(info.sheets).size === info.sheets.length, `${where}: a stylesheet is linked twice: ${info.sheets.join(" ")}`);
 	check(!info.sheets.some((h) => !h || h === "None" || h.endsWith("/None")), `${where}: a stylesheet link points at None`);
 	// A Builder page (the kit's 404 page) brings its own reset instead of Frappe's website bundle.
 	check(builder || info.sheets.some((h) => /website\.bundle/.test(h || "")), `${where}: Frappe's website.bundle.css is not linked`);

@@ -63,13 +63,21 @@ def measure(base: str, host: str, path: str) -> dict:
 			for font in FONT_URL.findall(data.decode("utf-8", "replace")):
 				font = font.strip("'\" ")
 				fonts[font.split("?")[0]] = len(get(base, host, font))
-	return {"path": path, "total": total, "sizes": sizes, "scripts": scripts, "external": external, "fonts": fonts}
+	return {
+		"path": path,
+		"styles": styles,
+		"total": total,
+		"sizes": sizes,
+		"scripts": scripts,
+		"external": external,
+		"fonts": fonts,
+	}
 
 
 STOCK_PAGES = ("/login", "/no-such-page-for-the-check")
 
 
-def stock_page_problems(base: str, host: str, path: str) -> list[str]:
+def stock_page_problems(base: str, host: str, path: str, login_navbar: bool = True) -> list[str]:
 	"""A stock Frappe page (login, the 404 page) must keep Frappe's own base stylesheet and never link `None`.
 
 	The kit once assigned a Website Theme that had no compiled file: Frappe then printed `href="None"` and dropped website.bundle.css,
@@ -85,11 +93,15 @@ def stock_page_problems(base: str, host: str, path: str) -> list[str]:
 		html = error.read().decode("utf-8", "replace")
 	hrefs = [(HREF.search(tag) or [None, ""])[1] for tag in LINK.findall(html) if "stylesheet" in tag]
 	problems = []
+	if len(hrefs) != len(set(hrefs)):
+		problems.append(f"a stylesheet is linked twice: {hrefs}")
 	if any(href in ("None", "", "/None") or href.endswith("/None") for href in hrefs):
 		problems.append("a stylesheet link points at None")
 	# With Builder installed the 404 page is the kit's Builder page, which has Builder's reset instead of the website bundle.
 	if not any("website.bundle" in href or "/builder/reset.css" in href for href in hrefs):
 		problems.append("Frappe's website.bundle.css is not linked")
+	if path == "/login" and not login_navbar:
+		return problems  # Frappe 16's login page overrides `block navbar` and `head_include`: nothing of the kit can reach it
 	# The kit reaches Frappe's own pages through the navbar (login replaces the head block): sheets, header, and on the 404 a footer.
 	if not any("/website_kit/css/wk.css" in href for href in hrefs):
 		problems.append("the kit stylesheet wk.css is not linked")
@@ -107,6 +119,11 @@ def main() -> int:
 	parser.add_argument("--base", default="http://127.0.0.1:8000")
 	parser.add_argument("--host", default="test.localhost")
 	parser.add_argument("--budget-kb", type=float, default=40)
+	parser.add_argument(
+		"--no-login-navbar",
+		action="store_true",
+		help="the login page of this Frappe version has no navbar (Frappe 16): do not expect the kit header and sheets there",
+	)
 	args = parser.parse_args()
 	failed = False
 	for path in PAGES:
@@ -118,6 +135,8 @@ def main() -> int:
 		limit = 0 if path in NO_SCRIPT_FILES else MAX_SCRIPT_FILES_CONTACT
 		if len(result["scripts"]) > limit:
 			problems.append(f"{len(result['scripts'])} script files (allowed {limit}): {result['scripts']}")
+		if len(result["styles"]) != len(set(result["styles"])):
+			problems.append(f"a stylesheet is linked twice: {result['styles']}")
 		resources = [item for item in result["external"] if not item.startswith("preconnect")]
 		if resources:
 			problems.append(f"external resources: {resources}")
@@ -139,7 +158,7 @@ def main() -> int:
 			)
 		failed = failed or bool(problems)
 	for path in STOCK_PAGES:
-		problems = stock_page_problems(args.base, args.host, path)
+		problems = stock_page_problems(args.base, args.host, path, not args.no_login_navbar)
 		print(f"{path:14} stock page  " + ("FAIL " + "; ".join(problems) if problems else "ok"))
 		failed = failed or bool(problems)
 	return 1 if failed else 0

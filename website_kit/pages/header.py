@@ -15,6 +15,8 @@ from ..theme.escape import esc, safe_url
 from .content import TEXT, URLS
 
 KIT_PAGES = (("home", "menu_home"), ("about", "menu_about"), ("contact", "menu_contact"))
+# One link for every visitor: a guest gets the login form, a signed-in user is sent on to `/me` by Frappe (verified on 15.128.0).
+ACCOUNT_URL = "/login?redirect-to=/me"
 KIT_KEYS = tuple(key for key, _ in KIT_PAGES)
 LINK_PREFIXES = ("http://", "https://", "mailto:", "tel:")
 SCHEME = re.compile(r"[A-Za-z][A-Za-z0-9+.-]*:")
@@ -111,8 +113,10 @@ def inner(*, lang, published, other_available, site_items, hide_login, brand_htm
 		switch = {"label": text["lang_switch"], "url": URLS["home"][code], "code": code}
 	login = ""
 	if not hide_login:
-		# One static link for every visitor: Frappe caches a page by path and language only, and `/me` sends a guest to the login page.
-		login = f'<a class="wk-button wk-button--secondary" href="/me" rel="nofollow">{esc(text["account"])}</a>'
+		# Static: Frappe caches a page by path and language only, so the link cannot depend on who is signed in.
+		login = (
+			f'<a class="wk-button wk-button--secondary" href="{ACCOUNT_URL}" rel="nofollow">{esc(text["account"])}</a>'
+		)
 	logo = safe_url(logo_url)
 	name = (
 		f'<img class="wk-header__logo" src="{esc(logo)}" alt="{brand_html}">'

@@ -6,7 +6,8 @@
 //   CHROME=/usr/bin/google-chrome node scripts/header_check.mjs http://test.localhost:8000 [outdir]
 //
 // The site needs the Builder pages of the kit (Ukrainian at the root, English under /en); the shop entry is expected only when
-// Webshop is on with a published product. Exit code 1 on any failure.
+// Webshop is on with a published product. LOGIN_NAVBAR=0 leaves the login page out (Frappe 16's login page has no navbar).
+// Exit code 1 on any failure.
 import { createRequire } from "node:module";
 import { mkdirSync } from "node:fs";
 
@@ -21,9 +22,10 @@ const check = (ok, text) => {
 };
 
 // A Builder page and the stock pages that must show its menu, per language.
+const withLogin = process.env.LOGIN_NAVBAR !== "0";
 const SETS = [
-	{ lang: "uk", builder: "/about", stock: ["/login", "/all-products", "/no-such-page-for-the-check"] },
-	{ lang: "en", builder: "/en/about", stock: ["/login", "/all-products", "/no-such-page-for-the-check"] },
+	{ lang: "uk", builder: "/about", stock: [...(withLogin ? ["/login"] : []), "/all-products", "/no-such-page-for-the-check"] },
+	{ lang: "en", builder: "/en/about", stock: [...(withLogin ? ["/login"] : []), "/all-products", "/no-such-page-for-the-check"] },
 ];
 
 const browser = await puppeteer.launch({
@@ -70,7 +72,7 @@ try {
 			}
 			expected = await menuLinks(reference);
 			check(expected && expected.length >= 4, `${size.width}px ${builder}: the menu has ${expected ? expected.length : 0} links (home, about, contact, language, account expected)`);
-			check(expected && expected.some(([href]) => href === "/me"), `${size.width}px ${builder}: no account link`);
+			check(expected && expected.some(([href]) => href === "/login?redirect-to=/me"), `${size.width}px ${builder}: no account link`);
 			if (phone && expected && (await reference.$(".wk-header__burger"))) {
 				// Keyboard: Tab from the burger visits every link of the open menu, in order.
 				await reference.focus(".wk-header__burger");
@@ -89,7 +91,7 @@ try {
 				const got = await menuLinks(page);
 				// Same links, same labels, same order as the Builder page, in the same language.
 				// The login page itself has no account link (Frappe's `hide_login`); everything else must match.
-				const want = path === "/login" ? expected.filter(([href]) => href !== "/me") : expected;
+				const want = path === "/login" ? expected.filter(([href]) => href !== "/login?redirect-to=/me") : expected;
 				check(JSON.stringify(got) === JSON.stringify(want), `${size.width}px ${path} (${lang}): menu ${JSON.stringify(got)} differs from ${builder}: ${JSON.stringify(want)}`);
 				if (outDir) await page.screenshot({ path: `${outDir}/header-${lang}-${path.replace(/[^a-z]+/g, "_")}-${size.width}.png` });
 				await page.close();

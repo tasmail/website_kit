@@ -419,8 +419,15 @@ class TestShop(TestCase):
 		shop.load_samples()
 		self.assertEqual(shop.tagged("UOM"), ["шт"])
 		# a link that the old check (Item.stock_uom only) did not see: a conversion factor of the customer's
+		category = frappe.db.get_value("UOM Category", {}, "name")
+		if not category:
+			category = (
+				frappe.get_doc({"doctype": "UOM Category", "category_name": "WK test"})
+				.insert(ignore_permissions=True)
+				.name
+			)
 		factor = frappe.get_doc(
-			{"doctype": "UOM Conversion Factor", "from_uom": "шт", "to_uom": "Nos", "value": 1}
+			{"doctype": "UOM Conversion Factor", "category": category, "from_uom": "шт", "to_uom": "Nos", "value": 1}
 		).insert(ignore_permissions=True)
 		self.addCleanup(
 			lambda: frappe.delete_doc("UOM Conversion Factor", factor.name, force=True, ignore_permissions=True)
@@ -437,7 +444,9 @@ class TestShop(TestCase):
 	def test_the_navbar_values_carry_the_links_the_guard_and_on_shop_pages_the_strings(self):
 		shop.enable_shop()
 		frappe.clear_document_cache("Webshop Settings", "Webshop Settings")
-		other = runtime.update_website_context(frappe._dict(route="login"))["wk"]
+		other = runtime.update_website_context(frappe._dict(route="login"))[
+			"wk"
+		]  # Frappe's login page replaces head_include
 		self.assertIn("wk.css", other["links"])
 		self.assertNotIn("wk-shop.css", other["links"])
 		self.assertIn("file_uploader.bundle.js", other["scripts"])
@@ -447,7 +456,9 @@ class TestShop(TestCase):
 			values = runtime.update_website_context(frappe._dict(route="all-products"))["wk"]
 		finally:
 			frappe.local.lang = "en"
-		self.assertIn("wk-shop.css", values["links"])
+		# head_include carries the sheets of an ordinary page, so the navbar adds none (they would be linked twice)
+		self.assertEqual(values["links"], "")
+		self.assertIn("wk-shop.css", runtime.update_website_context(frappe._dict(route="all-products"))["head_include"])
 		self.assertIn("f._messages", values["scripts"])
 		self.assertIn("Додати в кошик", values["scripts"])
 		self.assertNotIn("{{", values["links"] + values["scripts"])
@@ -461,7 +472,7 @@ class TestShop(TestCase):
 		self.assertIn("wk-header__burger", html)
 		self.assertEqual(html.count('href="/all-products"'), 2)  # the wide menu and the one in the disclosure
 		self.assertEqual(jinja_api.wk_header("uk"), jinja_api.wk_header("uk"))
-		self.assertNotIn("/me", jinja_api.wk_header("uk", "x"))
+		self.assertNotIn("redirect-to", jinja_api.wk_header("uk", "x"))
 
 	def test_status_and_methods(self):
 		self.assertEqual(api.shop_status()["samples"], 0)

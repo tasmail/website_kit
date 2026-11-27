@@ -70,7 +70,7 @@ def test_kit_pages_come_first_then_the_other_language_then_login(lang):
 		(content.URLS["about"][lang], t["menu_about"]),
 		(content.URLS["contact"][lang], t["menu_contact"]),
 		(content.URLS["home"][other], t["lang_switch"]),
-		("/me", t["account"]),
+		(header.ACCOUNT_URL, t["account"]),
 	]
 
 
@@ -100,12 +100,12 @@ def test_the_language_switch_needs_the_other_home_page():
 
 
 def test_the_account_link_is_the_same_for_every_visitor_and_can_be_hidden():
-	"""Frappe caches a page by path and language only, so the header must not depend on who is signed in: one static link to `/me`,
-	which sends a guest on to the login page."""
+	"""Frappe caches a page by path and language only, so the header must not depend on who is signed in: one static link to `/login?redirect-to=/me`,
+	which sends a guest to the login form and a signed-in user on to `/me`."""
 	t = content.TEXT["uk"]
-	assert labels(build("uk"))[-1] == ("/me", t["account"])
+	assert labels(build("uk"))[-1] == (header.ACCOUNT_URL, t["account"])
 	assert "logged_in" not in inspect.signature(header.inner).parameters
-	assert "/me" not in [href for href, _ in labels(build("uk", hide_login=True))]
+	assert header.ACCOUNT_URL not in [href for href, _ in labels(build("uk", hide_login=True))]
 
 
 def test_children_of_a_site_item_are_a_details_group():
