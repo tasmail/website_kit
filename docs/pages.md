@@ -148,3 +148,14 @@ CI runs it, and `scripts/axe_check.mjs` (axe-core in headless Chrome at 1440 and
 numbers of the run that produced this pull request are in its description. Web fonts are woff2 and are not in the sum: the
 default preset names Inter, whose Latin and Cyrillic files are about 66 KB together, fetched by the browser only for the glyphs
 the page uses.
+
+## How a release reaches an existing site
+
+`bench migrate` runs `after_migrate`, which applies the theme and then syncs the pages (`pages/sync.py`). The sync is keyed on the
+content hash of each shipped object, not on the version: an object whose hash changed is updated in place while it is unedited, written
+as an unpublished draft next to an edited page, and left alone (with a note) when it is an edited component. The version string still
+has to move with the content: `website_kit/content_lock.json` pins a hash of the pages, templates, stylesheets and the guard script next
+to `__version__`, `tests/test_content_lock.py` fails when they disagree, and CI compares the lock with the base branch of a pull request.
+The sync leaves `{"version", "builder"}` under the key `_sync` of `pages_state`, so a site whose migrate never reached it can be told
+from one that was synced; the migrate log prints one line with what was written. CI installs the previous release, switches to the new
+code, migrates, and checks the shipped pages and the live header and 404 page ("Upgrade from the previous release").

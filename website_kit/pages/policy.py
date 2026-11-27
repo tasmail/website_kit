@@ -129,3 +129,12 @@ def home_page_changes(website_home, builder_home, route: str) -> dict:
 	if not (builder_home or "").strip():
 		changes["builder_settings.home_page"] = route
 	return changes
+
+
+def sync_is_stale(state, version: str) -> bool:
+	"""True when the pages were not synced by the running release: `state` is the recorded `pages_state`, whose `_sync` entry names the
+	release of the last sync. A site without Builder has nothing to heal; a site whose sync predates the record is stale once."""
+	run = state.get("_sync") if isinstance(state, dict) else None
+	if not isinstance(run, dict):
+		return True
+	return run.get("version") != version and bool(run.get("builder"))

@@ -32,3 +32,6 @@ doc_events = {
 		"on_trash": "website_kit.shop.clear_cache",
 	}
 }
+
+# A release that Press moves to a site without a migrate (only pages, templates or CSS changed) is caught up here, once per release.
+scheduler_events = {"hourly": ["website_kit.install.heal"]}

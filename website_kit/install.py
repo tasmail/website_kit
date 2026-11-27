@@ -34,10 +34,32 @@ def after_install() -> dict:
 def write_pages() -> dict:
 	"""Write the standard pages (needs Builder; a failure is logged and never stops the install, migrate or app install)."""
 	try:
-		return pages_sync.sync()
+		changes = pages_sync.sync()
+		print(
+			f"Website Kit: standard pages synced, {len(changes)} change(s): {changes or 'nothing to write'}"
+		)  # visible in the migrate log
+		return changes
 	except Exception:
 		frappe.log_error(title="Website Kit: the standard pages could not be written")
 		return {"pages": "failed, see the Error Log"}
+
+
+def heal() -> None:
+	"""Hourly job: bring a site whose pages were not synced by the running release up to date (policy 5.8, same as a migrate).
+
+	Press moves a site to a new bench WITHOUT `bench migrate` when only pages, templates or CSS changed ("Pull"), so nothing syncs.
+	The check is one read of the recorded state; the work runs once per release.
+	"""
+	from . import __version__
+	from .pages import policy
+
+	try:
+		if not policy.sync_is_stale(pages_sync._load_state(), __version__):
+			return
+		kit_apply.apply()
+		write_pages()
+	except Exception:
+		frappe.log_error(title="Website Kit: the hourly refresh of the pages failed")
 
 
 def after_app_install(app_name=None) -> None:
