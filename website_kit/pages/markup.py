@@ -112,8 +112,11 @@ def contact_form(text, privacy_url) -> str:
 	)
 
 
-def head_tags(*, base_css, theme_css, robots_closed, alternates, organization, guard_site_key) -> str:
+def head_tags(*, base_css, theme_css, robots_closed, alternates, organization, guard_site_key, language="") -> str:
 	"""The `<head>` additions of a standard page: stylesheets, robots, hreflang pairs, Organization data, guard client.
+
+	`language` (a kit language code) adds the script that remembers the language of the page in the `preferred_language`
+	cookie: the stock pages (shop, cart, login) carry no language in their address, Frappe reads it from this cookie.
 
 	Stylesheet URLs go through `safe_url`; the JSON-LD and the guard key are JSON with `<` escaped, so no value can close the tag.
 	"""
@@ -127,10 +130,21 @@ def head_tags(*, base_css, theme_css, robots_closed, alternates, organization, g
 		parts.append(f'<link rel="alternate" hreflang="{esc(lang)}" href="{esc(url)}">')
 	if organization:
 		parts.append(f'<script type="application/ld+json">{json_script(organization)}</script>')
+	if language:
+		parts.append(f"<script>{language_cookie_script(language)}</script>")
 	if guard_site_key:
 		parts.append(f"<script>window.FRAPPE_GUARD={json_script({'siteKey': guard_site_key})};</script>")
 		parts.append(f'<script src="{GUARD_SCRIPT}" defer></script>')
 	return "".join(parts)
+
+
+def language_cookie_script(language) -> str:
+	"""Sets the cookie Frappe reads first for a guest (after `_lang`); one year, site-wide, `Secure` on https."""
+	code = json_script(str(language))
+	return (
+		f'document.cookie="preferred_language="+{code}+";path=/;max-age=31536000;SameSite=Lax"'
+		'+(location.protocol==="https:"?";Secure":"");'
+	)
 
 
 def _protect(value):

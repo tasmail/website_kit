@@ -102,6 +102,7 @@ def wk_head(lang="uk", key="home"):
 		alternates=alternates,
 		organization=organization,
 		guard_site_key=guard_key,
+		language=lang if key in ROUTES and lang in TEXT else "",
 	)
 
 
@@ -127,8 +128,9 @@ def _published_pages(lang) -> tuple[set, bool]:
 	return published, ROUTES["home"][other] in routes
 
 
-def _site_items() -> list:
-	"""The top bar items of Website Settings (one level of children); the shop entry only while the shop has products."""
+def _site_items(lang) -> list:
+	"""The top bar items of Website Settings (one level of children), labels translated into `lang` (the language of the
+	header, not the request's: a Builder page is in the language of its route); the shop entry only while the shop has products."""
 	from . import shop
 
 	rows = frappe.get_website_settings("top_bar_items") or []
@@ -138,11 +140,15 @@ def _site_items() -> list:
 			children.setdefault(row.parent_label, []).append(row)
 	items = [
 		{
-			"label": frappe._(row.label),
+			"label": frappe._(row.label, lang=lang),
 			"url": row.url or "",
 			"new_tab": bool(row.open_in_new_tab),
 			"children": [
-				{"label": frappe._(child.label), "url": child.url or "", "new_tab": bool(child.open_in_new_tab)}
+				{
+					"label": frappe._(child.label, lang=lang),
+					"url": child.url or "",
+					"new_tab": bool(child.open_in_new_tab),
+				}
 				for child in children.get(row.label, [])
 			],
 		}
@@ -166,7 +172,7 @@ def wk_header(lang="", hide_login=""):
 		lang=lang,
 		published=published,
 		other_available=other_available,
-		site_items=_site_items(),
+		site_items=_site_items(lang),
 		hide_login=bool(hide_login),
 		brand_html=esc(_brand_text()),
 		logo_url=frappe.get_website_settings("banner_image") or "",

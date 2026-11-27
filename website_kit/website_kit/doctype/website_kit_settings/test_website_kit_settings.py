@@ -283,6 +283,24 @@ class TestWebsiteKitSettings(TestCase):
 		self.assertIn("Legal", footer)
 		self.assertIn(">Terms</a>", footer)
 
+	def test_the_menu_labels_follow_the_language_of_the_header_not_the_request(self):
+		from website_kit import jinja_api
+
+		self.with_top_bar([{"label": "Shop", "url": "/extra-page"}])
+		language = frappe.local.lang
+		self.addCleanup(setattr, frappe.local, "lang", language)
+		frappe.local.lang = "de"  # a visitor whose browser asks for German
+		self.assertIn(">Магазин</a>", jinja_api.wk_header("uk"))
+		self.assertIn(">Shop</a>", jinja_api.wk_header("en"))
+
+	def test_a_kit_page_head_remembers_its_language_and_the_not_found_page_does_not(self):
+		from website_kit import jinja_api
+
+		head = jinja_api.wk_head("uk", "home")
+		self.assertIn('document.cookie="preferred_language="+"uk"', head)
+		self.assertIn('document.cookie="preferred_language="+"en"', jinja_api.wk_head("en", "about"))
+		self.assertNotIn("preferred_language", jinja_api.wk_head("uk", "notfound"))
+
 	def test_the_header_function_escapes_the_brand(self):
 		from website_kit import jinja_api
 
