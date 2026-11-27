@@ -40,6 +40,14 @@ GUARD_SCRIPT = """(function (f) {
 })(window.frappe);"""
 
 
+# The language button of a page that is not a kit page leads to the same address with `?_lang=<code>`; Frappe reads it for this
+# request only, so the page also keeps it for the next ones in the cookie that Frappe reads for a guest.
+LANG_SCRIPT = """(function () {
+	var m = /[?&]_lang=(uk|en)(?:&|$)/.exec(location.search);
+	if (m) document.cookie = "preferred_language=" + m[1] + ";path=/;max-age=31536000;SameSite=Lax" + (location.protocol === "https:" ? ";Secure" : "");
+})();"""
+
+
 # Frappe's own pages that override `{% block head_include %}` (checked in frappe/www and webshop/www of version 15): everything the
 # kit puts into `head_include` is lost there, so the navbar links the sheets. On every other page `head_include` carries them and the
 # navbar must not repeat them.
@@ -72,7 +80,7 @@ def i18n(messages: dict) -> str:
 
 def scripts(*, guard: bool, messages: dict) -> str:
 	"""Both scripts, in the order they must run."""
-	return (f"<script>{GUARD_SCRIPT}</script>" if guard else "") + i18n(messages)
+	return (f"<script>{GUARD_SCRIPT}\n{LANG_SCRIPT}</script>" if guard else "") + i18n(messages)
 
 
 @functools.cache

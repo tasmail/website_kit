@@ -521,6 +521,7 @@
 		"wk-footer__sub",
 		"wk-menu",
 		"wk-menu__group",
+		"wk-menu__lang",
 		"wk-menu__link",
 		"wk-menu__sub",
 		"wk-header__menu",

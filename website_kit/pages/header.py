@@ -12,7 +12,7 @@ import re
 from urllib.parse import urlsplit
 
 from ..theme.escape import esc, safe_url
-from .content import TEXT, URLS
+from .content import ROUTES, TEXT, URLS
 
 KIT_PAGES = (("home", "menu_home"), ("about", "menu_about"), ("contact", "menu_contact"))
 # One link for every visitor: a guest gets the login form, a signed-in user is sent on to `/me` by Frappe (verified on 15.128.0).
@@ -85,24 +85,52 @@ def _item(item) -> str:
 	return f'<li class="wk-menu__item">{anchor}</li>' if anchor else ""
 
 
+def switch_target(path, lang, published_routes) -> str:
+	"""Where the language button of the page at `path` leads: the same page in the other language.
+
+	A kit page goes to its twin when the twin is published (else to the other home page); any other page (the shop, the
+	login, the 404) stays where it is and asks for the language with `?_lang=`, which Frappe reads before the cookie. The
+	address carries no query of its own: Frappe caches a page by path and language, so a link with the visitor's
+	query would be served to the next visitor."""
+	other = TEXT[lang]["lang_switch_code"]
+	path = "/" + (path or "").strip().strip("/")
+	if path == "/" + ROUTES["home"]["uk"]:  # the route name of the home page; its public address is `/`
+		path = URLS["home"]["uk"]
+	for key, by_lang in URLS.items():
+		if by_lang.get(lang) == path:
+			return by_lang[other] if ROUTES[key][other] in published_routes else URLS["home"][other]
+	return f"{path}?_lang={other}"
+
+
+def _switch(item) -> str:
+	"""The language button: the short code is the text, the name of the language is the tooltip and the accessible name."""
+	code, url = item["code"], link_url(item["url"])
+	name = esc(item["label"])
+	return (
+		f'<li class="wk-menu__item"><a class="wk-menu__lang" href="{esc(url)}" hreflang="{esc(code)}" lang="{esc(code)}" '
+		f'title="{name}" aria-label="{name}">{esc(item["short"])}</a></li>'
+	)
+
+
 def _nav(variant, label, items, switch, login) -> str:
 	rows = "".join(_item(item) for item in items)
 	if switch:
-		other = switch["code"]
-		anchor = _anchor(switch, extra=f' hreflang="{esc(other)}" lang="{esc(other)}"')
-		rows += f'<li class="wk-menu__item">{anchor}</li>'
+		rows += _switch(switch)
 	return (
 		f'<nav class="wk-header__nav wk-header__nav--{variant}" aria-label="{esc(label)}">'
 		f'<ul class="wk-menu">{rows}</ul>{login}</nav>'
 	)
 
 
-def inner(*, lang, published, other_available, site_items, hide_login, brand_html, logo_url, **_ignored) -> str:
+def inner(
+	*, lang, published, other_available, site_items, hide_login, brand_html, logo_url, switch_url="", **_ignored
+) -> str:
 	"""The markup inside `<header class="wk-header">`.
 
 	`published` is the set of kit page keys that exist (`home`, `about`, `contact`); `other_available` is true when the home
 	page of the other language exists; `site_items` are the Website Settings top bar items as `{label, url, new_tab, children}`
-	(the shop entry already filtered); `brand_html` is already escaped, `logo_url` is a trusted site file URL or empty.
+	(the shop entry already filtered); `switch_url` is where the language button leads (`switch_target`; the other home page when
+	empty); `brand_html` is already escaped, `logo_url` is a trusted site file URL or empty.
 	"""
 	text = TEXT.get(lang) or TEXT["en"]
 	lang = lang if lang in TEXT else "en"
@@ -110,7 +138,12 @@ def inner(*, lang, published, other_available, site_items, hide_login, brand_htm
 	switch = None
 	if other_available:
 		code = text["lang_switch_code"]
-		switch = {"label": text["lang_switch"], "url": URLS["home"][code], "code": code}
+		switch = {
+			"label": text["lang_switch"],
+			"short": text["lang_switch_short"],
+			"url": switch_url or URLS["home"][code],
+			"code": code,
+		}
 	login = ""
 	if not hide_login:
 		# Static: Frappe caches a page by path and language only, so the link cannot depend on who is signed in.

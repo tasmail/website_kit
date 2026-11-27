@@ -182,6 +182,25 @@ a { color: var(--wk-color-link); }
 	padding-block: calc(var(--wk-space-unit) * 1.25);
 }
 
+/* the language button: the code of the other language, its name is the tooltip */
+.wk-menu__lang {
+	align-items: center;
+	border: var(--wk-border-width) solid var(--wk-header-border);
+	border-radius: var(--wk-radius-sm);
+	color: var(--wk-header-fg);
+	display: inline-flex;
+	font-size: 0.875em;
+	font-weight: 600;
+	letter-spacing: 0.04em;
+	min-block-size: 44px;
+	min-inline-size: 44px;
+	justify-content: center;
+	padding-inline: calc(var(--wk-space-unit) * 1.5);
+	text-decoration: none;
+}
+
+.wk-menu__lang:hover { border-color: var(--wk-color-primary); color: var(--wk-color-primary); }
+
 .wk-menu__group { position: relative; }
 
 .wk-menu__group > summary { cursor: pointer; }
