@@ -47,14 +47,42 @@ def test_the_hash_changes_with_the_content_and_ignores_line_endings(tmp_path):
 	assert contenthash.normalise(b"a\r\nb\n") == contenthash.normalise(b"a\nb\n")
 
 
+OLD = ["website_kit.patches.v0_3.use_stock_website_theme"]
+NEW = [*OLD, "website_kit.patches.v0_3.refresh_content_0_3_1"]
+
+
 def test_the_bump_rule():
 	same = {"version": "0.3.1", "hash": "aa"}
-	assert check_version_bump.problem(same, same) is None
-	assert check_version_bump.problem({"version": "0.3.0", "hash": "aa"}, {"version": "0.3.1", "hash": "bb"}) is None
-	assert "bump" in check_version_bump.problem({"version": "0.3.0", "hash": "aa"}, {"version": "0.3.0", "hash": "bb"})
-	assert "older" in check_version_bump.problem({"version": "0.3.1", "hash": "aa"}, {"version": "0.3.0", "hash": "bb"})
+	assert check_version_bump.problem(same, same, OLD, OLD) is None
+	moved = {"version": "0.3.1", "hash": "bb"}
+	assert check_version_bump.problem({"version": "0.3.0", "hash": "aa"}, moved, OLD, NEW) is None
+	assert "bump" in check_version_bump.problem({"version": "0.3.1", "hash": "aa"}, moved, OLD, NEW)
+	assert "older" in check_version_bump.problem(
+		{"version": "0.3.1", "hash": "aa"}, {"version": "0.3.0", "hash": "bb"}, OLD, NEW
+	)
 	# a version bump without a content change is allowed (a release can be only a bump)
-	assert check_version_bump.problem({"version": "0.3.0", "hash": "aa"}, {"version": "0.3.1", "hash": "aa"}) is None
+	assert (
+		check_version_bump.problem({"version": "0.3.0", "hash": "aa"}, {"version": "0.3.1", "hash": "aa"}, OLD, OLD)
+		is None
+	)
+
+
+def test_changed_content_needs_a_new_patch_so_that_press_runs_migrate():
+	"""Press runs `bench migrate` for a site update only when patches.txt, hooks.py, fixtures or DocType files changed; a release of only
+	pages, templates and CSS is a plain "Pull" and nothing syncs (kitdemo stayed on the old pages after PR #7)."""
+	base, head = {"version": "0.3.0", "hash": "aa"}, {"version": "0.3.1", "hash": "bb"}
+	message = check_version_bump.problem(base, head, OLD, OLD)
+	assert message and "patches.txt" in message and "migrate" in message
+	assert check_version_bump.problem(base, head, OLD, NEW) is None
+	assert check_version_bump.new_patches(OLD, NEW) == ["website_kit.patches.v0_3.refresh_content_0_3_1"]
+	assert check_version_bump.patch_lines("# c\n[pre_model_sync]\n\n[post_model_sync]\na.b  # x\n") == ["a.b"]
+
+
+def test_the_release_patch_is_listed_and_syncs_the_content():
+	listed = check_version_bump.patch_lines((ROOT / "website_kit" / "patches.txt").read_text(encoding="utf-8"))
+	assert "website_kit.patches.v0_3.refresh_content_0_3_1" in listed
+	source = (ROOT / "website_kit" / "patches" / "v0_3" / "refresh_content_0_3_1.py").read_text(encoding="utf-8")
+	assert "after_migrate" in source or ("apply" in source and "write_pages" in source)
 
 
 def test_the_script_runs_against_a_git_ref():

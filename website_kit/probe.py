@@ -310,6 +310,20 @@ def assert_upgraded() -> None:
 	assert frappe.db.get_single_value(SETTINGS, "kit_version").startswith(__version__), (
 		"the theme was not applied by this release"
 	)
+	# The safety net for a site moved without a migrate: pretend the last sync was by an older release, run the hourly job.
+	from . import install
+
+	frappe.db.set_single_value(
+		SETTINGS, "pages_state", json.dumps({**state, "_sync": {"version": "0.0.0", "builder": True}})
+	)
+	frappe.clear_document_cache(SETTINGS, SETTINGS)
+	frappe.db.commit()
+	install.heal()
+	frappe.db.commit()
+	healed = json.loads(frappe.db.get_single_value(SETTINGS, "pages_state") or "{}")
+	assert healed.get("_sync") == {"version": __version__, "builder": True}, (
+		f"the hourly job did not catch the site up: {healed.get('_sync')}"
+	)
 	stale = []
 	for spec in shipped.all_specs():
 		if not frappe.db.exists(spec["kind"], spec["name"]):
