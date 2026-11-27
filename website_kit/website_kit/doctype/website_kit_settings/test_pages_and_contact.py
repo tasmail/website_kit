@@ -204,7 +204,7 @@ class TestStandardPages(KitTestCase):
 
 	def test_no_english_is_left_on_the_ukrainian_pages(self):
 		self.configure(brand_name="Ромашка")
-		allowed = {"English", "reCAPTCHA", "Google"}
+		allowed = {"English", "EN", "reCAPTCHA", "Google"}  # EN: the code on the language button
 		for path in UK_PAGES:
 			text = prose(fetch(path)[1])
 			words = set(re.findall(r"[A-Za-z]{2,}", text)) - allowed
