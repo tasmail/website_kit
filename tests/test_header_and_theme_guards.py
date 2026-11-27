@@ -118,3 +118,10 @@ def test_the_login_card_follows_the_card_token():
 	assert rule and "background-color: var(--wk-card-bg)" in rule.group(1)
 	for page in ("for-forgot", "for-login-with-email-link", "for-signup", "for-email-login"):
 		assert f".{page} .page-card" in BASE_CSS
+
+
+def test_the_primary_button_text_beats_frappes_btn_btn_primary_rule():
+	"""Frappe's `.btn.btn-primary { color: var(--neutral) }` (white) outranks a bare `.btn-primary` and left white text on a light
+	primary of the dark preset (the 404 page's "Back to Home", 2.2:1)."""
+	rule = re.search(r"(?m)^\.btn-primary,\n\.btn\.btn-primary,[^{]*\{([^}]*)\}", BASE_CSS)
+	assert rule and "color: var(--wk-color-primary-contrast)" in rule.group(1)

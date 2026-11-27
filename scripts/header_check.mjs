@@ -63,7 +63,8 @@ async function open(size, lang, path) {
 try {
 	for (const size of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
 		const phone = size.width < 800;
-		for (const { lang, builder, stock } of SETS) {
+		const refs = {};
+		for (const { lang, builder } of SETS) {
 			const reference = await open(size, lang, builder);
 			let expected;
 			if (phone) {
@@ -85,14 +86,20 @@ try {
 			}
 			if (outDir) await reference.screenshot({ path: `${outDir}/header-${lang}-${size.width}.png` });
 			await reference.close();
+			refs[lang] = expected;
+		}
+		for (const { lang, stock } of SETS) {
 			for (const path of stock) {
 				const page = await open(size, lang, path);
 				if (phone) await openMenu(page, `${size.width}px ${path} (${lang})`);
 				const got = await menuLinks(page);
-				// Same links, same labels, same order as the Builder page, in the same language.
+				// The stock page shows the language Frappe picked for the request (a Frappe version may ignore Accept-Language for a
+				// guest): compare with the Builder menu of that language. Same links, labels and order.
+				const shown = await page.evaluate(() => document.documentElement.lang.slice(0, 2));
+				const expected = refs[shown] || refs[lang];
 				// The login page itself has no account link (Frappe's `hide_login`); everything else must match.
 				const want = path === "/login" ? expected.filter(([href]) => href !== "/login?redirect-to=/me") : expected;
-				check(JSON.stringify(got) === JSON.stringify(want), `${size.width}px ${path} (${lang}): menu ${JSON.stringify(got)} differs from ${builder}: ${JSON.stringify(want)}`);
+				check(JSON.stringify(got) === JSON.stringify(want), `${size.width}px ${path} (${lang}, page language ${shown}): menu ${JSON.stringify(got)} differs from the Builder menu ${JSON.stringify(want)}`);
 				if (outDir) await page.screenshot({ path: `${outDir}/header-${lang}-${path.replace(/[^a-z]+/g, "_")}-${size.width}.png` });
 				await page.close();
 			}

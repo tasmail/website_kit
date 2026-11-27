@@ -89,8 +89,11 @@ a { color: var(--wk-color-link); }
 
 /* Stock Bootstrap pieces on the public website follow the tokens. */
 .btn-primary,
+.btn.btn-primary,
 .btn-primary:hover,
-.btn-primary:focus {
+.btn.btn-primary:hover,
+.btn-primary:focus,
+.btn.btn-primary:focus {
 	background-color: var(--wk-color-primary);
 	border-color: var(--wk-color-primary);
 	border-radius: var(--wk-button-radius);
