@@ -104,7 +104,7 @@ try {
 				const wanted = Object.values(refs).map((menu) => withoutSwitch(path === "/login" ? menu.filter(([href]) => href !== "/login?redirect-to=/me") : menu));
 				check(wanted.some((menu) => JSON.stringify(menu) === JSON.stringify(withoutSwitch(got))), `${size.width}px ${path} (${lang}): menu ${JSON.stringify(got)} matches no Builder menu ${JSON.stringify(wanted)}`);
 				const button = got.filter(isSwitch);
-				check(button.length === 1 && /^\/[^?]*\?_lang=(uk|en)$/.test(button[0][0]) && button[0][0].startsWith(new URL(path, "http://x").pathname), `${size.width}px ${path} (${lang}): the language button leads to ${JSON.stringify(button)}, not to the same page with ?_lang=`);
+				check(button.length === 1 && /^\?_lang=(uk|en)$/.test(button[0][0]), `${size.width}px ${path} (${lang}): the language button leads to ${JSON.stringify(button)}, not to ?_lang= of the same page`);
 				if (outDir) await page.screenshot({ path: `${outDir}/header-${lang}-${path.replace(/[^a-z]+/g, "_")}-${size.width}.png` });
 				await page.close();
 			}

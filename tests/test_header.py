@@ -256,9 +256,9 @@ ALL_ROUTES = {route for by_lang in content.ROUTES.values() for route in by_lang.
 		("/en/about", "en", "/about"),
 		("/contact/", "uk", "/en/contact"),
 		("/en/privacy", "en", "/privacy"),
-		("/all-products", "uk", "/all-products?_lang=en"),
-		("/login", "en", "/login?_lang=uk"),
-		("/no-such-page", "uk", "/no-such-page?_lang=en"),
+		("/all-products", "uk", "?_lang=en"),
+		("/login", "en", "?_lang=uk"),
+		("/no-such-page", "uk", "?_lang=en"),
 		("", "uk", "/en"),
 	],
 )
@@ -288,7 +288,9 @@ def test_the_language_button_is_a_short_code_with_the_language_name_as_tooltip()
 
 
 def test_the_query_of_the_visitor_never_reaches_the_cached_link():
-	assert "?" not in header.switch_target("/all-products", "uk", ALL_ROUTES).split("?_lang=")[0]
+	# the link of a page that is not a kit page is relative: whatever path was current when the page was cached, it is right
+	assert header.switch_target("/all-products", "uk", ALL_ROUTES) == header.switch_target("/login", "uk", ALL_ROUTES)
+	assert header.link_url("?_lang=en") == "?_lang=en"
 
 
 @pytest.mark.parametrize("path", ["/\\evil.com", "/\tx", "//evil.com", '/<a>"x'])
@@ -305,5 +307,7 @@ def test_a_path_the_link_check_refuses_leads_to_the_other_home_page(path):
 		switch_url=url,
 	)
 	hrefs = re.findall(r'class="wk-menu__lang" href="([^"]*)"', html)
-	assert hrefs and all(href.startswith("/") and not href.startswith("//") and "\\" not in href for href in hrefs)
+	assert hrefs and all(
+		href.startswith(("/", "?")) and not href.startswith("//") and "\\" not in href for href in hrefs
+	)
 	assert all("<" not in href and '"' not in href for href in hrefs)

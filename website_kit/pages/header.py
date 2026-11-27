@@ -34,7 +34,7 @@ def link_url(url) -> str:
 	if SCHEME.match(text):
 		if not text.lower().startswith(LINK_PREFIXES):
 			return ""
-	elif not text.startswith(("/", "#")):
+	elif not text.startswith(("/", "#", "?")):
 		text = "/" + text
 	return text.replace(" ", "%20")
 
@@ -99,7 +99,7 @@ def switch_target(path, lang, published_routes) -> str:
 	for key, by_lang in URLS.items():
 		if by_lang.get(lang) == path:
 			return by_lang[other] if ROUTES[key][other] in published_routes else URLS["home"][other]
-	return f"{path}?_lang={other}"
+	return f"?_lang={other}"
 
 
 def _switch(item) -> str:
