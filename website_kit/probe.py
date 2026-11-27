@@ -285,3 +285,55 @@ def assert_stock_theme() -> None:
 	left = [name for name in (os.listdir(folder) if os.path.isdir(folder) else []) if name.startswith("website_kit_")]
 	assert not left, f"generated theme files are left: {left}"
 	print("stock theme ok")
+
+
+def assert_upgraded() -> None:
+	"""CI only, after `bench migrate` on a site that was installed from the previous release: every shipped Builder object exists in
+	the shipped form (an unedited object is updated in place), the sync recorded its run, and real requests show the new header on a
+	Builder page and the kit header and footer on the not-found page."""
+	import json
+	import re
+
+	from frappe.app import application
+	from werkzeug.test import Client
+
+	from . import __version__
+	from .pages import specs as shipped
+	from .pages import sync
+	from .pages.blocks import digest
+
+	site = frappe.local.site
+	state = json.loads(frappe.db.get_single_value(SETTINGS, "pages_state") or "{}")
+	assert state.get("_sync") == {"version": __version__, "builder": True}, (
+		f"the sync did not run in this release: {state.get('_sync')}"
+	)
+	assert frappe.db.get_single_value(SETTINGS, "kit_version").startswith(__version__), (
+		"the theme was not applied by this release"
+	)
+	stale = []
+	for spec in shipped.all_specs():
+		if not frappe.db.exists(spec["kind"], spec["name"]):
+			stale.append(f"{spec['name']}: missing")
+		elif digest(sync.current_fields(spec["kind"], spec["name"])) != spec["hash"]:
+			stale.append(f"{spec['name']}: not the shipped version")
+	assert not stale, f"migrate did not bring the shipped pages in: {stale}"
+	assert frappe.db.exists("Builder Page", {"route": "404", "published": 1}), "no published not-found page"
+	frappe.db.commit()
+	frappe.destroy()
+	client = Client(application)  # the WSGI application opens its own connection per request
+
+	def get(path):
+		response = client.get(path, base_url=f"http://{site}", buffered=True)
+		return response, response.get_data(as_text=True)
+
+	response, body = get("/about")
+	assert response.status_code == 200 and "redirect-to=/me" in body, "a Builder page does not show the new header"
+	assert len(re.findall(r'class="wk-header__nav ', body)) == 2, "the header is not the new one"
+	response, body = get("/wk-upgrade-check-no-such-page")
+	assert response.status_code == 404, f"a miss answered {response.status_code}"
+	assert 'class="wk-header"' in body and 'class="wk-footer"' in body, (
+		"the not-found page has no kit header and footer"
+	)
+	frappe.init(site=site)
+	frappe.connect()
+	print("upgrade ok")

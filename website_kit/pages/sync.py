@@ -12,6 +12,7 @@ import json
 
 import frappe
 
+from .. import __version__
 from . import policy, specs
 from .blocks import digest, dump
 
@@ -19,6 +20,7 @@ SETTINGS = "Website Kit Settings"
 STATE_FIELD = "pages_state"
 NOTE_FIELD = "pages_note"
 PAGE = "Builder Page"
+RUN_KEY = "_sync"
 
 
 def builder_ready() -> bool:
@@ -106,10 +108,19 @@ def _draft_fields(spec: dict, shipped: str) -> dict:
 	return fields
 
 
+def _record_run(state: dict, builder: bool) -> None:
+	"""Remember, in the state itself, that a sync ran, with which release and whether Builder was there: a site that did not get new
+	pages can then be told from one whose migrate never reached the sync (no timestamp, so a repeat changes nothing)."""
+	state[RUN_KEY] = {"version": __version__, "builder": builder}
+	if not builder:
+		_save(STATE_FIELD, json.dumps(state, sort_keys=True))
+
+
 def sync() -> dict:
 	"""Apply the shipped objects; returns `{object: action}` for what was written, `{}` when nothing was."""
 	if not builder_ready():
 		frappe.logger("website_kit").info("Builder is not installed: the standard pages were not written")
+		_record_run(_load_state(), builder=False)
 		return {}
 	state = _load_state()
 	changes, notes = {}, []
@@ -156,6 +167,7 @@ def sync() -> dict:
 			state.pop(key, None)
 		else:
 			state[key] = new_state
+	_record_run(state, builder=True)
 	if _save(STATE_FIELD, json.dumps(state, sort_keys=True)):
 		changes["pages_state"] = "recorded"
 	merged = policy.merge_notes(frappe.db.get_single_value(SETTINGS, NOTE_FIELD), notes)

@@ -34,7 +34,11 @@ def after_install() -> dict:
 def write_pages() -> dict:
 	"""Write the standard pages (needs Builder; a failure is logged and never stops the install, migrate or app install)."""
 	try:
-		return pages_sync.sync()
+		changes = pages_sync.sync()
+		print(
+			f"Website Kit: standard pages synced, {len(changes)} change(s): {changes or 'nothing to write'}"
+		)  # visible in the migrate log
+		return changes
 	except Exception:
 		frappe.log_error(title="Website Kit: the standard pages could not be written")
 		return {"pages": "failed, see the Error Log"}
