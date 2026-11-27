@@ -282,12 +282,28 @@ def test_the_language_button_is_a_short_code_with_the_language_name_as_tooltip()
 		logo_url="",
 		switch_url="/en/about",
 	)
-	button = (
-		'<a class="wk-menu__lang" href="/en/about" hreflang="en" lang="en" title="English" aria-label="English">EN</a>'
-	)
+	button = '<a class="wk-menu__lang" href="/en/about" hreflang="en" lang="en" title="English" aria-label="EN, English">EN</a>'
 	assert html.count(button) == 2  # the narrow menu and the wide menu
 	assert ">English<" not in html
 
 
 def test_the_query_of_the_visitor_never_reaches_the_cached_link():
 	assert "?" not in header.switch_target("/all-products", "uk", ALL_ROUTES).split("?_lang=")[0]
+
+
+@pytest.mark.parametrize("path", ["/\\evil.com", "/\tx", "//evil.com", '/<a>"x'])
+def test_a_path_the_link_check_refuses_leads_to_the_other_home_page(path):
+	url = header.switch_target(path, "uk", ALL_ROUTES)
+	html = header.inner(
+		lang="uk",
+		published=ALL_PAGES,
+		other_available=True,
+		site_items=[],
+		hide_login=False,
+		brand_html="B",
+		logo_url="",
+		switch_url=url,
+	)
+	hrefs = re.findall(r'class="wk-menu__lang" href="([^"]*)"', html)
+	assert hrefs and all(href.startswith("/") and not href.startswith("//") and "\\" not in href for href in hrefs)
+	assert "<script" not in html and '"><' not in html

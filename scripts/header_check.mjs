@@ -60,6 +60,11 @@ async function open(size, lang, path) {
 	return page;
 }
 
+// The language button leads to the same page in the other language, so its address differs from page to page: the menus are compared
+// with it left out, and its address is checked on its own below.
+const isSwitch = ([, text]) => text === "EN" || text === "UK";
+const withoutSwitch = (menu) => menu.filter((link) => !isSwitch(link));
+
 try {
 	for (const size of [{ width: 390, height: 844 }, { width: 1440, height: 900 }]) {
 		const phone = size.width < 800;
@@ -96,8 +101,10 @@ try {
 				// The stock page shows the language Frappe picked for the request (Frappe 16 ignores Accept-Language for a guest, and
 				// `<html lang>` is the site language on 15): it must equal the Builder menu of one of the two languages, link for link.
 				// The login page itself has no account link (Frappe's `hide_login`); everything else must match.
-				const wanted = Object.values(refs).map((menu) => (path === "/login" ? menu.filter(([href]) => href !== "/login?redirect-to=/me") : menu));
-				check(wanted.some((menu) => JSON.stringify(menu) === JSON.stringify(got)), `${size.width}px ${path} (${lang}): menu ${JSON.stringify(got)} matches no Builder menu ${JSON.stringify(wanted)}`);
+				const wanted = Object.values(refs).map((menu) => withoutSwitch(path === "/login" ? menu.filter(([href]) => href !== "/login?redirect-to=/me") : menu));
+				check(wanted.some((menu) => JSON.stringify(menu) === JSON.stringify(withoutSwitch(got))), `${size.width}px ${path} (${lang}): menu ${JSON.stringify(got)} matches no Builder menu ${JSON.stringify(wanted)}`);
+				const button = got.filter(isSwitch);
+				check(button.length === 1 && /^\/[^?]*\?_lang=(uk|en)$/.test(button[0][0]) && button[0][0].startsWith(new URL(path, "http://x").pathname), `${size.width}px ${path} (${lang}): the language button leads to ${JSON.stringify(button)}, not to the same page with ?_lang=`);
 				if (outDir) await page.screenshot({ path: `${outDir}/header-${lang}-${path.replace(/[^a-z]+/g, "_")}-${size.width}.png` });
 				await page.close();
 			}

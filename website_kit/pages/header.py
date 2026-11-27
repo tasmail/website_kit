@@ -104,11 +104,15 @@ def switch_target(path, lang, published_routes) -> str:
 
 def _switch(item) -> str:
 	"""The language button: the short code is the text, the name of the language is the tooltip and the accessible name."""
-	code, url = item["code"], link_url(item["url"])
-	name = esc(item["label"])
+	code = item["code"]
+	url = (
+		link_url(item["url"]) or URLS["home"][code]
+	)  # a path `link_url` refuses leads to the other home page, never to `""`
+	name, short = esc(item["label"]), esc(item["short"])
+	# The accessible name starts with the visible text (WCAG 2.5.3) and adds the language name; `lang` makes a reader say it right.
 	return (
 		f'<li class="wk-menu__item"><a class="wk-menu__lang" href="{esc(url)}" hreflang="{esc(code)}" lang="{esc(code)}" '
-		f'title="{name}" aria-label="{name}">{esc(item["short"])}</a></li>'
+		f'title="{name}" aria-label="{short}, {name}">{short}</a></li>'
 	)
 
 

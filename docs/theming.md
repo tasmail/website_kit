@@ -204,8 +204,9 @@ Both scripts are inline, so the number of script files of the Builder pages stay
 
 The header is one function (`wk_header`, `website_kit/pages/header.py`) that both the Builder pages and the stock navbar call, so a visitor
 sees the same menu on the home page, the shop, the login page and the 404 page: the kit pages that exist (Home, About, Contact), the
-top bar items of Website Settings (the shop entry only while the shop has a published product), the other language when its home page
-exists, and one account link to `/login?redirect-to=/me` (a guest gets the login form, a signed-in user goes on to `/me`; a static link: Frappe caches pages by path and language only, so the header cannot depend on who is signed in). On a stock page the language is the request language when the kit has texts for it, else English.
+top bar items of Website Settings (the shop entry only while the shop has a published product), the language button (the code of the other language, `EN` or `UK`, with the language name as tooltip and accessible name; it leads to the
+same page in the other language: the twin of a kit page, else the other home page; on any other page, the same path with `?_lang=<code>`, which Frappe
+reads for the request and the page script keeps in the `preferred_language` cookie), and one account link to `/login?redirect-to=/me` (a guest gets the login form, a signed-in user goes on to `/me`; a static link: Frappe caches pages by path and language only, so the header cannot depend on who is signed in). On a stock page the language is the request language when the kit has texts for it, else English.
 
 On the Builder pages the header is a single raw block; its markup is the function's, so the menu there is no longer edited block by
 block in Builder: change the menu in Website Settings, the labels of the kit pages in `pages/content.py`.
