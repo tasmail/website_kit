@@ -69,14 +69,14 @@ def test_kit_pages_come_first_then_the_other_language_then_login(lang):
 		(content.URLS["home"][lang], t["menu_home"]),
 		(content.URLS["about"][lang], t["menu_about"]),
 		(content.URLS["contact"][lang], t["menu_contact"]),
-		(content.URLS["home"][other], t["lang_switch"]),
+		(content.URLS["home"][other], t["lang_switch_short"]),
 		(header.ACCOUNT_URL, t["account"]),
 	]
 
 
 def test_site_items_sit_between_the_kit_pages_and_the_language_switch():
 	html = build("en", site_items=[{"label": "Shop", "url": "/all-products"}])
-	assert [text for _, text in labels(html)] == ["Home", "About", "Contact", "Shop", "Українська", "My account"]
+	assert [text for _, text in labels(html)] == ["Home", "About", "Contact", "Shop", "UK", "My account"]
 
 
 def test_a_site_item_that_repeats_a_kit_page_is_dropped():
@@ -241,3 +241,73 @@ def test_the_stock_navbar_still_renders_when_the_context_has_no_links_or_scripts
 	"""A template render without the kit's context (a test, a preview) must not print Jinja's error text into the page."""
 	html = _render_navbar(wk={"brand_name": "B"})
 	assert "no such element" not in html and "<header" in html
+
+
+ALL_ROUTES = {route for by_lang in content.ROUTES.values() for route in by_lang.values()}
+
+
+@pytest.mark.parametrize(
+	("path", "lang", "target"),
+	[
+		("/", "uk", "/en"),
+		("/home", "uk", "/en"),
+		("/en", "en", "/"),
+		("/about", "uk", "/en/about"),
+		("/en/about", "en", "/about"),
+		("/contact/", "uk", "/en/contact"),
+		("/en/privacy", "en", "/privacy"),
+		("/all-products", "uk", "?_lang=en"),
+		("/login", "en", "?_lang=uk"),
+		("/no-such-page", "uk", "?_lang=en"),
+		("", "uk", "/en"),
+	],
+)
+def test_the_language_button_stays_on_the_page(path, lang, target):
+	assert header.switch_target(path, lang, ALL_ROUTES) == target
+
+
+def test_a_twin_that_is_not_published_leads_to_the_other_home_page():
+	routes = ALL_ROUTES - {"en/about"}
+	assert header.switch_target("/about", "uk", routes) == "/en"
+
+
+def test_the_language_button_is_a_short_code_with_the_language_name_as_tooltip():
+	html = header.inner(
+		lang="uk",
+		published=ALL_PAGES,
+		other_available=True,
+		site_items=[],
+		hide_login=False,
+		brand_html="B",
+		logo_url="",
+		switch_url="/en/about",
+	)
+	button = '<a class="wk-menu__lang" href="/en/about" hreflang="en" lang="en" title="English" aria-label="EN, English">EN</a>'
+	assert html.count(button) == 2  # the narrow menu and the wide menu
+	assert ">English<" not in html
+
+
+def test_the_query_of_the_visitor_never_reaches_the_cached_link():
+	# the link of a page that is not a kit page is relative: whatever path was current when the page was cached, it is right
+	assert header.switch_target("/all-products", "uk", ALL_ROUTES) == header.switch_target("/login", "uk", ALL_ROUTES)
+	assert header.link_url("?_lang=en") == "?_lang=en"
+
+
+@pytest.mark.parametrize("path", ["/\\evil.com", "/\tx", "//evil.com", '/<a>"x'])
+def test_a_path_the_link_check_refuses_leads_to_the_other_home_page(path):
+	url = header.switch_target(path, "uk", ALL_ROUTES)
+	html = header.inner(
+		lang="uk",
+		published=ALL_PAGES,
+		other_available=True,
+		site_items=[],
+		hide_login=False,
+		brand_html="B",
+		logo_url="",
+		switch_url=url,
+	)
+	hrefs = re.findall(r'class="wk-menu__lang" href="([^"]*)"', html)
+	assert hrefs and all(
+		href.startswith(("/", "?")) and not href.startswith("//") and "\\" not in href for href in hrefs
+	)
+	assert all("<" not in href and '"' not in href for href in hrefs)

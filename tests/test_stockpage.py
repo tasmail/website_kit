@@ -116,3 +116,10 @@ def test_the_runtime_hands_the_navbar_links_only_where_the_head_is_replaced_and_
 	assert re.search(r"stockpage\.scripts\(\s*guard=True,", source), (
 		"the file-uploader guard must be on for every stock page"
 	)
+
+
+def test_a_stock_page_keeps_the_language_it_was_asked_for_in_the_cookie():
+	html = stockpage.scripts(guard=True, messages={})
+	assert "_lang=(uk|en)" in html and "preferred_language=" in html and html.count("<script") == 1
+	assert "preferred_language" not in stockpage.scripts(guard=False, messages={})
+	assert len(html) < 1200

@@ -114,10 +114,11 @@ def _language(lang) -> str:
 	return current if current in TEXT else "en"
 
 
-def _published_pages(lang) -> tuple[set, bool]:
-	"""The kit pages of `lang` that exist as published Builder pages, and whether the home page of the other language does."""
+def _published_pages(lang) -> tuple[set, bool, set]:
+	"""The kit pages of `lang` that exist as published Builder pages, whether the home page of the other language does, and the
+	routes of every published kit page of both languages."""
 	if not frappe.db.exists("DocType", "Builder Page"):
-		return set(), False
+		return set(), False, set()
 	other = TEXT[lang]["lang_switch_code"]
 	routes = frappe.get_all(
 		"Builder Page",
@@ -125,7 +126,7 @@ def _published_pages(lang) -> tuple[set, bool]:
 		pluck="route",
 	)
 	published = {key for key in header.KIT_KEYS if ROUTES[key][lang] in routes}
-	return published, ROUTES["home"][other] in routes
+	return published, ROUTES["home"][other] in routes, set(routes)
 
 
 def _site_items(lang) -> list:
@@ -158,6 +159,12 @@ def _site_items(lang) -> list:
 	return shop.visible_menu(items)
 
 
+def _request_path() -> str:
+	"""The path of the page being rendered (no query), empty outside a request."""
+	request = getattr(frappe.local, "request", None)
+	return (getattr(request, "path", "") or "") if request else ""
+
+
 @never_raises
 def wk_header(lang="", hide_login=""):
 	"""The content of the site header, for the Builder pages (`lang` given) and the stock navbar (`lang` empty: request language).
@@ -167,7 +174,7 @@ def wk_header(lang="", hide_login=""):
 	and language only.
 	"""
 	lang = _language(lang)
-	published, other_available = _published_pages(lang)
+	published, other_available, routes = _published_pages(lang)
 	return header.inner(
 		lang=lang,
 		published=published,
@@ -176,6 +183,7 @@ def wk_header(lang="", hide_login=""):
 		hide_login=bool(hide_login),
 		brand_html=esc(_brand_text()),
 		logo_url=frappe.get_website_settings("banner_image") or "",
+		switch_url=header.switch_target(_request_path(), lang, routes),
 	)
 
 
