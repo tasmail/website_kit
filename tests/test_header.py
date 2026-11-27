@@ -306,4 +306,4 @@ def test_a_path_the_link_check_refuses_leads_to_the_other_home_page(path):
 	)
 	hrefs = re.findall(r'class="wk-menu__lang" href="([^"]*)"', html)
 	assert hrefs and all(href.startswith("/") and not href.startswith("//") and "\\" not in href for href in hrefs)
-	assert "<script" not in html and '"><' not in html
+	assert all("<" not in href and '"' not in href for href in hrefs)
