@@ -99,6 +99,21 @@ def test_head_tags_when_open_add_alternates_and_organization():
 	assert html.count("</script>") == 1  # the name cannot close the element
 
 
+def test_the_language_cookie_script_is_added_only_for_a_kit_language():
+	args = dict(
+		base_css="/b.css", theme_css="", robots_closed=True, alternates=[], organization=None, guard_site_key=""
+	)
+	assert "preferred_language" not in markup.head_tags(**args)
+	html = markup.head_tags(**args, language="uk")
+	assert 'document.cookie="preferred_language="+"uk"+";path=/;max-age=31536000;SameSite=Lax"' in html
+	assert 'location.protocol==="https:"?";Secure"' in html and html.count("</script>") == 1
+
+
+def test_the_language_value_cannot_close_the_script():
+	script = markup.language_cookie_script('uk"</script><b>')
+	assert "</script>" not in script and "\\u003c" in script
+
+
 def test_the_guard_client_is_loaded_only_with_a_site_key():
 	html = markup.head_tags(
 		base_css="/b.css",
