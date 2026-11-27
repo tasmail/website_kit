@@ -173,7 +173,7 @@ class TestStandardPages(KitTestCase):
 	def test_the_pages_components_and_script_exist(self):
 		for spec in specs.all_specs():
 			self.assertTrue(frappe.db.exists(spec["kind"], spec["name"]), spec["name"])
-		self.assertEqual(frappe.db.count(PAGE, {"name": ["like", "wk-%"]}), 8)
+		self.assertEqual(frappe.db.count(PAGE, {"name": ["like", "wk-%"]}), 9)
 		self.assertEqual(frappe.db.get_value(PAGE, "wk-contact-en", "language"), "en")
 		self.assertEqual(frappe.db.get_value(PAGE, "wk-home-uk", "route"), "home")
 		self.assertEqual(frappe.db.get_value(PAGE, "wk-privacy-uk", "disable_indexing"), 1)
@@ -291,7 +291,7 @@ class TestUpgradePolicy(KitTestCase):
 			self.assertEqual(result.get(f"{PAGE}:{self.NAME}"), "update")
 			self.assertEqual(frappe.db.get_value(PAGE, self.NAME, "meta_description"), "A new description")
 			self.assertEqual(sync.sync(), {})  # and stable
-		self.assertEqual(frappe.db.count(PAGE, {"name": ["like", "wk-%"]}), 8)
+		self.assertEqual(frappe.db.count(PAGE, {"name": ["like", "wk-%"]}), 9)
 
 	def test_an_edited_page_is_kept_and_the_new_version_becomes_a_draft(self):
 		page = frappe.get_doc(PAGE, self.NAME)

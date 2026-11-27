@@ -35,7 +35,7 @@ def test_templates_never_render_site_data_without_escaping():
 			expression = expression.strip()
 			ok = (
 				"| wk_esc" in expression
-				or expression.startswith(("_(", "wk.", "url_prefix"))
+				or expression.startswith(("_(", "wk.", "wk_header(", "url_prefix"))
 				or "wk.brand_name" in expression
 			)
 			assert ok, (path.name, expression)

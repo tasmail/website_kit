@@ -236,29 +236,66 @@ class TestWebsiteKitSettings(TestCase):
 		self.assertTrue(frappe.db.exists("Error Log", {"error": ["like", "%disk full%"]}))
 		apply.apply()  # restores kit_version
 
+	def with_top_bar(self, rows):
+		"""Put these top bar rows into Website Settings for one test and restore the customer's rows afterwards."""
+		website_settings = frappe.get_doc("Website Settings")
+		keep = [
+			{key: row.get(key) for key in ("label", "url", "parent_label", "open_in_new_tab", "right")}
+			for row in website_settings.top_bar_items
+		]
+
+		def put(items):
+			doc = frappe.get_doc("Website Settings")
+			doc.set("top_bar_items", items)
+			doc.save(ignore_permissions=True)
+			if hasattr(frappe.local, "website_settings"):
+				del frappe.local.website_settings
+
+		self.addCleanup(put, keep)
+		put(rows)
+
 	def test_the_menus_render_one_level_of_children(self):
-		context = {
-			"wk": {"brand_name": "Brand"},
-			"url_prefix": "",
-			"top_bar_items": [
-				frappe._dict(label="Shop", url="/shop", child_items=[frappe._dict(label="{{ 7*7 }}", url="/shop/a")]),
-				frappe._dict(label="About", url="/about"),
-			],
-			"footer_items": [
-				frappe._dict(label="Legal", url="/legal", child_items=[frappe._dict(label="Terms", url="/terms")]),
-			],
-		}
-		nav = frappe.get_doc("Web Template", "WK Navbar").render(context)
+		from website_kit import jinja_api
+
+		self.with_top_bar(
+			[
+				{"label": "Shop", "url": ""},
+				{"label": "{{ 7*7 }}", "url": "/shop/a", "parent_label": "Shop"},
+				{"label": "About us", "url": "/about-us"},
+			]
+		)
+		nav = jinja_api.wk_header("en")
 		self.assertIn("<details", nav)
 		self.assertIn("<summary", nav)
 		self.assertIn(">Shop</summary>", nav)
 		self.assertIn("/shop/a", nav)
-		self.assertIn(">About</a>", nav)
+		self.assertIn(">About us</a>", nav)
 		self.assertNotIn("49", nav)
 		self.assertNotIn("{{", nav)
+		context = {
+			"wk": {"brand_name": "Brand"},
+			"url_prefix": "",
+			"footer_items": [
+				frappe._dict(label="Legal", url="/legal", child_items=[frappe._dict(label="Terms", url="/terms")]),
+			],
+		}
 		footer = frappe.get_doc("Web Template", "WK Footer").render(context)
 		self.assertIn("Legal", footer)
 		self.assertIn(">Terms</a>", footer)
+
+	def test_the_header_function_escapes_the_brand(self):
+		from website_kit import jinja_api
+
+		doc = frappe.get_doc(SETTINGS)
+		original = doc.brand_name
+		self.addCleanup(lambda: frappe.db.set_single_value(SETTINGS, "brand_name", original or ""))
+		frappe.db.set_single_value(SETTINGS, "brand_name", "{{ 7*7 }} <b>")
+		frappe.clear_document_cache(SETTINGS, SETTINGS)
+		html = jinja_api.wk_header("en")
+		self.assertNotIn("49", html)
+		self.assertNotIn("<b>", html)
+		self.assertNotIn("{{", html)
+		self.assertIn("&lt;b&gt;", html)
 
 	def test_invalid_overrides_are_rejected(self):
 		doc = frappe.get_doc(SETTINGS)
@@ -309,7 +346,6 @@ class TestWebsiteKitSettings(TestCase):
 		brand = "{{ 7*7 }} <b>"
 		context = {
 			"wk": {"brand_name": escape.esc(brand)},
-			"top_bar_items": [frappe._dict(label="{{ 7*7 }}", url="/about")],
 			"footer_items": [frappe._dict(label="<i>", url="/x")],
 			"copyright": "{{ 7*7 }} & Co",
 			"footer_address": "{% if 1 %}x{% endif %}",

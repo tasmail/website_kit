@@ -43,7 +43,7 @@ What exists:
 
 What does not exist yet: the "Public website" switch, and any deployment. These are planned in the analysis `docs/site-default-theme-analysis.md` of `tasmail/erpnext-infra`.
 
-Public pages keep Frappe's prebuilt `website.bundle.css` and add `wk.css` and the generated `wk-theme.css` (and `wk-shop.css` on shop pages). Measured on a Frappe 15.128.0 bench (raw / gzip): `wk.css` 7.5 KB / 1.8 KB, `wk-theme.css` of the `clear` preset 3.2 KB / 1.0 KB, `wk-shop.css` 5.4 KB / 1.6 KB; on `/all-products` with ten samples the three together are 4.4 KB gzip (the page is 4.5 KB heavier than the same page with them removed). The CI job prints the sizes of the first two on every run.
+Public pages keep Frappe's prebuilt `website.bundle.css` and add `wk.css` and the generated `wk-theme.css` (and `wk-shop.css` on shop pages). Measured on a Frappe 15.128.0 bench (raw / gzip): `wk.css` 10.6 KB / 2.7 KB, `wk-theme.css` of the `clear` preset 3.2 KB / 1.0 KB, `wk-shop.css` 4.6 KB / 1.7 KB; the three together are 5.4 KB gzip on a shop page (release 0.3.0: 4.4 KB). The stock navbar also writes two inline scripts into the page: the file-uploader guard (0.55 KB raw, 0.3 KB gzip, on every stock page) and, on shop pages in a language other than English, the Webshop strings (3.0 KB raw, 1.3 KB gzip for Ukrainian). The rest of a stock page, the 330 KB of HTML with its icon sprites included, is Frappe's and Webshop's own. The CI job prints the sizes of the first two files on every run.
 
 Not verified: behaviour with the real Webshop (a stand-in of its two DocTypes is used in the tests), a real reCAPTCHA call,
 Frappe 16, Builder newer than 1.36.6, Lighthouse.

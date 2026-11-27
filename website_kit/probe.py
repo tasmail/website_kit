@@ -152,10 +152,32 @@ def http_cache_check() -> None:
 	response = admin.post("/api/method/login", data={"usr": "Administrator", "pwd": "admin"}, base_url=f"http://{site}")
 	assert response.status_code == 200, "login failed"
 	path = "/" + route
+
+	def page(client, target):
+		return client.get(target, base_url=f"http://{site}", buffered=True).get_data(as_text=True)
+
+	def header_of(body):
+		match = re.search(r'<header class="wk-header">.*?</header>', body, re.S)
+		assert match, "the page has no kit header"
+		return match.group(0)
+
+	def sheets(body):
+		return re.findall(
+			r'<link[^>]*rel="stylesheet"[^>]*href="([^"]+)"|<link[^>]*href="([^"]+)"[^>]*rel="stylesheet"', body
+		)
+
 	fetch(guest, path)  # warm the cache
 	response, links = fetch(guest, path)
 	assert response.headers.get("X-From-Cache") == "True", "the page cache is off: set developer_mode to 0"
 	assert links == [theme_url], links
+	# Every kit stylesheet is linked once (the navbar must not repeat what head_include already carries), and the header is the
+	# same for a guest, for the cached copy and for a signed-in user: Frappe caches a page by path and language only.
+	cached_body = page(guest, path)
+	hrefs = [a or b for a, b in sheets(cached_body)]
+	assert len(hrefs) == len(set(hrefs)), f"a stylesheet is linked twice: {hrefs}"
+	admin_body = page(admin, path)
+	assert header_of(admin_body) == header_of(cached_body), "the header differs between a guest and a signed-in user"
+	assert header_of(page(guest, path)) == header_of(cached_body), "the cached header changed after a signed-in visit"
 	response, links = fetch(admin, path + "?wk_safe=1")
 	assert response.headers.get("X-From-Cache") in (None, "False"), "a safe-mode page came from the cache"
 	assert links == [safe_url], links

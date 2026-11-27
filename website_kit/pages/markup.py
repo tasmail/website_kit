@@ -138,7 +138,7 @@ def _protect(value):
 	if isinstance(value, str):
 		return value.replace("{", "\u0000L").replace("}", "\u0000R")
 	if isinstance(value, dict):
-		return {key: _protect(item) for key, item in value.items()}
+		return {_protect(key): _protect(item) for key, item in value.items()}
 	if isinstance(value, list):
 		return [_protect(item) for item in value]
 	return value

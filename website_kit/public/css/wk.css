@@ -2,6 +2,64 @@
  * Every value comes from the --wk-* custom properties that the generated per-site file defines (docs/theming.md).
  * Classes carry the wk- prefix, so Frappe forms and the Desk are left alone. Logical properties keep RTL possible. */
 
+/* Frappe's design variables point at the kit tokens on every page that loads the kit: Webshop's markup, the login and
+ * update-password pages, the 404 page and the breadcrumb are written against them (`var(--gray-800)`, even in inline styles), so a
+ * dark or high-contrast preset restyles the stock markup without light text on a white card or grey text under 4.5:1. */
+:root {
+	--bg-color: var(--wk-color-bg);
+	--fg-color: var(--wk-color-bg);
+	--card-bg: var(--wk-card-bg);
+	--control-bg: var(--wk-color-bg);
+	--white: var(--wk-color-bg);
+	--gray-50: var(--wk-color-surface);
+	--gray-100: var(--wk-color-surface);
+	--fg-hover-color: var(--wk-color-surface);
+	--btn-default-bg: var(--wk-color-surface);
+	--btn-default-hover-bg: var(--wk-color-surface);
+	--blue-50: var(--wk-color-surface);
+	--gray-200: var(--wk-color-border);
+	--gray-300: var(--wk-color-border);
+	--border-color: var(--wk-color-border);
+	--dark-border-color: var(--wk-color-border);
+	--gray-400: var(--wk-color-muted);
+	--gray-500: var(--wk-color-muted);
+	--gray-600: var(--wk-color-muted);
+	--text-muted: var(--wk-color-muted);
+	--text-light: var(--wk-color-muted);
+	--gray-700: var(--wk-color-text);
+	--gray-800: var(--wk-color-text);
+	--gray-900: var(--wk-color-text);
+	--text-color: var(--wk-color-text);
+	--heading-color: var(--wk-color-text);
+	--primary: var(--wk-color-primary);
+	--btn-primary: var(--wk-color-primary);
+	--blue-500: var(--wk-color-link);
+	--blue-600: var(--wk-color-link);
+	--blue-700: var(--wk-color-link);
+	--border-radius: var(--wk-radius-sm);
+	--border-radius-md: var(--wk-radius-md);
+	--border-radius-lg: var(--wk-radius-lg);
+	--card-border-radius: var(--wk-radius-md);
+	--product-bg-color: var(--wk-card-bg);
+	--body-bg-color: var(--wk-color-bg);
+}
+
+/* Bootstrap's colour utilities are !important and fixed (#6c757d is 4.1:1 on white), so the muted text takes the token the same way. */
+.text-muted { color: var(--wk-color-muted) !important; }
+
+/* Frappe's login card is `#fff` in login.bundle.css (a constant, not a variable): on a dark preset the light text sat on white (2.2:1). */
+.for-login .page-card,
+.for-forgot .page-card,
+.for-login-with-email-link .page-card,
+.for-signup .page-card,
+.for-email-login .page-card {
+	background-color: var(--wk-card-bg);
+	color: var(--wk-color-text);
+}
+
+/* The current breadcrumb is a Sass constant of the website bundle (#7c7c7c, 4.17:1 on white), not a variable. */
+.breadcrumb-item.active { color: var(--wk-color-muted); }
+
 body {
 	background: var(--wk-color-bg);
 	color: var(--wk-color-text);
@@ -23,15 +81,19 @@ h3 { font-size: calc(1rem * var(--wk-heading-scale)); }
 
 a { color: var(--wk-color-link); }
 
+/* !important: Webshop's `.btn:focus { outline: none }` and Bootstrap's focus shadows would otherwise hide the keyboard ring. */
 :focus-visible {
-	outline: max(2px, var(--wk-border-width)) solid var(--wk-color-accent);
+	outline: max(2px, var(--wk-border-width)) solid var(--wk-color-accent) !important;
 	outline-offset: 2px;
 }
 
 /* Stock Bootstrap pieces on the public website follow the tokens. */
 .btn-primary,
+.btn.btn-primary,
 .btn-primary:hover,
-.btn-primary:focus {
+.btn.btn-primary:hover,
+.btn-primary:focus,
+.btn.btn-primary:focus {
 	background-color: var(--wk-color-primary);
 	border-color: var(--wk-color-primary);
 	border-radius: var(--wk-button-radius);
@@ -73,14 +135,14 @@ a { color: var(--wk-color-link); }
 /* Header and menu */
 .wk-header {
 	background: var(--wk-header-bg);
+	position: relative; /* the open narrow menu is a panel under the bar */
 	border-block-end: var(--wk-border-width) solid var(--wk-header-border);
 	color: var(--wk-header-fg);
 }
 
 .wk-header__inner {
 	align-items: center;
-	position: relative; /* the invisible menu checkbox is positioned against it */
-	display: flex;
+		display: flex;
 	flex-wrap: wrap;
 	gap: var(--wk-space-unit) calc(var(--wk-space-unit) * 3);
 	justify-content: space-between;
@@ -236,46 +298,57 @@ a { color: var(--wk-color-link); }
 	.wk-skip-link { transition: none; }
 }
 
-/* Collapsed menu on narrow screens: a checkbox and a label, no JavaScript. */
-.wk-header__toggle,
-.wk-header__burger { display: none; }
+/* Collapsed menu on narrow screens: a native details/summary disclosure, no checkbox and no JavaScript (Enter and Space work, the
+ * open state is exposed to assistive technology). The header writes the menu twice: `--narrow` inside the disclosure and `--wide`
+ * outside it; exactly one of the two is shown at any width. */
+.wk-header__menu { display: none; }
+
+.wk-header__burger {
+	align-items: center;
+	block-size: 44px;
+	border: var(--wk-border-width) solid var(--wk-header-border);
+	border-radius: var(--wk-radius-sm);
+	cursor: pointer;
+	display: inline-flex;
+	inline-size: 44px;
+	justify-content: center;
+	list-style: none;
+}
+
+.wk-header__burger::-webkit-details-marker { display: none; }
+.wk-header__burger::marker { content: ""; }
+
+.wk-header__burger span,
+.wk-header__burger span::before,
+.wk-header__burger span::after {
+	background: var(--wk-header-fg);
+	block-size: 2px;
+	content: "";
+	display: block;
+	inline-size: 20px;
+	position: relative;
+}
+
+.wk-header__burger span::before { inset-block-start: -6px; position: absolute; }
+.wk-header__burger span::after { inset-block-start: 6px; position: absolute; }
+
+.wk-header__nav--narrow {
+	align-items: stretch;
+	background: var(--wk-header-bg);
+	border-block-end: var(--wk-border-width) solid var(--wk-header-border);
+	display: flex;
+	flex-direction: column;
+	inset-block-start: 100%;
+	inset-inline: 0;
+	padding: var(--wk-space-unit) calc(var(--wk-space-unit) * 2) calc(var(--wk-space-unit) * 2);
+	position: absolute; /* a panel under the bar: opening the menu does not push the page down */
+	z-index: 100;
+}
+
+.wk-header__nav--narrow .wk-menu { flex-direction: column; }
+.wk-header__nav--narrow .wk-menu__sub { border: 0; padding-inline-start: calc(var(--wk-space-unit) * 2); position: static; }
 
 @media (max-width: 48em) {
-	.wk-header__toggle {
-		block-size: 44px;
-		display: block;
-		inline-size: 44px;
-		margin: 0;
-		opacity: 0;
-		position: absolute;
-		inset-inline-end: calc(var(--wk-space-unit) * 2);
-	}
-
-	.wk-header__burger {
-		block-size: 44px;
-		border: var(--wk-border-width) solid var(--wk-header-border);
-		border-radius: var(--wk-radius-sm);
-		cursor: pointer;
-		display: inline-flex;
-		align-items: center;
-		justify-content: center;
-		inline-size: 44px;
-	}
-
-	.wk-header__burger span,
-	.wk-header__burger span::before,
-	.wk-header__burger span::after {
-		background: var(--wk-header-fg);
-		block-size: 2px;
-		content: "";
-		display: block;
-		inline-size: 20px;
-		position: relative;
-	}
-
-	.wk-header__burger span::before { inset-block-start: -6px; position: absolute; }
-	.wk-header__burger span::after { inset-block-start: 6px; position: absolute; }
-	.wk-header__toggle:focus-visible + .wk-header__burger { outline: max(2px, var(--wk-border-width)) solid var(--wk-color-accent); outline-offset: 2px; }
-	.wk-header__nav { display: none; flex-basis: 100%; }
-	.wk-header__toggle:checked ~ .wk-header__nav { display: flex; flex-direction: column; align-items: stretch; }
+	.wk-header__menu { display: block; }
+	.wk-header__nav--wide { display: none; }
 }

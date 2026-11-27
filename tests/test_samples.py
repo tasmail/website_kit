@@ -84,12 +84,42 @@ def test_the_shop_stylesheet_is_scoped_to_the_shop_pages():
 	"""Every rule is under the body class `wk-shop`, which the kit adds only on the Webshop pages, so no other page is restyled."""
 	css = (ROOT / "website_kit/public/css/wk-shop.css").read_text(encoding="utf-8")
 	body = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
-	selectors = [s.strip() for block in re.findall(r"([^{}]+)\{", body) for s in block.split(",")]
-	assert selectors and all(s.startswith((".wk-shop ", "body.wk-shop", "@media")) for s in selectors), selectors
-	assert re.search(
-		r"\.wk-shop \.text-muted\s*\{\s*color:\s*var\(--wk-color-muted\)\s*!important", body
-	)  # Bootstrap's utility is !important
+	blocks = [block for block in re.findall(r"([^{}]+)\{", body) if not block.strip().startswith("@media")]
+	selectors = [s.strip() for block in blocks for s in block.split(",")]
+	assert selectors and all(s.startswith((".wk-shop ", "body.wk-shop")) for s in selectors), selectors
 	assert "url(" not in body and "@import" not in body and "@font-face" not in body
-	# the main job is to point Frappe's design variables at the kit tokens, so inline `var(--gray-800)` in Webshop's markup follows the preset
-	for variable in ("--text-color", "--gray-800", "--border-color", "--bg-color", "--primary"):
-		assert re.search(rf"{variable}:\s*var\(--wk-", body), variable
+	# the variable remap moved to wk.css (`:root`): the shop sheet does not repeat it
+	assert "--gray-800" not in body and "--text-muted" not in body
+
+
+def test_group_and_unit_names_follow_the_site_language():
+	assert (samples.group_name("uk"), samples.uom_name("uk")) == ("Зразки", "шт")
+	assert (samples.group_name("uk-UA"), samples.uom_name("uk-UA")) == ("Зразки", "шт")
+	for lang in ("en", "de", "", None):
+		assert (samples.group_name(lang), samples.uom_name(lang)) == ("Sample", "Nos"), lang
+
+
+def test_the_unit_is_tagged_like_every_other_record_the_kit_creates():
+	"""A "шт" unit made for the samples must be removed with them; the source lists UOM among the tagged doctypes."""
+	source = (ROOT / "website_kit/shop.py").read_text(encoding="utf-8")
+	assert re.search(r'TAGGED = \((?=[^)]*"UOM")', source)
+	assert "samples.uom_name" in source and '"stock_uom": "Nos"' not in source
+
+
+def test_the_shop_link_colour_does_not_reach_the_header_and_footer():
+	"""`.wk-shop a:not(.btn)` outranks `.wk-menu__link` and `.wk-footer a`, so the menu turned blue on shop pages (and the footer
+	link unreadable on a dark footer); the link colour is scoped to the page content."""
+	css = (ROOT / "website_kit/public/css/wk-shop.css").read_text(encoding="utf-8")
+	assert not re.search(r"(?m)^\.wk-shop a:not\(\.btn\)", css)
+	assert re.search(
+		r"(?m)^\.wk-shop \.page-content-wrapper a:not\(\.btn\)\s*\{\s*color:\s*var\(--wk-color-link\)", css
+	)
+
+
+def test_an_empty_product_container_does_not_get_the_card_look():
+	"""Webshop prints an empty `.product-container` below a product without specifications, custom content or reviews."""
+	css = (ROOT / "website_kit/public/css/wk-shop.css").read_text(encoding="utf-8")
+	rule = re.search(r"\.wk-shop \.product-container:not\(:has\(\.product-page-content > \*\)\)\s*\{([^}]*)\}", css)
+	assert rule and "border: 0" in rule.group(1) and "box-shadow: none" in rule.group(1)
+	card = css.index(".wk-shop .list-row,\n.wk-shop .product-container")
+	assert card < css.index(rule.group(0)), "the plain rule must come after the card rule to win"

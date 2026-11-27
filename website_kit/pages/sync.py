@@ -53,7 +53,7 @@ def current_fields(kind: str, name: str) -> dict:
 		return {
 			"page_title": doc.page_title,
 			"route": doc.route,
-			"language": doc.language,
+			"language": doc.language or "",
 			"meta_description": doc.meta_description,
 			"blocks": _normalized(doc.blocks),
 			"head_html": doc.head_html or "",

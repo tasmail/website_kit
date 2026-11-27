@@ -1,0 +1,53 @@
+# Strings that Webshop's scripts translate in the browser (`__(...)` in the JavaScript of the shop pages; the Desk scripts are left out).
+# Frappe loads no translations into website pages, so the kit hands these over as one JSON block (website_kit/stockpage.py).
+Add to Cart
+Add to Quote
+Available on backorder
+Cannot find a matching Item. Please select some other value for {0}.
+Cart is Empty
+Categories
+Clear
+Clear Values
+Clear values
+Contact Us
+Continue Selection
+Discounts
+Email
+Enter value betweeen {0} and {1}
+Explore
+Full Name
+Go to Cart
+Go to Quote
+In stock
+Item Code
+Loading...
+Message
+Next
+No products found
+No searches yet.
+Not in stock
+Note
+OFF
+Organization Name
+Out of stock
+Pay Remaining
+Phone Number
+Prev
+Recent
+Review Submitted
+Search for Products
+Select Variant
+Select Variant for {0}
+Send
+Something went wrong!
+Something went wrong. Please refresh or contact us.
+Sorry, something went wrong. Please refresh.
+Subject
+Submit
+Submitting Review ...
+Thank you for submitting your review
+Value must be between {0} and {1}
+Wishlist is empty !
+Write a Review
+{0} item found.
+{0} items found.

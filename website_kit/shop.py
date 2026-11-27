@@ -12,7 +12,7 @@ from frappe import _
 
 from . import samples, shop_menu
 
-TAGGED = ("Item", "Item Group", "Item Price", "Website Item")
+TAGGED = ("Item", "Item Group", "Item Price", "Website Item", "UOM")
 MENU_MARKER = "website_kit_shop_menu_added"
 # What Webshop Settings holds on a fresh site; the kit sets its own values only where the customer has not changed them.
 WEBSHOP_DEFAULTS = {"show_price": 0, "products_per_page": 6, "enable_field_filters": 0}
@@ -264,17 +264,23 @@ def tag_fields_exist() -> bool:
 
 def _create_samples(price_list: str, written: list) -> int:
 	tag = {samples.TAG_FIELD: 1}
-	if not frappe.db.exists("Item Group", samples.ITEM_GROUP):
+	lang = site_language()
+	group, uom = samples.group_name(lang), samples.uom_name(lang)
+	# A group or unit that already exists (the customer's own, or ERPNext's) is used as it is and never tagged, so removal leaves it.
+	if not frappe.db.exists("Item Group", group):
 		frappe.get_doc(
 			{
 				"doctype": "Item Group",
-				"item_group_name": samples.ITEM_GROUP,
+				"item_group_name": group,
 				"parent_item_group": "All Item Groups",
 				"is_group": 0,
 				**tag,
 			}
 		).insert(ignore_permissions=True)
-	lang = site_language()
+	if not frappe.db.exists("UOM", uom):
+		frappe.get_doc({"doctype": "UOM", "uom_name": uom, "enabled": 1, "must_be_whole_number": 1, **tag}).insert(
+			ignore_permissions=True
+		)
 	created = 0
 	for entry in samples.ITEMS:
 		code = samples.item_code(entry[0])
@@ -286,8 +292,8 @@ def _create_samples(price_list: str, written: list) -> int:
 				"doctype": "Item",
 				"item_code": code,
 				"item_name": name,
-				"item_group": samples.ITEM_GROUP,
-				"stock_uom": "Nos",
+				"item_group": group,
+				"stock_uom": uom,
 				"is_stock_item": 0,
 				"is_sales_item": 1,
 				"is_purchase_item": 0,
@@ -312,7 +318,7 @@ def _create_samples(price_list: str, written: list) -> int:
 				"doctype": "Website Item",
 				"item_code": item.name,
 				"web_item_name": name,
-				"item_group": samples.ITEM_GROUP,
+				"item_group": group,
 				"published": 1,
 				"website_image": image,
 				"thumbnail": image,  # an SVG has no raster thumbnail; naming one keeps Webshop from trying to make it
@@ -344,10 +350,10 @@ def _picture(entry: tuple, lang: str, item_name: str, written: list) -> str:
 
 
 def remove_samples() -> dict:
-	"""Delete exactly the tagged records and the files the kit made for them; an item that a document uses is kept and named."""
+	"""Delete exactly the tagged records and the files the kit made for them; an item, group or unit that a document uses is kept and named."""
 	_require_shop()
 	files = sample_files()  # chosen first: they are found through the records that are deleted below
-	removed = {"Website Item": 0, "Item Price": 0, "Item": 0, "Item Group": 0, "File": 0}
+	removed = {"Website Item": 0, "Item Price": 0, "Item": 0, "Item Group": 0, "UOM": 0, "File": 0}
 	kept = []
 	for doctype in ("Website Item", "Item Price"):
 		for name in tagged(doctype):
@@ -359,10 +365,17 @@ def remove_samples() -> dict:
 			removed["Item"] += 1
 		except frappe.LinkExistsError:
 			kept.append(name)
-	for name in tagged("Item Group"):
-		if not kept and not frappe.db.exists("Item", {"item_group": name}):
-			frappe.delete_doc("Item Group", name, ignore_permissions=True, force=True)
-			removed["Item Group"] += 1
+	# The group and the unit are the kit's own only while nothing links to them. They are deleted without `force`, so Frappe's link
+	# check runs over every link field (a customer's item, price, conversion factor, invoice line ...); one that is used is kept and named.
+	for doctype in ("Item Group", "UOM"):
+		for name in tagged(doctype):
+			if kept:
+				continue
+			try:
+				frappe.delete_doc(doctype, name, ignore_permissions=True)
+				removed[doctype] += 1
+			except frappe.LinkExistsError:
+				kept.append(f"{doctype}: {name}")
 	if kept:
 		kept_files = set(sample_files())
 		files = [name for name in files if name not in kept_files]

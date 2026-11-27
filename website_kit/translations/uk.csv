@@ -17,8 +17,6 @@ Theme file,Файл теми
 The brand name is too long (at most 140 characters).,Назва бренду задовга (щонайбільше 140 символів).
 Invalid theme settings: {0},Некоректні налаштування теми: {0}
 Skip to content,Перейти до вмісту
-Home,Головна
-Main menu,Головне меню
 !important is only meant for --wk-* properties; it makes the rule hard to override.,!important призначений лише для властивостей --wk-*: через нього правило важко перевизначити.
 '!' is only allowed as !important at the end of a value.,'!' дозволено лише як !important в кінці значення.
 '{0}' is never closed.,'{0}' не закрито.
@@ -248,7 +246,6 @@ reCAPTCHA keys readable,Ключі reCAPTCHA читаються
 Contact form status,Стан форми зв'язку
 "Whether the contact form is shown, and why not.","Чи показується форма зв'язку, а якщо ні, то чому."
 "Enter one plain e-mail address, without a name or a list.","Введіть одну звичайну електронну адресу, без імені чи списку."
-Menu,Меню
 Add a new address,Додати нову адресу
 Add notes,Додати примітки
 Add to Cart,Додати в кошик
@@ -338,3 +335,11 @@ Your cart is Empty,Ваш кошик порожній
 Page Not Found,Сторінку не знайдено
 Cart,Кошик
 Orders,Замовлення
+Submitting Review ...,Надсилаємо відгук ...
+{0} item found.,Знайдено: {0}.
+{0} items found.,Знайдено: {0}.
+Email,Електронна пошта,Webshop page
+Full Name,Повне ім'я,Webshop page
+Message,Повідомлення,Webshop page
+Send,Надіслати,Webshop page
+Submit,Надіслати,Webshop page

@@ -169,21 +169,76 @@ Selectors on internal classes (such as the parts of the header) or on Frappe and
 
 ## Shop styling
 
-While Webshop is on, the kit adds the body class `wk-shop` and one more stylesheet, `/assets/website_kit/css/wk-shop.css` (5.4 KB raw, 1.6 KB
-gzip), on the Webshop pages only: the catalogue and its sub-routes, search, cart, orders, wishlist, checkout and the product pages. Webshop's
-markup is written against Frappe's design variables (`var(--gray-800)` even in inline styles), so the stylesheet points those variables
-(`--text-color`, `--gray-*`, `--border-color`, `--bg-color`, `--primary`, ...) at the kit tokens on the `wk-shop` body, plus a few rules for the card
-variant, radii and fonts. A preset, including the dark one, therefore re-skins the stock markup without light text on a white card. It
-adds no layout rules: Frappe's `website.bundle.css` and Webshop's bundle stay in charge of the layout, which is why the kit keeps the stock
-`Standard` Website Theme. That markup is outside the contract above, so a Webshop release can change it; CI renders the pages in Chrome
-under every preset (`scripts/shop_layout_check.mjs`) and fails on a layout change.
+While Webshop is on, the kit adds the body class `wk-shop` and one more stylesheet, `/assets/website_kit/css/wk-shop.css`, on the Webshop
+pages only: the catalogue and its sub-routes, search, cart, orders, wishlist, checkout and the product pages. Webshop's markup is written
+against Frappe's design variables (`var(--gray-800)` even in inline styles), so `wk.css` points those variables (`--text-color`,
+`--text-muted`, `--gray-*`, `--border-color`, `--bg-color`, `--primary`, ...) at the kit tokens on `:root`, on every page that loads the
+kit: the login page, the 404 page and the breadcrumb read them too, and Bootstrap's `!important` `.text-muted` takes the muted token. A
+preset, including the dark one, therefore re-skins the stock markup without light text on a white card or grey text under 4.5:1.
+`wk-shop.css` adds a few rules for the card variant, radii, fonts and the 44 px grid/list toggles. It adds no layout rules: Frappe's
+`website.bundle.css` and Webshop's bundle stay in charge of the layout, which is why the kit keeps the stock `Standard` Website Theme. That
+markup is outside the contract above, so a Webshop release can change it; CI renders the pages in Chrome under every preset
+(`scripts/shop_layout_check.mjs`: layout, contrast, the header on every page) and fails on a change.
 
-The login page is Frappe's own template and does not load the kit head; it keeps the stock Frappe styling (with the stock base stylesheet).
+The keyboard focus ring (`:focus-visible`) is `!important`: Webshop's `.btn:focus { outline: none }` would otherwise hide it.
 
-Sample products carry the hidden field `website_kit_sample`; "Remove sample products" deletes exactly the tagged records and the pictures
-named `wk-sample-...svg`. They are created in the site language (System Settings), in Ukrainian or English.
+## Stock pages and the navbar
+
+Frappe's own pages (login, update-password, signup, 404, search, orders, `/me`) are not Builder pages. Some of them (login) replace the
+whole `head_include` block, so the kit's stylesheet links never reach them from the head. The WK Navbar template therefore emits the links
+itself (`wk.css`, the generated token file and, on shop pages, `wk-shop.css`) together with two small inline scripts:
+
+- the **file-uploader guard**: Frappe's website bundle calls `frappe.require("file_uploader.bundle.js")` on every page, and
+  `frappe.boot.assets_json` does not exist on a website page, so the call ended in an uncaught promise rejection. The guard skips exactly
+  that one call while the asset map is missing; every other `frappe.require` goes through;
+- the **Webshop strings** (shop pages in a language other than English only): Frappe 15 loads no translations into website pages, so the
+  `__("Add to Cart")` calls of Webshop's scripts stayed English. The server translates the strings listed in
+  `translations/webshop_js_sources.txt` and the inline script merges them into `frappe._messages` as one JSON object (Frappe drops the
+  attributes of script tags in a web template, so a separate `application/json` block is not possible). A `uk.csv` row with the context
+  `Webshop page` wins over Frappe's translation of the same word on a shop page only ("Submit" is "Провести" in the Desk). Strings that
+  nobody translates stay English.
+
+Both scripts are inline, so the number of script files of the Builder pages stays at zero.
+
+## One header
+
+The header is one function (`wk_header`, `website_kit/pages/header.py`) that both the Builder pages and the stock navbar call, so a visitor
+sees the same menu on the home page, the shop, the login page and the 404 page: the kit pages that exist (Home, About, Contact), the
+top bar items of Website Settings (the shop entry only while the shop has a published product), the other language when its home page
+exists, and one account link to `/login?redirect-to=/me` (a guest gets the login form, a signed-in user goes on to `/me`; a static link: Frappe caches pages by path and language only, so the header cannot depend on who is signed in). On a stock page the language is the request language when the kit has texts for it, else English.
+
+On the Builder pages the header is a single raw block; its markup is the function's, so the menu there is no longer edited block by
+block in Builder: change the menu in Website Settings, the labels of the kit pages in `pages/content.py`.
 
 ## Header on narrow screens
 
-Below 48 em the header menu is collapsed behind a burger button. It is a checkbox and a label (no JavaScript, keyboard operable with Space,
-a visible focus ring); the screen reader announces it as the checkbox "Menu". At 48 em and wider the menu is always open.
+Below 48 em the header menu is collapsed behind a burger button. It is a native `<details>` element with a `<summary>` (no JavaScript, no
+checkbox): Enter and Space open and close it, the open state is exposed to assistive technology, the burger has an accessible name
+("Menu") and a visible focus ring, and the open menu is a panel under the bar. The menu is written twice in the markup, once inside the
+disclosure and once as a plain `<nav>`; the stylesheet shows exactly one of them at any width, so a screen reader never meets it twice.
+At 48 em and wider the menu is always open. Escape does not close the disclosure: that would need a script, and the kit's budget for
+the Builder pages is zero script files. Activating the burger again closes it.
+
+## Sample products
+
+Sample products carry the hidden field `website_kit_sample`; "Remove sample products" deletes exactly the tagged records and the pictures
+named `wk-sample-...svg`. They are created in the site language (System Settings), in Ukrainian or English, including the item group
+(`Зразки` / `Sample`) and the unit (`шт` / `Nos`); a group or unit that already exists is used and left alone, and one the kit creates
+is tagged and removed with the samples. Samples loaded by an earlier release keep their English group and unit: use *Remove sample
+products*, then *Load sample products* to get the translated ones.
+
+## Known limits of the stock pages
+
+- Webshop's search is a JavaScript call and a POST. A link such as `/all-products?search=mug` is ignored by Webshop; the kit does not
+  add that behaviour.
+- A visitor sees no "Add to Cart" or "Add to Quote" button on a sample product. That is Webshop's rule: the button needs a price and
+  either stock or the Webshop Settings option "Allow items not in stock", and the samples are non-stock items on purpose (they leave
+  no stock or accounting entries). The kit does not switch that option on; enable it in Webshop Settings to let visitors add the
+  samples to the cart.
+- The catalogue opens in the grid or list view Webshop chooses (its setting, not the kit's).
+- Page weight on a shop page is the sum of Frappe's and Webshop's own bundles and the kit's files; the kit's part (three stylesheets
+  and the inline scripts) is listed in the README.
+- Escape does not close the narrow-screen menu (see above).
+- The Webshop strings are merged into `frappe._messages` by an inline script. The branches `version-15` and `version-16` of Frappe
+  leave that object alone afterwards; on Frappe `develop` the base template resets it after the script, so the strings would be lost
+  there (not supported by this release).
