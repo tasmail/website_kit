@@ -8,6 +8,7 @@ disclosure (that would need script); a second activation of the summary does.
 Everything from the site goes through `esc` (HTML escape plus brace encoding), URLs through `link_url`.
 """
 
+import re
 from urllib.parse import urlsplit
 
 from ..theme.escape import esc, safe_url
@@ -16,23 +17,29 @@ from .content import TEXT, URLS
 KIT_PAGES = (("home", "menu_home"), ("about", "menu_about"), ("contact", "menu_contact"))
 KIT_KEYS = tuple(key for key, _ in KIT_PAGES)
 LINK_PREFIXES = ("http://", "https://", "mailto:", "tel:")
+SCHEME = re.compile(r"[A-Za-z][A-Za-z0-9+.-]*:")
 
 
 def link_url(url) -> str:
-	"""A menu target that is safe to put into `href`: a site path, an anchor, or an http(s), mailto or tel link; else empty."""
+	"""A menu target that is safe to put into `href`, normalised like Frappe's `abs_url` for the forms the old navbar took.
+
+	A route name such as `shop` becomes `/shop`; a path and an anchor stay; an http(s), mailto or tel link stays; spaces are
+	encoded. Any other scheme (`javascript:`, `data:`, `vbscript:`, `file:`, ...), a control character or a backslash gives an empty
+	string, which drops the item."""
 	text = "" if url is None else str(url).strip()
-	if any(char in text for char in "\x00\r\n\t<>\\ "):
+	if not text or "\\" in text or any(ord(char) < 32 or ord(char) == 127 for char in text):
 		return ""
-	if text.startswith("/") and not text.startswith("//"):
-		return text
-	if text.startswith("#") or text.lower().startswith(LINK_PREFIXES):
-		return text
-	return ""
+	if SCHEME.match(text):
+		if not text.lower().startswith(LINK_PREFIXES):
+			return ""
+	elif not text.startswith(("/", "#")):
+		text = "/" + text
+	return text.replace(" ", "%20")
 
 
 def _path(url) -> str:
 	"""The comparable path of a same-site URL (`/` for the home page); empty for an external link."""
-	parts = urlsplit(str(url or "").strip())
+	parts = urlsplit(link_url(url))
 	if parts.netloc or parts.scheme:
 		return ""
 	return "/" + parts.path.strip().strip("/").lower() if parts.path.strip() else ""
@@ -88,9 +95,7 @@ def _nav(variant, label, items, switch, login) -> str:
 	)
 
 
-def inner(
-	*, lang, published, other_available, site_items, logged_in, hide_login, brand_html, logo_url, **_ignored
-) -> str:
+def inner(*, lang, published, other_available, site_items, hide_login, brand_html, logo_url, **_ignored) -> str:
 	"""The markup inside `<header class="wk-header">`.
 
 	`published` is the set of kit page keys that exist (`home`, `about`, `contact`); `other_available` is true when the home
@@ -106,8 +111,8 @@ def inner(
 		switch = {"label": text["lang_switch"], "url": URLS["home"][code], "code": code}
 	login = ""
 	if not hide_login:
-		href, label = ("/me", text["account"]) if logged_in else ("/login", text["login"])
-		login = f'<a class="wk-button wk-button--secondary" href="{href}" rel="nofollow">{esc(label)}</a>'
+		# One static link for every visitor: Frappe caches a page by path and language only, and `/me` sends a guest to the login page.
+		login = f'<a class="wk-button wk-button--secondary" href="/me" rel="nofollow">{esc(text["account"])}</a>'
 	logo = safe_url(logo_url)
 	name = (
 		f'<img class="wk-header__logo" src="{esc(logo)}" alt="{brand_html}">'

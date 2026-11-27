@@ -410,6 +410,30 @@ class TestShop(TestCase):
 		self.assertTrue(frappe.db.exists("UOM", "шт"))
 		frappe.delete_doc("UOM", "шт", ignore_permissions=True, force=True)
 
+	def test_a_unit_or_group_that_a_customer_document_uses_is_kept_and_named(self):
+		original = frappe.db.get_single_value("System Settings", "language")
+		self.addCleanup(lambda: frappe.db.set_single_value("System Settings", "language", original))
+		frappe.db.set_single_value("System Settings", "language", "uk")
+		if frappe.db.exists("UOM", "шт") or frappe.db.exists("Item Group", "Зразки"):
+			self.skipTest("the site already has the unit or the group")
+		shop.load_samples()
+		self.assertEqual(shop.tagged("UOM"), ["шт"])
+		# a link that the old check (Item.stock_uom only) did not see: a conversion factor of the customer's
+		factor = frappe.get_doc(
+			{"doctype": "UOM Conversion Factor", "from_uom": "шт", "to_uom": "Nos", "value": 1}
+		).insert(ignore_permissions=True)
+		self.addCleanup(
+			lambda: frappe.delete_doc("UOM Conversion Factor", factor.name, force=True, ignore_permissions=True)
+		)
+		result = shop.remove_samples()
+		self.assertTrue(frappe.db.exists("UOM", "шт"), "a unit that a document links to was deleted")
+		self.assertIn("UOM: шт", result["kept"])
+		self.assertEqual(result["removed"]["Item"], len(samples.ITEMS))
+		frappe.delete_doc("UOM Conversion Factor", factor.name, force=True, ignore_permissions=True)
+		result = shop.remove_samples()
+		self.assertFalse(frappe.db.exists("UOM", "шт"))
+		self.assertEqual(result["kept"], [])
+
 	def test_the_navbar_values_carry_the_links_the_guard_and_on_shop_pages_the_strings(self):
 		shop.enable_shop()
 		frappe.clear_document_cache("Webshop Settings", "Webshop Settings")
@@ -437,7 +461,7 @@ class TestShop(TestCase):
 		self.assertIn("wk-header__burger", html)
 		self.assertEqual(html.count('href="/all-products"'), 2)  # the wide menu and the one in the disclosure
 		self.assertEqual(jinja_api.wk_header("uk"), jinja_api.wk_header("uk"))
-		self.assertNotIn("/login", jinja_api.wk_header("uk", "x"))
+		self.assertNotIn("/me", jinja_api.wk_header("uk", "x"))
 
 	def test_status_and_methods(self):
 		self.assertEqual(api.shop_status()["samples"], 0)

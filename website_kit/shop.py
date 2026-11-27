@@ -350,7 +350,7 @@ def _picture(entry: tuple, lang: str, item_name: str, written: list) -> str:
 
 
 def remove_samples() -> dict:
-	"""Delete exactly the tagged records and the files the kit made for them; an item that a document uses is kept and named."""
+	"""Delete exactly the tagged records and the files the kit made for them; an item, group or unit that a document uses is kept and named."""
 	_require_shop()
 	files = sample_files()  # chosen first: they are found through the records that are deleted below
 	removed = {"Website Item": 0, "Item Price": 0, "Item": 0, "Item Group": 0, "UOM": 0, "File": 0}
@@ -365,14 +365,17 @@ def remove_samples() -> dict:
 			removed["Item"] += 1
 		except frappe.LinkExistsError:
 			kept.append(name)
-	for name in tagged("Item Group"):
-		if not kept and not frappe.db.exists("Item", {"item_group": name}):
-			frappe.delete_doc("Item Group", name, ignore_permissions=True, force=True)
-			removed["Item Group"] += 1
-	for name in tagged("UOM"):
-		if not kept and not frappe.db.exists("Item", {"stock_uom": name}):
-			frappe.delete_doc("UOM", name, ignore_permissions=True, force=True)
-			removed["UOM"] += 1
+	# The group and the unit are the kit's own only while nothing links to them. They are deleted without `force`, so Frappe's link
+	# check runs over every link field (a customer's item, price, conversion factor, invoice line ...); one that is used is kept and named.
+	for doctype in ("Item Group", "UOM"):
+		for name in tagged(doctype):
+			if kept:
+				continue
+			try:
+				frappe.delete_doc(doctype, name, ignore_permissions=True)
+				removed[doctype] += 1
+			except frappe.LinkExistsError:
+				kept.append(f"{doctype}: {name}")
 	if kept:
 		kept_files = set(sample_files())
 		files = [name for name in files if name not in kept_files]

@@ -175,7 +175,6 @@ def test_pages_point_at_each_other_in_both_languages():
 			published={"home"},
 			other_available=True,
 			site_items=[],
-			logged_in=False,
 			hide_login=False,
 			brand_html="x",
 			logo_url="",

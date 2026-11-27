@@ -1,5 +1,6 @@
 """The one header of the site: the same markup on Builder pages and on stock pages (login, shop, 404)."""
 
+import inspect
 import json
 import re
 from html.parser import HTMLParser
@@ -15,13 +16,12 @@ NAVBAR = (PKG / "website_kit/web_template/wk_navbar/wk_navbar.html").read_text(e
 ALL_PAGES = {"home", "about", "contact"}
 
 
-def build(lang="uk", published=ALL_PAGES, other=True, site_items=(), logged_in=False, hide_login=False, logo_url=""):
+def build(lang="uk", published=ALL_PAGES, other=True, site_items=(), hide_login=False, logo_url=""):
 	return header.inner(
 		lang=lang,
 		published=published,
 		other_available=other,
 		site_items=list(site_items),
-		logged_in=logged_in,
 		hide_login=hide_login,
 		brand_html="Shop &amp; Co",
 		logo_url=logo_url,
@@ -70,13 +70,13 @@ def test_kit_pages_come_first_then_the_other_language_then_login(lang):
 		(content.URLS["about"][lang], t["menu_about"]),
 		(content.URLS["contact"][lang], t["menu_contact"]),
 		(content.URLS["home"][other], t["lang_switch"]),
-		("/login", t["login"]),
+		("/me", t["account"]),
 	]
 
 
 def test_site_items_sit_between_the_kit_pages_and_the_language_switch():
 	html = build("en", site_items=[{"label": "Shop", "url": "/all-products"}])
-	assert [text for _, text in labels(html)] == ["Home", "About", "Contact", "Shop", "Українська", "Log in"]
+	assert [text for _, text in labels(html)] == ["Home", "About", "Contact", "Shop", "Українська", "My account"]
 
 
 def test_a_site_item_that_repeats_a_kit_page_is_dropped():
@@ -99,11 +99,13 @@ def test_the_language_switch_needs_the_other_home_page():
 	assert content.URLS["home"]["en"] not in [href for href, _ in labels(build("uk", other=False))]
 
 
-def test_login_becomes_the_account_link_for_a_signed_in_user_and_can_be_hidden():
+def test_the_account_link_is_the_same_for_every_visitor_and_can_be_hidden():
+	"""Frappe caches a page by path and language only, so the header must not depend on who is signed in: one static link to `/me`,
+	which sends a guest on to the login page."""
 	t = content.TEXT["uk"]
-	assert labels(build("uk", logged_in=True))[-1] == ("/me", t["account"])
-	assert "/login" not in [href for href, _ in labels(build("uk", hide_login=True))]
-	assert "/me" not in [href for href, _ in labels(build("uk", hide_login=True, logged_in=True))]
+	assert labels(build("uk"))[-1] == ("/me", t["account"])
+	assert "logged_in" not in inspect.signature(header.inner).parameters
+	assert "/me" not in [href for href, _ in labels(build("uk", hide_login=True))]
 
 
 def test_children_of_a_site_item_are_a_details_group():
@@ -124,9 +126,54 @@ def test_site_data_is_escaped_and_braces_encoded():
 	assert "<script>" not in build("en", site_items=[{"label": "x", "url": '/x"><script>'}])
 
 
-def test_a_javascript_url_is_not_linked():
-	html = build("en", site_items=[{"label": "Bad", "url": "javascript:alert(1)"}])
-	assert "javascript:" not in html
+@pytest.mark.parametrize(
+	("url", "href"),
+	[
+		("/shop", "/shop"),
+		("shop", "/shop"),  # a route name, as Frappe's abs_url takes it
+		("about/us", "/about/us"),
+		("www.example.com", "/www.example.com"),  # abs_url does not read it as a host either
+		("/a b", "/a%20b"),
+		(" /padded ", "/padded"),
+		("#top", "#top"),
+		("https://example.com/x?a=1", "https://example.com/x?a=1"),
+		("HTTP://example.com", "HTTP://example.com"),
+		("mailto:a@b.c", "mailto:a@b.c"),
+		("tel:+380441234567", "tel:+380441234567"),
+		("//cdn.example.com/x", "//cdn.example.com/x"),
+	],
+)
+def test_the_menu_urls_that_the_old_navbar_accepted_are_still_linked(url, href):
+	assert header.link_url(url) == href
+	assert f'href="{href}"' in build("en", site_items=[{"label": "X", "url": url}])
+
+
+@pytest.mark.parametrize(
+	"url",
+	[
+		"javascript:alert(1)",
+		"JavaScript:alert(1)",
+		" javascript:alert(1)",
+		"java\tscript:alert(1)",
+		"java\nscript:alert(1)",
+		"data:text/html,<script>alert(1)</script>",
+		"vbscript:msgbox(1)",
+		"file:///etc/passwd",
+		"blob:https://x/y",
+		"\\\\host\\share",
+		"",
+		None,
+	],
+)
+def test_script_and_other_schemes_are_never_linked(url):
+	assert header.link_url(url) == ""
+	html = build("en", site_items=[{"label": "Bad", "url": url}])
+	assert "javascript" not in html.lower() and "data:" not in html and "vbscript" not in html and "Bad" not in html
+
+
+def test_a_quote_or_tag_in_a_url_cannot_leave_the_attribute():
+	html = build("en", site_items=[{"label": "x", "url": '/x"><script>alert(1)</script>'}])
+	assert "<script" not in html and "&quot;&gt;&lt;script" in html
 
 
 def test_the_brand_links_home_and_a_logo_replaces_the_name():

@@ -122,6 +122,7 @@ def update_website_context(context):
 	link = theme_link(settings, mode) if settings else ""
 	if link:
 		links += f'<link rel="stylesheet" href="{esc(link)}">'
+	route = context.get("route") or getattr(getattr(frappe.local, "request", None), "path", "")
 	shop_on = _shop_enabled() and is_shop_page(context)
 	shop_link = f"{SHOP_CSS}?v={__version__}" if shop_on else ""
 	if shop_on:
@@ -136,7 +137,9 @@ def update_website_context(context):
 			"theme_api": WK_THEME_API,
 			"mode": mode,
 			# What the navbar emits itself: Frappe's login page replaces the whole head_include block (see stockpage.py).
-			"links": stockpage.links(f"{BASE_CSS}?v={__version__}", link, shop_link),
+			"links": stockpage.links(f"{BASE_CSS}?v={__version__}", link, shop_link)
+			if stockpage.replaces_head(route)
+			else "",
 			"scripts": stockpage.scripts(guard=True, messages=webshop_messages() if shop_on else {}),
 		},
 	}

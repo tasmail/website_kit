@@ -69,8 +69,8 @@ try {
 				await openMenu(reference, `${size.width}px ${builder}`);
 			}
 			expected = await menuLinks(reference);
-			check(expected && expected.length >= 4, `${size.width}px ${builder}: the menu has ${expected ? expected.length : 0} links (home, about, contact, language, login expected)`);
-			check(expected && expected.some(([href]) => href === "/login"), `${size.width}px ${builder}: no login link`);
+			check(expected && expected.length >= 4, `${size.width}px ${builder}: the menu has ${expected ? expected.length : 0} links (home, about, contact, language, account expected)`);
+			check(expected && expected.some(([href]) => href === "/me"), `${size.width}px ${builder}: no account link`);
 			if (phone && expected && (await reference.$(".wk-header__burger"))) {
 				// Keyboard: Tab from the burger visits every link of the open menu, in order.
 				await reference.focus(".wk-header__burger");
@@ -88,8 +88,8 @@ try {
 				if (phone) await openMenu(page, `${size.width}px ${path} (${lang})`);
 				const got = await menuLinks(page);
 				// Same links, same labels, same order as the Builder page, in the same language.
-				// The login page itself has no login link (Frappe's `hide_login`); everything else must match.
-				const want = path === "/login" ? expected.filter(([href]) => href !== "/login") : expected;
+				// The login page itself has no account link (Frappe's `hide_login`); everything else must match.
+				const want = path === "/login" ? expected.filter(([href]) => href !== "/me") : expected;
 				check(JSON.stringify(got) === JSON.stringify(want), `${size.width}px ${path} (${lang}): menu ${JSON.stringify(got)} differs from ${builder}: ${JSON.stringify(want)}`);
 				if (outDir) await page.screenshot({ path: `${outDir}/header-${lang}-${path.replace(/[^a-z]+/g, "_")}-${size.width}.png` });
 				await page.close();

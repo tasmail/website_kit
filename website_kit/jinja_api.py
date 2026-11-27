@@ -157,7 +157,8 @@ def wk_header(lang="", hide_login=""):
 	"""The content of the site header, for the Builder pages (`lang` given) and the stock navbar (`lang` empty: request language).
 
 	One function for both, so the menu is the same on every page: the kit pages that exist, the site's own top bar items, the
-	other language and the login link. Pages that a signed-in user sees are never served from the guest cache.
+	other language and one static account link. The result never depends on the visitor, because Frappe caches a page by path
+	and language only.
 	"""
 	lang = _language(lang)
 	published, other_available = _published_pages(lang)
@@ -166,7 +167,6 @@ def wk_header(lang="", hide_login=""):
 		published=published,
 		other_available=other_available,
 		site_items=_site_items(),
-		logged_in=frappe.session.user != "Guest",
 		hide_login=bool(hide_login),
 		brand_html=esc(_brand_text()),
 		logo_url=frappe.get_website_settings("banner_image") or "",

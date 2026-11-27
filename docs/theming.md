@@ -205,7 +205,7 @@ Both scripts are inline, so the number of script files of the Builder pages stay
 The header is one function (`wk_header`, `website_kit/pages/header.py`) that both the Builder pages and the stock navbar call, so a visitor
 sees the same menu on the home page, the shop, the login page and the 404 page: the kit pages that exist (Home, About, Contact), the
 top bar items of Website Settings (the shop entry only while the shop has a published product), the other language when its home page
-exists, and the login or account link. On a stock page the language is the request language when the kit has texts for it, else English.
+exists, and one account link to `/me`, which sends a guest on to the login page (a static link: Frappe caches pages by path and language only, so the header cannot depend on who is signed in). On a stock page the language is the request language when the kit has texts for it, else English.
 
 On the Builder pages the header is a single raw block; its markup is the function's, so the menu there is no longer edited block by
 block in Builder: change the menu in Website Settings, the labels of the kit pages in `pages/content.py`.
@@ -239,3 +239,6 @@ products*, then *Load sample products* to get the translated ones.
 - Page weight on a shop page is the sum of Frappe's and Webshop's own bundles and the kit's files; the kit's part (three stylesheets
   and the inline scripts) is listed in the README.
 - Escape does not close the narrow-screen menu (see above).
+- The Webshop strings are merged into `frappe._messages` by an inline script. The branches `version-15` and `version-16` of Frappe
+  leave that object alone afterwards; on Frappe `develop` the base template resets it after the script, so the strings would be lost
+  there (not supported by this release).

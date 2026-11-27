@@ -40,6 +40,17 @@ GUARD_SCRIPT = """(function (f) {
 })(window.frappe);"""
 
 
+# Frappe's own pages that override `{% block head_include %}` (checked in frappe/www and webshop/www of version 15): everything the
+# kit puts into `head_include` is lost there, so the navbar links the sheets. On every other page `head_include` carries them and the
+# navbar must not repeat them.
+HEAD_REPLACED = ("login", "update-password", "error", "shop-by-category")
+
+
+def replaces_head(route) -> bool:
+	"""True for a page whose template replaces the head block, so the stylesheet links have to come from the navbar."""
+	return str(route or "").strip("/") in HEAD_REPLACED
+
+
 def links(base_css: str, theme_css: str = "", shop_css: str = "") -> str:
 	"""The stylesheet links: the base sheet, the generated token file, and the shop sheet on shop pages.
 

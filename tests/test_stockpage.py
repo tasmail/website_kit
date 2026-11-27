@@ -5,6 +5,7 @@ import re
 import shutil
 import subprocess
 import textwrap
+from pathlib import Path
 
 import pytest
 
@@ -96,3 +97,22 @@ def test_the_shop_context_wins_and_untranslated_strings_are_left_out():
 	assert found["Submit"] == "Надіслати" and "Add to Cart" in found
 	assert "Prev" not in found or found["Prev"] != "Prev"
 	assert all(source != text for source, text in found.items())
+
+
+@pytest.mark.parametrize("route", ["login", "/login", "login/", "update-password", "error", "shop-by-category"])
+def test_the_pages_that_replace_the_head_block_get_their_links_from_the_navbar(route):
+	assert stockpage.replaces_head(route)
+
+
+@pytest.mark.parametrize("route", ["", None, "about", "all-products", "cart", "wk-cache-probe", "login-help", "me"])
+def test_every_other_page_gets_the_links_from_head_include_only(route):
+	"""Both places would link every sheet twice (page weight, and the cache probe of CI counts the links)."""
+	assert not stockpage.replaces_head(route)
+
+
+def test_the_runtime_hands_the_navbar_links_only_where_the_head_is_replaced_and_always_the_guard():
+	source = (Path(__file__).resolve().parent.parent / "website_kit/runtime.py").read_text(encoding="utf-8")
+	assert "stockpage.replaces_head(" in source
+	assert re.search(r"stockpage\.scripts\(\s*guard=True,", source), (
+		"the file-uploader guard must be on for every stock page"
+	)
