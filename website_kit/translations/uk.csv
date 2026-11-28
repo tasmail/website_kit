@@ -3,27 +3,27 @@ Website Kit Settings,Налаштування Website Kit
 Preset,Готова тема
 The ready-made look of the public website.,Готовий вигляд публічного сайту.
 Brand name,Назва бренду
-Shown in the header. Empty: the app name of Website Settings.,Показується в шапці. Порожньо: назва застосунку з налаштувань вебсайту.
+"Shown in the header of the site. If empty, the name set in Website Settings is used.","Показується в шапці сайту. Якщо порожньо, використовується назва з налаштувань вебсайту."
 Search engines,Пошукові системи
 Allow search engines,Дозволити пошукові системи
-Off: the site sends X-Robots-Tag noindex and robots.txt disallows everything.,"Вимкнено: сайт надсилає X-Robots-Tag noindex, а robots.txt забороняє все."
+"Off: the site asks search engines such as Google not to list any of its pages, so it does not appear in search results. On: search engines may list the public pages.","Вимкнено: сайт просить пошукові системи, як-от Google, не показувати жодної його сторінки, тож його немає в результатах пошуку. Увімкнено: пошукові системи можуть показувати публічні сторінки."
 Advanced,Додатково
-Token overrides,Зміни токенів
-"JSON with the values that differ from the preset: {""tokens"": {""color-primary"": ""#1d4ed8""}, ""variants"": {""card"": ""raised""}}.","JSON зі значеннями, що відрізняються від готової теми: {""tokens"": {""color-primary"": ""#1d4ed8""}, ""variants"": {""card"": ""raised""}}."
+Colour and style overrides,Зміни кольорів і стилю
+"For advanced users. The values that differ from the chosen theme, written as text; the Custom theme editor fills them in for you. Example: {""tokens"": {""color-primary"": ""#1d4ed8""}, ""variants"": {""card"": ""raised""}}.","Для досвідчених користувачів. Значення, що відрізняються від вибраної теми, записані текстом; редактор власної теми заповнює їх за вас. Приклад: {""tokens"": {""color-primary"": ""#1d4ed8""}, ""variants"": {""card"": ""raised""}}."
 Custom CSS,Власний CSS
-Applied kit version,Застосована версія набору
-Theme file hash,Хеш файлу теми
-Theme file,Файл теми
+Applied Website Kit version,Застосована версія Website Kit
+Theme version code,Код версії теми
+Theme style sheet,Таблиця стилів теми
 The brand name is too long (at most 140 characters).,Назва бренду задовга (щонайбільше 140 символів).
 Invalid theme settings: {0},Некоректні налаштування теми: {0}
 Skip to content,Перейти до вмісту
-!important is only meant for --wk-* properties; it makes the rule hard to override.,!important призначений лише для властивостей --wk-*: через нього правило важко перевизначити.
+!important makes this rule very hard to change later; avoid it unless you really need it.,!important робить це правило дуже важко змінити пізніше; не використовуйте його без потреби.
 '!' is only allowed as !important at the end of a value.,'!' дозволено лише як !important в кінці значення.
 '{0}' is never closed.,'{0}' не закрито.
-"'{0}' is not allowed anywhere in the CSS, because it could end the style element.","'{0}' заборонено в будь-якому місці CSS, бо воно може закрити елемент style."
+"'{0}' is not allowed anywhere in the CSS, because it could break the page.","'{0}' заборонено в будь-якому місці CSS, бо воно може зламати сторінку."
 '{0}' is not allowed in a @supports condition.,'{0}' заборонено в умові @supports.
 '{0}' is not allowed in a media query.,'{0}' заборонено в медіазапиті.
-@font-face may only use local() sources.,@font-face може використовувати лише джерела local().
+@font-face may only use fonts that are already on the visitor's device (local()).,"@font-face може використовувати лише шрифти, які вже є на пристрої відвідувача (local())."
 A colour is written as #rrggbb.,Колір записується як #rrggbb.
 "A draft is waiting. Saving this page publishes the values on the page, not the draft.","Є чернетка. Збереження цієї сторінки публікує значення зі сторінки, а не чернетку."
 A script URL is not allowed.,Адреса зі скриптом заборонена.
@@ -39,8 +39,8 @@ Button,Кнопка
 Buttons,Кнопки
 Cards,Картки
 Cards and bands,Картки та смуги
-Check the CSS on the server,Перевірити CSS на сервері
-Checked when you type and again on save. It is linked after the theme and only from public pages.,Перевіряється під час набору і ще раз під час збереження. Підключається після теми і лише на публічних сторінках.
+Check the CSS,Перевірити CSS
+"For web designers. Your rules are checked as you type and again when you save. They apply to the public pages of the site only, on top of the chosen theme.","Для веб-дизайнерів. Ваші правила перевіряються під час набору і ще раз під час збереження. Вони діють лише на публічних сторінках сайту, поверх вибраної теми."
 Clear,Чиста,Website Kit theme
 Colours,Кольори
 Contrast,Контраст
@@ -48,10 +48,10 @@ Copy a ready-made theme,Скопіювати готову тему
 Corner radius,Заокруглення кутів
 Custom,Власна,Website Kit theme
 Custom CSS help,Довідка про власний CSS
-Custom CSS is switched off for this site by the operator; it is saved but not applied.,"Оператор вимкнув власний CSS для цього сайту: його можна зберегти, але він не застосовується."
+Custom CSS is not available on this site: what you enter is saved but not applied.,"Власний CSS на цьому сайті недоступний: введене зберігається, але не застосовується."
 Custom CSS messages,Повідомлення про власний CSS
 Custom CSS reset,Власний CSS скинуто
-Custom properties must start with --wk- or --cx-.,Власні властивості мають починатися з --wk- або --cx-.
+Names of your own variables must start with --cx-; names that start with --wk- belong to the theme.,Назви ваших власних змінних мають починатися з --cx-; назви з --wk- належать темі.
 Custom theme controls,Керування власною темою
 Custom theme editor,Редактор власної теми
 Custom theme starts from,Власна тема походить від
@@ -65,19 +65,19 @@ Draft saved,Чернетку збережено
 Errors,Помилки
 Expected 'property: value'.,Очікується 'властивість: значення'.
 Expected '{' after the rule.,Після правила очікується '{'.
-Hash,Хеш
+Version code,Код версії
 Heading font,Шрифт заголовків
-Leave safe mode,Вийти з безпечного режиму
+Show Custom CSS again,Знову показати власний CSS
 Ledger,Облік,Website Kit theme
 Links,Посилання
 Live preview,Попередній перегляд
 Low contrast,Низький контраст
 Market,Ринок
-Names in the Custom CSS that this kit version does not know.,"Назви у власному CSS, яких ця версія набору не знає."
+Parts of your Custom CSS that this version of Website Kit no longer recognises.,"Частини вашого власного CSS, яких ця версія Website Kit більше не розпізнає."
 Nested rules are not allowed.,Вкладені правила заборонені.
 Night,Ніч
 Notes on the Custom CSS,Примітки до власного CSS
-"Only /files/ and /assets/ paths and small image data: URLs are allowed, not '{0}'.","Дозволені лише шляхи /files/ і /assets/ та малі зображення у вигляді data:, а не '{0}'."
+"Only pictures and fonts from the files of this site, and very small embedded images, are allowed here, not '{0}'.","Тут дозволені лише зображення й шрифти з файлів цього сайту та дуже малі вбудовані зображення, а не '{0}'."
 Open the draft on the site,Відкрити чернетку на сайті
 Open the site with the draft,Відкрити сайт із чернеткою
 Page background,Тло сторінки
@@ -89,14 +89,13 @@ Primary (buttons),Основний (кнопки)
 Reason,Причина
 Remove the Custom CSS and save? The old CSS stays in the versions.,Прибрати власний CSS і зберегти? Старий CSS залишиться у версіях.
 Reset Custom CSS,Скинути власний CSS
-Reset to preset,Скинути до готової теми
-Reset to the preset,Скинуто до готової теми
+Reset to the ready-made theme,Скинути до готової теми
 Restore,Відновити
 Restore a version,Відновити версію
 Restored a version,Відновлено версію
 "Retail, shops and food: warm off-white, one warm accent, Lora headings with Source Sans 3, raised cards, pill buttons.","Роздріб, магазини та їжа: теплий білий, один теплий акцент, заголовки Lora з Source Sans 3, піднесені картки, круглі кнопки."
 Rules are nested deeper than {0} levels.,Правила вкладені глибше ніж на {0} рівні.
-Safe mode file,Файл безпечного режиму
+Style sheet without Custom CSS,Таблиця стилів без власного CSS
 Save as draft,Зберегти як чернетку
 Saved,Збережено
 Saved at,Збережено о
@@ -120,9 +119,9 @@ The CSS is valid,CSS коректний
 The Custom CSS was rejected,Власний CSS відхилено
 The at-rule @{0} is not allowed.,Правило @{0} заборонене.
 The character U+{0} (control or invisible) is not allowed.,Символ U+{0} (керівний або невидимий) заборонений.
-The class .{0} is not part of this kit version.,Клас .{0} не входить до цієї версії набору.
+The class .{0} is not known to this version of Website Kit and may have no effect.,Клас .{0} невідомий цій версії Website Kit і може не діяти.
 The comment is never closed.,Коментар не закрито.
-The custom property {0} is not a token of this kit version.,Власна властивість {0} не є токеном цієї версії набору.
+The variable {0} is not known to this version of Website Kit and may have no effect.,Змінна {0} невідома цій версії Website Kit і може не діяти.
 The draft is ready. Open the site while you are logged in as a Website Manager to see it; visitors do not see it.,"Чернетка готова. Відкрийте сайт, увійшовши як Website Manager, щоб її побачити; відвідувачі її не бачать."
 The function {0}() is not allowed.,Функція {0}() заборонена.
 The last 20 saved looks. Restoring one saves it as a new version.,Останні 20 збережених виглядів. Відновлення зберігає вибраний як нову версію.
@@ -130,12 +129,12 @@ The name of a @keyframes rule must start with cx-.,Назва правила @ke
 The property '{0}' is not allowed.,Властивість '{0}' заборонена.
 The pseudo-class or pseudo-element '{0}' is not allowed.,Псевдоклас або псевдоелемент '{0}' заборонений.
 The selector is empty.,Селектор порожній.
-The selector part '{0}' could match the Desk or the system UI.,Частина селектора '{0}' може зачепити Desk або системний інтерфейс.
+"The selector part '{0}' could change the editing screens of the site, which is not allowed.","Частина селектора '{0}' може змінити екрани редагування сайту, що заборонено."
 The string is never closed.,Рядок не закрито.
 "The text colour and the background have a contrast of {0}:1, below 4.5:1.","Контраст кольору тексту й тла {0}:1, нижче 4,5:1."
 The url( is never closed.,url( не закрито.
 The url() is malformed.,url() має хибний формат.
-Theme API version,Версія API теми
+Theme format version,Версія формату теми
 Theme cards,Картки тем
 Themes,Теми
 There are no saved versions yet.,Збережених версій ще немає.
@@ -149,7 +148,9 @@ Versions,Версії
 View without Custom CSS,Переглянути без власного CSS
 Warnings,Попередження
 Website Kit Theme Version,Версія теми Website Kit
-"Written after the theme and linked only from the public pages, never from the Desk. Allowed: @media, @supports, @font-face (local fonts), @keyframes cx-*, most layout, colour and type properties, custom properties --wk-* and --cx-*, and url() to /files/ and /assets/ only. Selectors on internal classes or on Frappe and Webshop markup are outside the theming contract and may change in a release.","Записується після теми і підключається лише на публічних сторінках, ніколи в Desk. Дозволено: @media, @supports, @font-face (локальні шрифти), @keyframes cx-*, більшість властивостей розмітки, кольору й шрифту, власні властивості --wk-* і --cx-*, а url() лише на /files/ і /assets/. Селектори на внутрішні класи або на розмітку Frappe і Webshop не входять до контракту теми і можуть змінитися в релізі."
+"Your rules are added after the theme and apply to the public pages of the site only, never to the editing screens. You can adjust layout, colours, text and fonts. Pictures can come only from the files of this site. Rules aimed at the inner parts of the site's pages are not guaranteed: they may stop working after an update.","Ваші правила додаються після теми й діють лише на публічних сторінках сайту, ніколи на екранах редагування. Можна змінювати розмітку, кольори, текст і шрифти. Зображення можуть братися лише з файлів цього сайту. Правила, націлені на внутрішні частини сторінок сайту, не гарантовані: після оновлення вони можуть перестати працювати."
+For advanced readers,Для досвідчених читачів
+"Allowed: @media, @supports, @font-face (local fonts), @keyframes cx-*, most layout, colour and type properties, custom properties --wk-* (the theme's own) and --cx-* (yours), and url() to /files/ and /assets/ only. Selectors on internal classes or on Frappe and Webshop markup are outside the theming contract and may change in a release.","Дозволено: @media, @supports, @font-face (локальні шрифти), @keyframes cx-*, більшість властивостей розмітки, кольору й шрифту, власні властивості --wk-* (самої теми) і --cx-* (ваші), а url() лише на /files/ і /assets/. Селектори на внутрішні класи або на розмітку Frappe і Webshop не входять до контракту теми і можуть змінитися в релізі."
 Your company,Ваша компанія
 Your own colours and sizes are dropped when you pick a ready-made theme. Continue?,"Ваші кольори та розміри буде скинуто, якщо обрати готову тему. Продовжити?"
 accent on background,акцент на тлі
@@ -206,7 +207,7 @@ Load sample products,Завантажити зразкові товари
 Personalize this site,Персоналізувати цей сайт
 Published products,Опубліковані товари
 Remove sample products,Видалити зразкові товари
-Sample products are non-stock items with pictures drawn by the kit. Removing them deletes exactly those records and leaves no stock or accounting entries.,"Зразкові товари є нескладськими позиціями з малюнками, які створює набір. Видалення прибирає саме ці записи і не залишає складських чи бухгалтерських проводок."
+Sample products are demonstration products with simple pictures. They do not affect your stock or accounts. Removing them deletes only these sample products.,Зразкові товари — це демонстраційні товари з простими малюнками. Вони не впливають на ваші склад і облік. Видалення прибирає лише ці зразкові товари.
 Setting up the website,Налаштування вебсайту
 Shop actions,Дії магазину
 Shop and existing sites,Магазин та наявні сайти
@@ -219,31 +220,37 @@ There is no enabled selling price list in {0}.,Немає увімкненого
 sample products,зразкові товари
 Shop,Магазин
 "Brackets, parentheses and functions are nested deeper than {0} levels.",Дужки та функції вкладені глибше ніж на {0} рівнів.
-"var() is not allowed in '{0}', because a custom property could carry an external address.","var() заборонений у '{0}', бо власна властивість може містити зовнішню адресу."
+"var() is not allowed in '{0}', because a variable could point to an address outside this site.","var() заборонений у '{0}', бо змінна може вказувати на адресу поза цим сайтом."
 Contact e-mail,Контактна пошта
-Shown on the Contact page and in the footer. The contact form sends its messages to this address (Contact Us Settings). An address at foss.ua is refused.,Показується на сторінці «Контакти» та в підвалі. Форма зв'язку надсилає повідомлення на цю адресу (Contact Us Settings). Адреса в домені foss.ua не приймається.
+Shown on the Contact page and in the footer. Messages from the contact form are sent to this address. Use your own address: addresses at foss.ua are not accepted.,Показується на сторінці «Контакти» та в підвалі. Повідомлення з форми зв'язку надходять на цю адресу. Вкажіть власну адресу: адреси в домені foss.ua не приймаються.
 Contact phone,Контактний телефон
 Shown on the Contact page and in the footer.,Показується на сторінці «Контакти» та в підвалі.
 Address,Адреса
 "Shown on the Contact page and in the footer, one line per row.","Показується на сторінці «Контакти» та в підвалі, кожен рядок окремо."
 Data controller name,Назва володільця даних
-The full name of the person or company that is responsible for the data collected on the site. It is written on the Privacy page; until you enter it the page shows a placeholder.,"Повна назва особи чи компанії, що відповідає за дані, зібрані на сайті. Вона вказується на сторінці конфіденційності; доки її не введено, сторінка показує заповнювач."
+"The full name of the person or company that is responsible for the data collected on the site. It is shown on the Privacy page; until you enter it, the page shows a reminder in square brackets.","Повна назва особи чи компанії, що відповідає за дані, зібрані на сайті. Вона показується на сторінці конфіденційності; доки її не введено, сторінка показує нагадування у квадратних дужках."
 Contact form,Форма зв'язку
-"The form is shown only when the guard app (frappe_guard) is installed and set to enforce for the contact action (site config guard_mode), and has reCAPTCHA v3 keys for this site's address. Enter the keys of your own domain here (register it at google.com/recaptcha); on a site address that ends in erp-crm.org the keys of the platform are used while these fields are empty. Otherwise the Contact page shows your e-mail and phone instead of the form.","Форма показується, лише коли встановлено застосунок захисту (frappe_guard) у режимі enforce для дії contact (guard_mode у конфігурації сайту) і є ключі reCAPTCHA v3 для адреси цього сайту. Введіть тут ключі власного домену (зареєструйте його на google.com/recaptcha); на адресі сайту, що закінчується на erp-crm.org, поки ці поля порожні, діють ключі платформи. Інакше сторінка «Контакти» показує вашу пошту й телефон замість форми."
+"The contact form appears on the Contact page only when spam protection is switched on for your site and reCAPTCHA keys are available. Enter the keys for your own domain here (you can register it at google.com/recaptcha). On a site address that ends in erp-crm.org, the keys of the platform are used while these fields are empty. Until the form can work, the Contact page shows your e-mail and phone instead. The status below tells you why the form is not shown.","Форма зв'язку з'являється на сторінці «Контакти», лише коли для вашого сайту ввімкнено захист від спаму і є ключі reCAPTCHA. Введіть тут ключі для власного домену (зареєструвати його можна на google.com/recaptcha). На адресі сайту, що закінчується на erp-crm.org, поки ці поля порожні, діють ключі платформи. Доки форма не може працювати, сторінка «Контакти» показує вашу пошту й телефон. Нижче в стані вказано, чому форму не показано."
 reCAPTCHA site key,Публічний ключ reCAPTCHA
-The public key of reCAPTCHA v3 for your domain.,Публічний ключ reCAPTCHA v3 для вашого домену.
+The public key from your reCAPTCHA registration for this domain (Google calls it the site key).,Публічний ключ з вашої реєстрації reCAPTCHA для цього домену (Google називає його site key).
 reCAPTCHA secret key,Секретний ключ reCAPTCHA
-The secret key of the same pair. It is stored encrypted and never shown.,Секретний ключ тієї ж пари. Він зберігається в зашифрованому вигляді й ніколи не показується.
+The secret key of the same pair. It is stored safely and never shown again.,Секретний ключ тієї ж пари. Він надійно зберігається й більше ніколи не показується.
 Notes on the standard pages,Примітки щодо стандартних сторінок
-Written when a new kit version could not replace a page or component that you edited.,"Записується, коли нова версія набору не могла замінити сторінку чи компонент, які ви редагували."
+Written when an update of Website Kit could not replace a page or a part of a page that you edited.,"Записується, коли оновлення Website Kit не могло замінити сторінку чи частину сторінки, які ви редагували."
 Standard pages state,Стан стандартних сторінок
-"What the kit last wrote into each standard page, component and script. Used to tell your edits from the kit's version.","Що набір востаннє записав у кожну стандартну сторінку, компонент і скрипт. За цим відрізняють ваші правки від версії набору."
+What Website Kit last wrote into each standard page and page part. Used to tell your edits from the kit's version.,Що Website Kit востаннє записав у кожну стандартну сторінку та частину сторінки. За цим відрізняють ваші правки від версії набору.
 Use your own e-mail address: the contact form never sends to this domain.,Вкажіть власну електронну адресу: форма зв'язку ніколи не надсилає на цей домен.
 The data controller name is too long (at most 140 characters).,Назва володільця даних задовга (щонайбільше 140 символів).
-"The reCAPTCHA site key looks wrong: it has letters, digits, - and _ only.","Публічний ключ reCAPTCHA має хибний вигляд: допускаються лише літери, цифри, - та _."
-"Enter both reCAPTCHA keys of the pair, or neither.",Введіть обидва ключі reCAPTCHA з пари або жодного.
+The reCAPTCHA site key looks wrong. Copy it again from your reCAPTCHA page.,Публічний ключ reCAPTCHA має хибний вигляд. Скопіюйте його ще раз зі сторінки reCAPTCHA.
+"Enter both reCAPTCHA keys, or leave both empty.",Введіть обидва ключі reCAPTCHA або залиште обидва порожніми.
 reCAPTCHA keys readable,Ключі reCAPTCHA читаються
 Contact form status,Стан форми зв'язку
+spam protection is not switched on for the contact form on this site,захист від спаму не ввімкнено для форми зв'язку на цьому сайті
+spam protection is not installed on this site,захист від спаму не встановлено на цьому сайті
+there are no reCAPTCHA keys: enter your own keys in the fields above,немає ключів reCAPTCHA: введіть власні ключі в полях вище
+there is no valid contact e-mail,немає чинної контактної пошти
+The contact form is available.,Форма зв'язку доступна.
+The contact form is not shown: {0}.,Форму зв'язку не показано: {0}.
 "Whether the contact form is shown, and why not.","Чи показується форма зв'язку, а якщо ні, то чому."
 "Enter one plain e-mail address, without a name or a list.","Введіть одну звичайну електронну адресу, без імені чи списку."
 Add a new address,Додати нову адресу
@@ -343,3 +350,4 @@ Full Name,Повне ім'я,Webshop page
 Message,Повідомлення,Webshop page
 Send,Надіслати,Webshop page
 Submit,Надіслати,Webshop page
+Details for support. You do not need to change anything here.,Подробиці для служби підтримки. Тут нічого змінювати не потрібно.

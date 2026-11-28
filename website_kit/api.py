@@ -137,7 +137,10 @@ def reset_to_preset() -> dict:
 	_guard()
 	settings = frappe.get_doc(SETTINGS)
 	preset = settings.custom_base or presets.DEFAULT_PRESET if settings.preset == presets.CUSTOM else settings.preset
-	_save({"preset": preset, "custom_base": "", "token_overrides": "", "custom_css": ""}, _("Reset to the preset"))
+	_save(
+		{"preset": preset, "custom_base": "", "token_overrides": "", "custom_css": ""},
+		_("Reset to the ready-made theme"),
+	)
 	return {"theme_hash": frappe.db.get_single_value(SETTINGS, "theme_hash")}
 
 

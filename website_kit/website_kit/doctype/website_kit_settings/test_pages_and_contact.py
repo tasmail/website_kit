@@ -444,7 +444,7 @@ class TestContactForm(KitTestCase):
 		self.assertNotIn("<form", html)
 		self.assertIn(f"mailto:{EMAIL}", html)
 		self.assertEqual(frappe.db.get_single_value("Contact Us Settings", "is_disabled"), 1)
-		self.assertIn("enforce", frappe.db.get_single_value(SETTINGS, "contact_form_status"))
+		self.assertIn("switched on", frappe.db.get_single_value(SETTINGS, "contact_form_status"))
 		self.assertNotIn("reCAPTCHA", visible_text(fetch("/privacy")[1]).replace("[", ""))
 
 	def test_the_contact_page_is_enabled_only_while_the_form_is_usable_and_disabled_again(self):

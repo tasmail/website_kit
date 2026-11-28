@@ -48,7 +48,7 @@
   {
    "fieldname": "hash",
    "fieldtype": "Data",
-   "label": "Hash",
+   "label": "Version code",
    "in_list_view": 1,
    "read_only": 1
   },
@@ -62,14 +62,14 @@
   {
    "fieldname": "api_version",
    "fieldtype": "Int",
-   "label": "Theme API version",
+   "label": "Theme format version",
    "read_only": 1,
    "hidden": 1
   },
   {
    "fieldname": "token_overrides",
    "fieldtype": "Code",
-   "label": "Token overrides",
+   "label": "Colour and style overrides",
    "options": "JSON",
    "read_only": 1,
    "hidden": 1
@@ -86,7 +86,7 @@
  "index_web_pages_for_search": 0,
  "istable": 1,
  "links": [],
- "modified": "2026-11-27 12:00:00.000000",
+ "modified": "2026-11-28 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Website Kit",
  "name": "Website Kit Theme Version",

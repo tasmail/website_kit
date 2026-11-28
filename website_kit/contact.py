@@ -4,6 +4,7 @@ Frappe-facing glue; the decisions are pure and live in `guard_keys.py` and `sett
 """
 
 import frappe
+from frappe import _
 
 from . import guard_keys, settings_sync
 
@@ -104,18 +105,18 @@ def before_request() -> None:
 def usable_without_host() -> tuple[bool, str]:
 	"""Whether the form can work on this site at all (independent of the request host), and the reason when it cannot."""
 	if not guard_installed():
-		return False, "the frappe_guard app is not installed"
+		return False, _("spam protection is not installed on this site")
 	if not guard_keys.contact_enforced(frappe.conf):
 		return (
 			False,
-			"the guard is not in enforce mode for the contact action (site config guard_mode or guard_actions)",
+			_("spam protection is not switched on for the contact form on this site"),
 		)
 	settings = kit_settings()
 	platform = frappe.conf.get(guard_keys.SITE_KEY) and frappe.conf.get(guard_keys.SECRET)
 	if not (own_keys_ok() or platform):
-		return False, "there are no reCAPTCHA keys (enter your own keys, or the platform has to provide them)"
+		return False, _("there are no reCAPTCHA keys: enter your own keys in the fields above")
 	if not guard_keys.single_recipient(settings.contact_email if settings else ""):
-		return False, "there is no valid contact e-mail"
+		return False, _("there is no valid contact e-mail")
 	return True, ""
 
 
@@ -133,7 +134,7 @@ def sync_contact_settings(contact_email, previous_email=None) -> dict:
 		doc.update(changes)
 		doc.save(ignore_permissions=True)
 	result = {f"contact_us_settings.{field}": "set" for field in changes}
-	status = "The contact form is available." if usable else f"The contact form is not shown: {reason}."
+	status = _("The contact form is available.") if usable else _("The contact form is not shown: {0}.").format(reason)
 	if (frappe.db.get_single_value(SETTINGS, "contact_form_status") or "") != status:
 		frappe.db.set_single_value(SETTINGS, "contact_form_status", status)
 		frappe.clear_document_cache(SETTINGS, SETTINGS)

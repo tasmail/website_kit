@@ -383,9 +383,11 @@
 		const enabled = wk.data.custom_css_enabled;
 		const limits = wk.data.limits;
 		frm.fields_dict.css_help.$wrapper.html(
-			`<p class="text-muted small" style="margin:0 0 8px">${__("Written after the theme and linked only from the public pages, never from the Desk. Allowed: @media, @supports, @font-face (local fonts), @keyframes cx-*, most layout, colour and type properties, custom properties --wk-* and --cx-*, and url() to /files/ and /assets/ only. Selectors on internal classes or on Frappe and Webshop markup are outside the theming contract and may change in a release.")}
-			(${__("At most {0} KB.").replace("{0}", Math.floor(limits.max_bytes / 1024))})</p>` +
-				(enabled ? "" : `<p class="text-danger small">${__("Custom CSS is switched off for this site by the operator; it is saved but not applied.")}</p>`)
+			`<p class="text-muted small" style="margin:0 0 8px">${__("Your rules are added after the theme and apply to the public pages of the site only, never to the editing screens. You can adjust layout, colours, text and fonts. Pictures can come only from the files of this site. Rules aimed at the inner parts of the site's pages are not guaranteed: they may stop working after an update.")}
+			(${__("At most {0} KB.").replace("{0}", Math.floor(limits.max_bytes / 1024))})</p>
+			<details class="small text-muted" style="margin:0 0 8px"><summary>${__("For advanced readers")}</summary>
+			<p style="margin:6px 0 0">${__("Allowed: @media, @supports, @font-face (local fonts), @keyframes cx-*, most layout, colour and type properties, custom properties --wk-* (the theme's own) and --cx-* (yours), and url() to /files/ and /assets/ only. Selectors on internal classes or on Frappe and Webshop markup are outside the theming contract and may change in a release.")}</p></details>` +
+				(enabled ? "" : `<p class="text-danger small">${__("Custom CSS is not available on this site: what you enter is saved but not applied.")}</p>`)
 		);
 		frm.set_df_property("custom_css", "read_only", enabled ? 0 : 1);
 	}
@@ -453,15 +455,15 @@
 			}, group);
 		}
 		frm.add_custom_button(__("View without Custom CSS"), () => window.open("/?wk_safe=1", "_blank", "noopener"), group);
-		frm.add_custom_button(__("Leave safe mode"), () => window.open("/?wk_safe=0", "_blank", "noopener"), group);
-		frm.add_custom_button(__("Check the CSS on the server"), async () => {
+		frm.add_custom_button(__("Show Custom CSS again"), () => window.open("/?wk_safe=0", "_blank", "noopener"), group);
+		frm.add_custom_button(__("Check the CSS"), async () => {
 			const result = await frappe.xcall(API + "check_css", { custom_css: frm.doc.custom_css || "" });
 			show_messages(frm, result.errors, result.warnings, "");
 			if (result.ok) frappe.show_alert({ message: __("The CSS is valid"), indicator: "green" });
 		}, group);
 		frm.add_custom_button(__("Restore a version"), () => restore_dialog(frm), group);
 		frm.add_custom_button(__("Reset Custom CSS"), () => reset(frm, "reset_custom_css", __("Remove the Custom CSS and save? The old CSS stays in the versions.")), group);
-		frm.add_custom_button(__("Reset to preset"), () => reset(frm, "reset_to_preset", __("Drop your own colours, sizes and Custom CSS and save? They stay in the versions.")), group);
+		frm.add_custom_button(__("Reset to the ready-made theme"), () => reset(frm, "reset_to_preset", __("Drop your own colours, sizes and Custom CSS and save? They stay in the versions.")), group);
 	}
 
 	function reset(frm, method, question) {
@@ -510,7 +512,7 @@
 			lines.push(`<p>${status.enabled ? `<span class="indicator-pill green">${__("The shop is on")}</span>` : `<span class="indicator-pill gray">${__("The shop is off")}</span>`}
 				${__("Published products")}: <b>${status.published}</b>; ${__("sample products")}: <b>${status.samples}</b>.
 				${status.published ? "" : __("The Shop link stays out of the menu while there are no published products.")}</p>
-				<p class="text-muted small">${__("Sample products are non-stock items with pictures drawn by the kit. Removing them deletes exactly those records and leaves no stock or accounting entries.")}</p>
+				<p class="text-muted small">${__("Sample products are demonstration products with simple pictures. They do not affect your stock or accounts. Removing them deletes only these sample products.")}</p>
 				<div class="wk-shop-buttons" style="display:flex;gap:8px;flex-wrap:wrap">
 				<button type="button" class="btn btn-default btn-sm" data-act="enable_shop">${__("Enable shop")}</button>
 				<button type="button" class="btn btn-default btn-sm" data-act="load_samples">${__("Load sample products")}</button>
