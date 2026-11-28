@@ -173,7 +173,7 @@ class TestThemeSettings(TestCase):
 		doc = settings()
 		self.assertEqual((doc.preset, doc.token_overrides, doc.custom_css), ("market", "", ""))
 		self.assertEqual(doc.theme_hash, compiler.build("market")[1])
-		self.assertEqual(doc.versions[-1].reason, "Reset to the preset")
+		self.assertEqual(doc.versions[-1].reason, "Reset to the ready-made theme")
 
 	def test_the_custom_theme_keeps_its_base_and_is_frozen(self):
 		values = api.duplicate_as_custom("night", "", "")

@@ -8,3 +8,4 @@ website_kit.patches.v0_3.use_stock_website_theme
 website_kit.patches.v0_3.refresh_content_0_3_1
 website_kit.patches.v0_3.clear_page_cache_0_3_2
 website_kit.patches.v0_3.refresh_content_0_3_3
+website_kit.patches.v0_3.refresh_content_0_3_4

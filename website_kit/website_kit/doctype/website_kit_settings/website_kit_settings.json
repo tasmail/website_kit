@@ -79,7 +79,7 @@
    "fieldname": "brand_name",
    "fieldtype": "Data",
    "label": "Brand name",
-   "description": "Shown in the header. Empty: the app name of Website Settings."
+   "description": "Shown in the header of the site. If empty, the name set in Website Settings is used."
   },
   {
    "fieldname": "contacts_section",
@@ -91,7 +91,7 @@
    "fieldtype": "Data",
    "options": "Email",
    "label": "Contact e-mail",
-   "description": "Shown on the Contact page and in the footer. The contact form sends its messages to this address (Contact Us Settings). An address at foss.ua is refused."
+   "description": "Shown on the Contact page and in the footer. Messages from the contact form are sent to this address. Use your own address: addresses at foss.ua are not accepted."
   },
   {
    "fieldname": "contact_phone",
@@ -110,25 +110,25 @@
    "fieldname": "controller_name",
    "fieldtype": "Data",
    "label": "Data controller name",
-   "description": "The full name of the person or company that is responsible for the data collected on the site. It is written on the Privacy page; until you enter it the page shows a placeholder."
+   "description": "The full name of the person or company that is responsible for the data collected on the site. It is shown on the Privacy page; until you enter it, the page shows a reminder in square brackets."
   },
   {
    "fieldname": "form_section",
    "fieldtype": "Section Break",
    "label": "Contact form",
-   "description": "The form is shown only when the guard app (frappe_guard) is installed and set to enforce for the contact action (site config guard_mode), and has reCAPTCHA v3 keys for this site's address. Enter the keys of your own domain here (register it at google.com/recaptcha); on a site address that ends in erp-crm.org the keys of the platform are used while these fields are empty. Otherwise the Contact page shows your e-mail and phone instead of the form."
+   "description": "The contact form appears on the Contact page only when spam protection is switched on for your site and reCAPTCHA keys are available. Enter the keys for your own domain here (you can register it at google.com/recaptcha). On a site address that ends in erp-crm.org, the keys of the platform are used while these fields are empty. Until the form can work, the Contact page shows your e-mail and phone instead. The status below tells you why the form is not shown."
   },
   {
    "fieldname": "recaptcha_site_key",
    "fieldtype": "Data",
    "label": "reCAPTCHA site key",
-   "description": "The public key of reCAPTCHA v3 for your domain."
+   "description": "The public key from your reCAPTCHA registration for this domain (Google calls it the site key)."
   },
   {
    "fieldname": "recaptcha_secret",
    "fieldtype": "Password",
    "label": "reCAPTCHA secret key",
-   "description": "The secret key of the same pair. It is stored encrypted and never shown."
+   "description": "The secret key of the same pair. It is stored safely and never shown again."
   },
   {
    "fieldname": "recaptcha_keys_ok",
@@ -181,7 +181,7 @@
    "fieldtype": "Code",
    "label": "Custom CSS",
    "options": "CSS",
-   "description": "Checked when you type and again on save. It is linked after the theme and only from public pages."
+   "description": "For web designers. Your rules are checked as you type and again when you save. They apply to the public pages of the site only, on top of the chosen theme."
   },
   {
    "fieldname": "css_messages",
@@ -223,7 +223,7 @@
    "fieldtype": "Check",
    "label": "Allow search engines",
    "default": "0",
-   "description": "Off: the site sends X-Robots-Tag noindex and robots.txt disallows everything."
+   "description": "Off: the site asks search engines such as Google not to list any of its pages, so it does not appear in search results. On: search engines may list the public pages."
   },
   {
    "fieldname": "advanced_section",
@@ -234,9 +234,9 @@
   {
    "fieldname": "token_overrides",
    "fieldtype": "Code",
-   "label": "Token overrides",
+   "label": "Colour and style overrides",
    "options": "JSON",
-   "description": "JSON with the values that differ from the preset: {\"tokens\": {\"color-primary\": \"#1d4ed8\"}, \"variants\": {\"card\": \"raised\"}}."
+   "description": "For advanced users. The values that differ from the chosen theme, written as text; the Custom theme editor fills them in for you. Example: {\"tokens\": {\"color-primary\": \"#1d4ed8\"}, \"variants\": {\"card\": \"raised\"}}."
   },
   {
    "fieldname": "draft_state",
@@ -256,45 +256,49 @@
    "fieldname": "status_section",
    "fieldtype": "Section Break",
    "label": "Status",
-   "collapsible": 1
+   "collapsible": 1,
+   "description": "Details for support. You do not need to change anything here."
   },
   {
    "fieldname": "kit_version",
    "fieldtype": "Data",
-   "label": "Applied kit version",
+   "label": "Applied Website Kit version",
    "read_only": 1
   },
   {
    "fieldname": "theme_hash",
    "fieldtype": "Data",
-   "label": "Theme file hash",
-   "read_only": 1
+   "label": "Theme version code",
+   "read_only": 1,
+   "hidden": 1
   },
   {
    "fieldname": "theme_file_url",
    "fieldtype": "Data",
-   "label": "Theme file",
-   "read_only": 1
+   "label": "Theme style sheet",
+   "read_only": 1,
+   "hidden": 1
   },
   {
    "fieldname": "safe_file_url",
    "fieldtype": "Data",
-   "label": "Safe mode file",
-   "read_only": 1
+   "label": "Style sheet without Custom CSS",
+   "read_only": 1,
+   "hidden": 1
   },
   {
    "fieldname": "css_notes",
    "fieldtype": "Small Text",
    "label": "Notes on the Custom CSS",
    "read_only": 1,
-   "description": "Names in the Custom CSS that this kit version does not know."
+   "description": "Parts of your Custom CSS that this version of Website Kit no longer recognises."
   },
   {
    "fieldname": "pages_note",
    "fieldtype": "Small Text",
    "label": "Notes on the standard pages",
    "read_only": 1,
-   "description": "Written when a new kit version could not replace a page or component that you edited."
+   "description": "Written when an update of Website Kit could not replace a page or a part of a page that you edited."
   },
   {
    "fieldname": "pages_state",
@@ -302,13 +306,14 @@
    "options": "JSON",
    "label": "Standard pages state",
    "read_only": 1,
-   "description": "What the kit last wrote into each standard page, component and script. Used to tell your edits from the kit's version."
+   "hidden": 1,
+   "description": "What Website Kit last wrote into each standard page and page part. Used to tell your edits from the kit's version."
   }
  ],
  "index_web_pages_for_search": 0,
  "issingle": 1,
  "links": [],
- "modified": "2026-11-27 12:00:00.000000",
+ "modified": "2026-11-28 12:00:00.000000",
  "modified_by": "Administrator",
  "module": "Website Kit",
  "name": "Website Kit Settings",

@@ -359,6 +359,11 @@ def privacy_body(ids, lang):
 		raw(ids, call("wk_privacy_captcha", lang), name="captcha"),
 		stack(
 			ids,
+			[heading(ids, 2, t["privacy_language_title"]), paragraph(ids, t["privacy_language_text"])],
+			gap=1.5,
+		),
+		stack(
+			ids,
 			[
 				heading(ids, 2, t["privacy4_title"]),
 				paragraph(ids, t["privacy4_text"]),

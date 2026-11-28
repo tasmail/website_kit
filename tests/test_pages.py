@@ -347,3 +347,20 @@ def test_instance_helper_applies_overrides():
 def test_digest_depends_on_content_only():
 	assert blocks.digest({"a": 1}) == blocks.digest({"a": 1}) != blocks.digest({"a": 2})
 	assert blocks.clone({"a": [1]}) == {"a": [1]}
+
+
+LANGUAGE_SENTENCES = {
+	"uk": "Сайт запам'ятовує в браузері мову, яку ви обрали, щоб наступні сторінки відкривалися нею. Більше нічого для цього не зберігається.",
+	"en": "The site remembers the language you choose in your browser, so the next pages open in it. Nothing else is stored for this.",
+}
+
+
+@pytest.mark.parametrize("lang", ["uk", "en"])
+def test_the_privacy_page_says_in_plain_words_that_the_language_choice_is_remembered(lang):
+	"""A neutral sentence for visitors: no cookie name, no attribute, no framework."""
+	assert content.TEXT[lang]["privacy_language_text"] == LANGUAGE_SENTENCES[lang]
+	for spec in specs.page_specs():
+		if spec["key"] == "privacy" and spec["lang"] == lang:
+			assert LANGUAGE_SENTENCES[lang] in spec["fields"]["blocks"]
+	for word in ("preferred_language", "SameSite", "max-age", "Frappe", "JavaScript", "cookie"):
+		assert word.lower() not in LANGUAGE_SENTENCES[lang].lower()

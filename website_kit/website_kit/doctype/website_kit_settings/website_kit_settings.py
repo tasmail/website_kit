@@ -63,9 +63,9 @@ class WebsiteKitSettings(Document):
 	def validate_recaptcha(self):
 		self.recaptcha_site_key = (self.recaptcha_site_key or "").strip()
 		if self.recaptcha_site_key and not guard_keys.valid_key(self.recaptcha_site_key):
-			frappe.throw(_("The reCAPTCHA site key looks wrong: it has letters, digits, - and _ only."))
+			frappe.throw(_("The reCAPTCHA site key looks wrong. Copy it again from your reCAPTCHA page."))
 		if bool(self.recaptcha_site_key) != bool(self.recaptcha_secret):
-			frappe.throw(_("Enter both reCAPTCHA keys of the pair, or neither."))
+			frappe.throw(_("Enter both reCAPTCHA keys, or leave both empty."))
 
 	def on_update(self):
 		# The render path cannot read a password, so whether the pair is readable is recorded here.

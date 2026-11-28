@@ -160,7 +160,13 @@ def _site_items(lang) -> list:
 
 
 def _request_path() -> str:
-	"""The path of the page being rendered (no query), empty outside a request."""
+	"""The path of the page being rendered (no query), empty outside a request.
+
+	`frappe.local.path` is what Frappe resolved the request to (`/about.html` and `/index` are already the page they stand for),
+	so it comes first; the raw request path is the fallback when Frappe has not set it."""
+	resolved = getattr(frappe.local, "path", "") or ""
+	if resolved:
+		return resolved
 	request = getattr(frappe.local, "request", None)
 	return (getattr(request, "path", "") or "") if request else ""
 
